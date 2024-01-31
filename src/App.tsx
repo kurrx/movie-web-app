@@ -4,8 +4,10 @@ import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { store, useAppTheme } from '@/features'
+import { useAppViewport } from '@/hooks'
 
 export function App() {
+  useAppViewport()
   useAppTheme()
 
   return (
