@@ -22,3 +22,7 @@ export function disableReactDevtools() {
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export function mediaQuery(query: string) {
+  return window.matchMedia(query).matches
+}
