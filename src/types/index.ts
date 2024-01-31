@@ -1,2 +1,2 @@
-export type * from './store'
-export type * from './theme'
+export type * from './store.types'
+export type * from './theme.types'
