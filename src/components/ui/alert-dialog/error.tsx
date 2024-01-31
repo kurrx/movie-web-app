@@ -17,7 +17,7 @@ export interface AlertErrorDialogProps {
   error?: SerializedError | null
   dismissible?: boolean
   onClose?: () => void
-  onReload: () => void
+  onReload?: () => void
 }
 
 export function AlertErrorDialog(props: AlertErrorDialogProps) {
