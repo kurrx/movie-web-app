@@ -1,4 +1,4 @@
-import { trimStr } from '@/api'
+import { trimStr } from '@/api/utils'
 import { Conditional } from '@/types'
 
 export class Parser {
