@@ -1,3 +1,6 @@
+import clsx, { ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
 
@@ -14,4 +17,8 @@ export function disableReactDevtools() {
     }
     globalHook[prop] = typeof globalHook[prop] === 'function' ? noop : null
   }
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
