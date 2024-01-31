@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Footer, Navbar, TooltipProvider } from '@/components'
 import { FeaturesProvider, store } from '@/features'
 import { useAppViewport } from '@/hooks'
+import { VPNMiddleware } from '@/middlewares'
 import { HomeView, RedirectView } from '@/views'
 
 export function App() {
@@ -18,10 +19,12 @@ export function App() {
           <FeaturesProvider>
             <Navbar />
             <main id='content'>
-              <Routes>
-                <Route path='/' element={<HomeView />} />
-                <Route path='*' element={<RedirectView to='/' />} />
-              </Routes>
+              <VPNMiddleware>
+                <Routes>
+                  <Route path='/' element={<HomeView />} />
+                  <Route path='*' element={<RedirectView to='/' />} />
+                </Routes>
+              </VPNMiddleware>
             </main>
             <Footer />
           </FeaturesProvider>
