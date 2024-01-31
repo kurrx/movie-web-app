@@ -3,7 +3,7 @@ import '@/App.css'
 import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-import { TooltipProvider } from '@/components'
+import { Navbar, TooltipProvider } from '@/components'
 import { FeaturesProvider, store } from '@/features'
 import { useAppViewport } from '@/hooks'
 
@@ -15,6 +15,7 @@ export function App() {
       <FeaturesProvider>
         <TooltipProvider delayDuration={200}>
           <BrowserRouter>
+            <Navbar />
             <main id='content'>
               <Routes>
                 <Route path='*' element={null} />
