@@ -5,7 +5,7 @@ export interface NavigationItemCollection {
 
 export interface NavigationItem {
   title: string
-  genres: Record<string, string | undefined>
+  genres: Record<string, string>
   collections: NavigationItemCollection[]
 }
 
