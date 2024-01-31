@@ -3,7 +3,7 @@ import { useMediaQuery } from 'usehooks-ts'
 
 import { useStore } from '@/hooks'
 
-import { selectTheme, selectThemeType, setThemeIsDarkPrefered } from './theme.slice'
+import { selectTheme, selectThemeType, setThemeIsDarkPrefered } from '../theme.slice'
 
 export function useAppTheme() {
   const [dispatch, selector] = useStore()
