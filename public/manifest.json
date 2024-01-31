@@ -1,6 +1,6 @@
 {
-  "name": "KurrTV",
-  "short_name": "KurrTV",
+  "name": "TV",
+  "short_name": "TV",
   "description": "Movie and TV Shows App",
   "dir": "auto",
   "display": "standalone",
