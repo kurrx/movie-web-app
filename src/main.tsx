@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { disableReactDevtools, IS_PROD } from '@/api'
+import { App } from '@/App'
 
 if (IS_PROD) {
   disableReactDevtools()
@@ -10,4 +11,8 @@ if (IS_PROD) {
 const container = document.getElementById('app') as HTMLDivElement
 const root = createRoot(container)
 
-root.render(<StrictMode></StrictMode>)
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
