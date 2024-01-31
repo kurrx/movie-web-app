@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Footer, Navbar, TooltipProvider } from '@/components'
 import { FeaturesProvider, store } from '@/features'
 import { useAppViewport } from '@/hooks'
-import { RedirectView } from '@/views'
+import { HomeView, RedirectView } from '@/views'
 
 export function App() {
   useAppViewport()
@@ -19,7 +19,7 @@ export function App() {
             <Navbar />
             <main id='content'>
               <Routes>
-                <Route path='/' element={null} />
+                <Route path='/' element={<HomeView />} />
                 <Route path='*' element={<RedirectView to='/' />} />
               </Routes>
             </main>
