@@ -1,6 +1,5 @@
 import { Range, Root, Thumb, Track } from '@radix-ui/react-slider'
-import type { ComponentPropsWithoutRef, ElementRef } from 'react'
-import { forwardRef } from 'react'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 
 import { cn } from '@/api'
 
