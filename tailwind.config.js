@@ -79,7 +79,7 @@ module.exports = {
         fade: 'fade 0.5s linear forwards infinite alternate',
       },
       fontFamily: {
-        sans: [...defaultTheme.fontFamily.sans],
+        sans: ['Geist', ...defaultTheme.fontFamily.sans],
       },
     },
   },

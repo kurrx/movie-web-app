@@ -1,0 +1,81 @@
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Thin.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-UltraLight.otf') format('opentype'),
+    url('/fonts/Geist/Geist-UltraLight.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Light.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Regular.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Medium.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-SemiBold.otf') format('opentype'),
+    url('/fonts/Geist/Geist-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Bold.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-Black.otf') format('opentype'),
+    url('/fonts/Geist/Geist-Black.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Geist';
+  font-display: swap;
+  src:
+    url('/fonts/Geist/Geist-UltraBlack.otf') format('opentype'),
+    url('/fonts/Geist/Geist-UltraBlack.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
