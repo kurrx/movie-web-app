@@ -2,7 +2,8 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 
 import { cn } from '@/api'
 import { Button } from '@/components'
-import { Title } from '@/features'
+import { setSearchOpen, Title } from '@/features'
+import { useStoreBoolean } from '@/hooks'
 
 const classes = {
   root: cn('flex-1 flex flex-col container'),
@@ -29,6 +30,8 @@ const classes = {
 }
 
 export function HomeView() {
+  const { setTrue: open } = useStoreBoolean(setSearchOpen)
+
   return (
     <div className={classes.root}>
       <Title>Home</Title>
@@ -38,7 +41,7 @@ export function HomeView() {
           Your&nbsp;Seat. Your&nbsp;Show. Your&nbsp;Cinematic&nbsp;Journey.
         </p>
         <div className={classes.button.wrapper}>
-          <Button className={classes.button.root}>
+          <Button className={classes.button.root} onClick={open}>
             <MagnifyingGlassIcon className={classes.button.icon} /> Explore
           </Button>
         </div>
