@@ -3,9 +3,11 @@ import '@/App.css'
 import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-import { store } from '@/features'
+import { store, useAppTheme } from '@/features'
 
 export function App() {
+  useAppTheme()
+
   return (
     <StoreProvider store={store}>
       <BrowserRouter>
