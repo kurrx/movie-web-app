@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Navbar, TooltipProvider } from '@/components'
 import { FeaturesProvider, store } from '@/features'
 import { useAppViewport } from '@/hooks'
+import { RedirectView } from '@/views'
 
 export function App() {
   useAppViewport()
@@ -18,7 +19,8 @@ export function App() {
             <Navbar />
             <main id='content'>
               <Routes>
-                <Route path='*' element={null} />
+                <Route path='/' element={null} />
+                <Route path='*' element={<RedirectView to='/' />} />
               </Routes>
             </main>
           </BrowserRouter>
