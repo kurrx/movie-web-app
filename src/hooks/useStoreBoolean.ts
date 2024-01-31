@@ -5,7 +5,7 @@ import { useAppDispatch } from './useStore'
 
 export type UseStoreBooleanAction = ActionCreatorWithPayload<SetStateAction<boolean>, string>
 
-export function useBooleanStore(action: UseStoreBooleanAction) {
+export function useStoreBoolean(action: UseStoreBooleanAction) {
   const dispatch = useAppDispatch()
 
   const set = useCallback(
