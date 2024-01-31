@@ -1,3 +1,4 @@
+import { SerializedError } from '@reduxjs/toolkit'
 import axios, {
   AxiosInstance,
   AxiosResponse,
@@ -12,6 +13,8 @@ export class HTTP {
 
   constructor(config?: CreateAxiosDefaults) {
     this.instance = axios.create(config)
+    this.useRequest(HTTP.onRequestDefault, HTTP.onErrorDefault)
+    this.useResponse(HTTP.onResponseDefault, HTTP.onErrorDefault)
   }
 
   public construct() {
@@ -38,6 +41,24 @@ export class HTTP {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static onErrorDefault(err: any): any {
-    return Promise.reject(err)
+    const convertedError: SerializedError = {}
+    if (axios.isCancel(err)) {
+      convertedError.name = 'Request Cancelled'
+      convertedError.message = `Request has been cancelled for some reason, please refresh the page.`
+      convertedError.code = 'CANCELLED'
+    } else if (axios.isAxiosError(err)) {
+      convertedError.name = err.name
+      convertedError.message = err.response?.data?.message || err.message
+      convertedError.code = err.response?.status ? `${err.response.status}` : err.code
+    } else if (err instanceof Error) {
+      convertedError.name = err.name
+      convertedError.message = err.message
+      convertedError.code = 'ERROR'
+    } else {
+      convertedError.name = 'Unknown Error'
+      convertedError.message = 'Something went wrong! Try again later.'
+      convertedError.code = 'UNKNOWN'
+    }
+    return Promise.reject(convertedError)
   }
 }
