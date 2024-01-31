@@ -8,13 +8,13 @@ import axios, {
 
 import { OnRejected, OnRequestFulfilled, OnResponseFulfilled } from '@/types'
 
-export class HTTP {
+export class Request {
   private instance: AxiosInstance
 
   constructor(config?: CreateAxiosDefaults) {
     this.instance = axios.create(config)
-    this.useRequest(HTTP.onRequestDefault, HTTP.onErrorDefault)
-    this.useResponse(HTTP.onResponseDefault, HTTP.onErrorDefault)
+    this.useRequest(Request.onRequestDefault, Request.onErrorDefault)
+    this.useResponse(Request.onResponseDefault, Request.onErrorDefault)
   }
 
   public construct() {

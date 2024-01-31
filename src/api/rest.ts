@@ -1,11 +1,11 @@
 import { SerializedError } from '@reduxjs/toolkit'
 
-import { HTTP } from '@/core'
+import { Request } from '@/core'
 import { RequestArgs } from '@/types'
 
 import { API_URL, PROXY_IP } from './env'
 
-const api = new HTTP({
+const api = new Request({
   baseURL: API_URL,
   responseType: 'json',
   responseEncoding: 'utf-8',
