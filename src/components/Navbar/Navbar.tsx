@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom'
 
 import { APP_NAME, cn, SOCIAL_GITHUB_URL, SOCIAL_X_URL } from '@/api'
 import { GithubLogoIcon, LogoIcon, XLogoIcon } from '@/assets'
-import { explore, SearchButton, ThemeSwitcher } from '@/features'
-import { useElementRect } from '@/hooks'
+import { explore, SearchButton, selectSearchDisabled, ThemeSwitcher } from '@/features'
+import { useAppSelector, useElementRect } from '@/hooks'
 
 import { NavbarExplore } from './NavbarExplore'
 import { NavbarSocialLink } from './NavbarSocialLink'
@@ -34,6 +34,7 @@ const classes = {
 
 export function Navbar() {
   const ref = useRef<HTMLElement>(null)
+  const searchDisabled = useAppSelector(selectSearchDisabled)
 
   useElementRect(ref, 'navbar')
 
@@ -49,7 +50,7 @@ export function Navbar() {
 
         <div className={classes.content}>
           <div className={classes.search}>
-            <SearchButton />
+            <SearchButton disabled={searchDisabled} />
           </div>
           <div className={classes.socials.wrapper}>
             <NavbarSocialLink href={SOCIAL_GITHUB_URL} label='Github'>

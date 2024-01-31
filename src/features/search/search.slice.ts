@@ -82,7 +82,7 @@ const searchSlice = createSlice({
 export const { setSearchOpen, setSearchDisabled } = searchSlice.actions
 
 export const selectSearchOpen = (state: AppStoreState) => state.search.open
-export const selectSearchDisabled = (state: AppStoreState) => state.search.open
+export const selectSearchDisabled = (state: AppStoreState) => state.search.disabled
 export const selectSearchResult = (state: AppStoreState, query: string) =>
   state.search.queries.find((q) => q.query === query)
 

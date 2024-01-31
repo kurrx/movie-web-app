@@ -3,9 +3,12 @@ import { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'rea
 
 import { fetchIsVPNActive } from '@/api'
 import { FetchState } from '@/core'
+import { setSearchDisabled } from '@/features'
+import { useStoreBoolean } from '@/hooks'
 import { FallbackView } from '@/views'
 
 export function VPNMiddleware({ children }: PropsWithChildren) {
+  const { setFalse: enableSearch } = useStoreBoolean(setSearchDisabled)
   const [state, setState] = useState<FetchState>(FetchState.LOADING)
   const [error, setError] = useState<SerializedError | null>(null)
   const controller = useRef<AbortController | null>(null)
@@ -20,6 +23,7 @@ export function VPNMiddleware({ children }: PropsWithChildren) {
     fetchIsVPNActive({ signal: controller.current.signal })
       .then(() => {
         setState(FetchState.SUCCESS)
+        enableSearch()
       })
       .catch((err) => {
         if (err.code === 'CANCELLED') return
@@ -34,13 +38,14 @@ export function VPNMiddleware({ children }: PropsWithChildren) {
     return () => {
       controller.current?.abort()
     }
-  }, [])
+  }, [enableSearch])
 
   const onClose = useCallback(() => {
     setState(FetchState.SUCCESS)
     setError(null)
     controller.current = null
-  }, [])
+    enableSearch()
+  }, [enableSearch])
 
   useEffect(validate, [validate])
 
