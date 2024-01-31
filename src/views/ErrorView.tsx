@@ -23,12 +23,12 @@ export function ErrorView(props: ErrorViewProps) {
 
   return (
     <div className={classes.root}>
-      <Title>{docTitle || 'Not Found'}</Title>
+      <Title>{docTitle || 'Error'}</Title>
       <div className={classes.content}>
-        <h1 className={classes.title}>{title || '404'}</h1>
+        <h1 className={classes.title}>{title || 'Oops'}</h1>
         <Separator orientation='vertical' className='hidden sm:block' />
         <Separator orientation='horizontal' className='sm:hidden block' />
-        <p className={classes.subtitle}>{subtitle || 'Page not found.'}</p>
+        <p className={classes.subtitle}>{subtitle || 'Something went wrong.'}</p>
       </div>
     </div>
   )
