@@ -1,3 +1,3 @@
-export * from './FeaturesProvider'
+export * from './components'
 export * from './store'
 export * from './theme'
