@@ -3,9 +3,10 @@ import { NavLink } from 'react-router-dom'
 
 import { APP_NAME, cn, SOCIAL_GITHUB_URL, SOCIAL_X_URL } from '@/api'
 import { GithubLogoIcon, LogoIcon, XLogoIcon } from '@/assets'
-import { ThemeSwitcher } from '@/features'
+import { explore, ThemeSwitcher } from '@/features'
 import { useElementRect } from '@/hooks'
 
+import { NavbarExplore } from './NavbarExplore'
 import { NavbarSocialLink } from './NavbarSocialLink'
 
 const classes = {
@@ -39,12 +40,12 @@ export function Navbar() {
   return (
     <header ref={ref} className={classes.root}>
       <div className={classes.container}>
-        <div className={classes.logo.wrapper}>
+        <NavbarExplore navigation={explore}>
           <NavLink className={classes.logo.link} to='/'>
             <LogoIcon className={classes.logo.icon} />
             <span className={classes.logo.text}>{APP_NAME}</span>
           </NavLink>
-        </div>
+        </NavbarExplore>
 
         <div className={classes.content}>
           <div className={classes.search}></div>
