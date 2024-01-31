@@ -8,7 +8,7 @@ export type Selector = TypedUseSelectorHook<AppStoreState>
 export const useAppDispatch: Dispatch = useDispatch
 export const useAppSelector: Selector = useSelector
 
-export function useStore(): [ReturnType<Dispatch>, Selector] {
+export function useStore() {
   const dispatch = useAppDispatch()
-  return [dispatch, useAppSelector]
+  return [dispatch, useAppSelector] as const
 }
