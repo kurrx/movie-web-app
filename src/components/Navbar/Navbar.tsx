@@ -16,7 +16,7 @@ const classes = {
     wrapper: cn('mr-4 hidden md:flex'),
     link: cn(
       'md:mr-3 flex items-center space-x-2 focus-visible:outline-none',
-      'focus-visible:ring-2 focus-visible:ring-ring rounded-md',
+      'focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
     ),
     icon: cn('h-5 w-5'),
     text: cn('font-bold'),
