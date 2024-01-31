@@ -13,9 +13,9 @@ export function App() {
 
   return (
     <StoreProvider store={store}>
-      <FeaturesProvider>
-        <TooltipProvider delayDuration={200}>
-          <BrowserRouter>
+      <TooltipProvider delayDuration={200}>
+        <BrowserRouter>
+          <FeaturesProvider>
             <Navbar />
             <main id='content'>
               <Routes>
@@ -23,9 +23,9 @@ export function App() {
                 <Route path='*' element={<RedirectView to='/' />} />
               </Routes>
             </main>
-          </BrowserRouter>
-        </TooltipProvider>
-      </FeaturesProvider>
+          </FeaturesProvider>
+        </BrowserRouter>
+      </TooltipProvider>
     </StoreProvider>
   )
 }
