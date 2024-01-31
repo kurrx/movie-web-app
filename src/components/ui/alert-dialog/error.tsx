@@ -15,13 +15,13 @@ export interface AlertErrorDialogProps {
   description?: string
   open?: boolean
   error?: SerializedError | null
-  dissmisable?: boolean
+  dismissible?: boolean
   onClose?: () => void
   onReload: () => void
 }
 
 export function AlertErrorDialog(props: AlertErrorDialogProps) {
-  const { title, description, open, error, dissmisable, onClose, onReload } = props
+  const { title, description, open, error, dismissible, onClose, onReload } = props
   const [closed, setClosed] = useState(false)
   const isOpen = useMemo(() => open && !closed, [open, closed])
 
@@ -44,7 +44,7 @@ export function AlertErrorDialog(props: AlertErrorDialogProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          {dissmisable && <AlertDialogCancel onClick={closeHandler}>Close</AlertDialogCancel>}
+          {dismissible && <AlertDialogCancel onClick={closeHandler}>Close</AlertDialogCancel>}
           <AlertDialogAction onClick={onReload}>Reload</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
