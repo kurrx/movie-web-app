@@ -1,5 +1,6 @@
 {
   "name": "tv.kurr.dev",
+  "type": "module",
   "version": "0.1.0",
   "description": "Movie and TV Shows App",
   "repository": "git@github.com:kurrx/tv.kurr.dev.git",

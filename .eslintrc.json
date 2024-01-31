@@ -46,6 +46,7 @@
     "browser": true, // enable use of global browser variables like `windows`.
     "node": true // enable use of global node variables like `process`.
   },
+  "ignorePatterns": ["tailwind.config.ts", "postcss.config.cjs"],
   "parser": "@typescript-eslint/parser", // Allows Eslint to understand TypeScript syntax.
   "parserOptions": {
     "project": "./tsconfig.eslint.json", // Specify where to find the root tsconfig file of your project.
