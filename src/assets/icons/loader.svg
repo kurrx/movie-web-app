@@ -1,0 +1,13 @@
+<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <path fill="currentColor" d="M21.75 12.5C21.75 7.39153 17.609 3.25 12.5 3.25C7.39153 3.25 3.25 7.39153 3.25 12.5H5.26408C5.26408 8.50403 8.50353 5.26408 12.5 5.26408C16.4965 5.26408 19.7359 8.50353 19.7359 12.5H21.75Z">
+    <animateTransform 
+      attributeName="transform" 
+      attributeType="XML" 
+      type="rotate"
+      dur="0.6s"
+      from="0 12.5 12.5"
+      to="360 12.5 12.5"
+      repeatCount="indefinite"
+    />
+  </path>
+</svg>
