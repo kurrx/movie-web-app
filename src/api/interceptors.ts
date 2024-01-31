@@ -6,7 +6,7 @@ import { OnRequestFulfilled, OnResponseFulfilled } from '@/types'
 export const convertDataToDom: OnResponseFulfilled = (response) => {
   const isContentTypeStr = typeof response.headers['content-type'] === 'string'
   const isHtml = isContentTypeStr && response.headers['content-type'].includes('text/html')
-  if (isContentTypeStr && isHtml) {
+  if (isContentTypeStr && isHtml && typeof response.data === 'string') {
     response.data = new DOMParser().parseFromString(response.data, 'text/html')
   }
   return response

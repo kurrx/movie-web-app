@@ -11,7 +11,7 @@ type Ref = HTMLDivElement
 type RefProps = Omit<HTMLAttributes<Ref>, 'onClick'>
 
 export interface AlertSuperProps extends RefProps {
-  title: string
+  title?: string
   variant?: 'default' | 'destructive'
   buttonText?: string
   onClick?: ButtonProps['onClick']
@@ -19,7 +19,7 @@ export interface AlertSuperProps extends RefProps {
 
 export const AlertSuper = forwardRef<Ref, AlertSuperProps>(function AlertSuper(props, ref) {
   const {
-    title,
+    title = 'Error',
     variant = 'default',
     buttonText = 'Click',
     onClick,

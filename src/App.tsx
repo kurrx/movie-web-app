@@ -4,7 +4,7 @@ import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { Footer, Navbar, TooltipProvider } from '@/components'
-import { FeaturesProvider, store } from '@/features'
+import { FeaturesProvider, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
 import { VPNMiddleware } from '@/middlewares'
 import { HomeView, RedirectView } from '@/views'
@@ -20,6 +20,7 @@ export function App() {
             <Navbar />
             <main id='content'>
               <VPNMiddleware>
+                <SearchDialog />
                 <Routes>
                   <Route path='/' element={<HomeView />} />
                   <Route path='*' element={<RedirectView to='/' />} />
