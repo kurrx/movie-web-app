@@ -28,9 +28,7 @@ export function NavbarSocialLink(props: NavbarSocialLinkProps) {
           </span>
         </a>
       </TooltipTrigger>
-      <TooltipContent>
-        <p>{label}</p>
-      </TooltipContent>
+      <TooltipContent>{label}</TooltipContent>
     </Tooltip>
   )
 }

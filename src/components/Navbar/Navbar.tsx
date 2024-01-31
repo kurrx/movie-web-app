@@ -32,7 +32,7 @@ const classes = {
 }
 
 export function Navbar() {
-  const ref = useRef<HTMLHeadElement>(null)
+  const ref = useRef<HTMLElement>(null)
 
   useElementRect(ref, 'navbar')
 
