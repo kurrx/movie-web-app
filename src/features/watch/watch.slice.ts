@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { fetchItem } from '@/api'
 import { FetchState } from '@/core'
-import { ItemFullID, ThunkApiConfig, WatchStoreState } from '@/types'
+import { AppStoreState, ItemFullID, ThunkApiConfig, WatchStoreState } from '@/types'
 
 const initialState: WatchStoreState = {
   items: [],
@@ -18,7 +18,7 @@ export const getItem = createAsyncThunk<GetItemReturnType, GetItemParamType, Thu
       const items = api.getState().watch.items
       const findItem = items.find((i) => i.id === arg.id)
       if (!findItem) return true
-      return findItem.state === FetchState.ERROR
+      return findItem.state !== FetchState.SUCCESS
     },
   },
 )
@@ -64,5 +64,8 @@ const watchSlice = createSlice({
       })
   },
 })
+
+export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
+  state.watch.items.find((i) => i.id === id)
 
 export const watchReducer = watchSlice.reducer

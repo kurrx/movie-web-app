@@ -2,14 +2,14 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { parseSlugToId } from '@/api'
-import { explore } from '@/features'
+import { explore, WatchContent } from '@/features'
 import { ItemID } from '@/types'
 
 import { ErrorView } from './ErrorView'
 
 export function WatchView() {
   const { typeId, genreId, slug } = useParams<Partial<ItemID>>()
-  const validatedParams = useMemo(() => {
+  const fullId = useMemo(() => {
     if (!typeId || !genreId || !slug) return null
     const type = explore[typeId].title
     if (!type) return null
@@ -21,9 +21,9 @@ export function WatchView() {
   }, [typeId, genreId, slug])
   const key = useMemo(() => `${typeId}-${genreId}-${slug}`, [typeId, genreId, slug])
 
-  if (!validatedParams) {
+  if (!fullId) {
     return <ErrorView title='404' subtitle='Page not found.' docTitle='Not Found' />
   }
 
-  return null
+  return <WatchContent key={key} fullId={fullId} />
 }
