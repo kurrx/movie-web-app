@@ -45,7 +45,7 @@ export function SearchItem(props: SearchItemProps) {
           src={item.posterUrl}
           alt={item.title}
           className={cn(classes.image.root, !imageLoaded ? 'hidden' : 'inline-block')}
-          onLoad={() => void setImageLoaded(true)}
+          onLoad={() => setImageLoaded(true)}
         />
         <Skeleton className={cn(classes.image.skeleton, !imageLoaded ? 'block' : 'hidden')} />
         <div className={classes.content.root}>

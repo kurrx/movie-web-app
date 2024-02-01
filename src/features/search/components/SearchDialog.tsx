@@ -29,7 +29,9 @@ export function SearchDialog() {
 
   const onSearch = useCallback(() => {
     const signal = dispatch(search(clearValue))
-    return () => void signal.abort()
+    return () => {
+      signal.abort()
+    }
   }, [dispatch, clearValue])
 
   useEffect(onSearch, [onSearch])

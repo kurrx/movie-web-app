@@ -20,7 +20,9 @@ export function WatchContent({ fullId }: WatchContentProps) {
 
   const get = useCallback(() => {
     const signal = dispatch(getItem(fullId))
-    return () => void signal.abort()
+    return () => {
+      signal.abort()
+    }
   }, [dispatch, fullId])
 
   useEffect(get, [get])
