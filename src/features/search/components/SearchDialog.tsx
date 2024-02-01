@@ -6,7 +6,7 @@ import { trimStr } from '@/api'
 import { CommandDialog, CommandInput, CommandList } from '@/components'
 import { useStore, useStoreBoolean } from '@/hooks'
 
-import { rezkaSearch, selectSearchOpen, selectSearchResult, setSearchOpen } from '../search.slice'
+import { search, selectSearchOpen, selectSearchResult, setSearchOpen } from '../search.slice'
 import { SearchContent } from './SearchContent'
 
 export function SearchDialog() {
@@ -27,12 +27,12 @@ export function SearchDialog() {
     [close],
   )
 
-  const search = useCallback(() => {
-    const signal = dispatch(rezkaSearch(clearValue))
+  const onSearch = useCallback(() => {
+    const signal = dispatch(search(clearValue))
     return () => void signal.abort()
   }, [dispatch, clearValue])
 
-  useEffect(search, [search])
+  useEffect(onSearch, [onSearch])
 
   useHotkeys('meta+k', toggle, [toggle])
 
@@ -51,7 +51,7 @@ export function SearchDialog() {
         onValueChange={setValue}
       />
       <CommandList>
-        <SearchContent value={clearValue} item={item} onRetry={search} onSelect={onSelect} />
+        <SearchContent value={clearValue} item={item} onRetry={onSearch} onSelect={onSelect} />
       </CommandList>
     </CommandDialog>
   )

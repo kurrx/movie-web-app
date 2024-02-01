@@ -1,5 +1,5 @@
 import { Request } from '@/core'
-import { SearchArgs } from '@/types'
+import { FetchSearchArgs } from '@/types'
 
 import { PROVIDER_URL, PROXY_URL } from './env'
 import { convertDataToDom, parseProxiedCookies, sendProxiedCookies } from './interceptors'
@@ -15,7 +15,7 @@ export const html = new Request({
   .useResponse(convertDataToDom)
   .construct()
 
-export async function search({ query, signal }: SearchArgs) {
+export async function fetchSearch({ query, signal }: FetchSearchArgs) {
   const params = { q: query, do: 'search', subaction: 'search' }
   const { data } = await html.get<Document>('/search/', { params, signal })
   return parseSearchDocument(data)

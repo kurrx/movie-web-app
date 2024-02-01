@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
-import { search } from '@/api'
+import { fetchSearch } from '@/api'
 import { FetchState } from '@/core'
 import { AppStoreState, SearchStoreState, ThunkApiConfig } from '@/types'
 
@@ -11,11 +11,11 @@ const initialState: SearchStoreState = {
   queries: [],
 }
 
-type SearchReturnType = Awaited<ReturnType<typeof search>> | null
+type SearchReturnType = Awaited<ReturnType<typeof fetchSearch>> | null
 type SearchParamType = string
-export const rezkaSearch = createAsyncThunk<SearchReturnType, SearchParamType, ThunkApiConfig>(
+export const search = createAsyncThunk<SearchReturnType, SearchParamType, ThunkApiConfig>(
   'search/rezkaSearch',
-  async (query, { signal }) => await search({ query, signal }),
+  async (query, { signal }) => await fetchSearch({ query, signal }),
   {
     condition(arg, api) {
       if (!arg) return false
@@ -45,7 +45,7 @@ const searchSlice = createSlice({
 
   extraReducers(builder) {
     builder
-      .addCase(rezkaSearch.pending, (state, action) => {
+      .addCase(search.pending, (state, action) => {
         const query = state.queries.find((q) => q.query === action.meta.arg)
         if (!query) {
           state.queries.push({
@@ -62,14 +62,14 @@ const searchSlice = createSlice({
           query.results = null
         }
       })
-      .addCase(rezkaSearch.fulfilled, (state, action) => {
+      .addCase(search.fulfilled, (state, action) => {
         const query = state.queries.find((q) => q.requestId === action.meta.requestId)
         if (query && query.state === FetchState.LOADING) {
           query.state = FetchState.SUCCESS
           query.results = action.payload
         }
       })
-      .addCase(rezkaSearch.rejected, (state, action) => {
+      .addCase(search.rejected, (state, action) => {
         const query = state.queries.find((q) => q.requestId === action.meta.requestId)
         if (query && query.state === FetchState.LOADING) {
           query.state = FetchState.ERROR
