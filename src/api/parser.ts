@@ -1,4 +1,4 @@
-import { Parser } from '@/core'
+import { Parser, Thumbnails } from '@/core'
 import { explore } from '@/features'
 import {
   BaseItem,
@@ -10,9 +10,14 @@ import {
   ItemRating,
   ItemTranslator,
   SearchItem,
+  Stream,
+  StreamQuality,
+  StreamSeason,
+  StreamSubtitle,
+  StreamSuccessResponse,
 } from '@/types'
 
-import { base64ToString } from './utils'
+import { base64ToString, product, stringToBase64, unite } from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
 const NOT_REALEASED_ERROR = 'This title is not released yet.'
@@ -605,4 +610,124 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
     actors,
     genreIds,
   }
+}
+
+function parseStreamSubtitles(
+  subtitle: string | false,
+  subtitleLns: Record<string, string> | false,
+): StreamSubtitle[] {
+  const results: StreamSubtitle[] = [{ id: null, title: null, url: null }]
+  if (!subtitle || !subtitleLns) return results
+  const entries = subtitle.split(',')
+  for (const entry of entries) {
+    const [title, url] = entry
+      .slice(1)
+      .split(']')
+      .map((v) => v.trim())
+    if (!title || !url) continue
+    try {
+      new URL(url)
+      const id = subtitleLns[title]
+      if (!id) continue
+      results.push({ id, title, url })
+    } catch {
+      continue
+    }
+  }
+  return results
+}
+
+function parseStreamQualities(url: string) {
+  const trashList = ['@', '#', '!', '^', '$']
+  const two = unite(product(trashList, 2))
+  const tree = unite(product(trashList, 3))
+  const trashCodesSet = two.concat(tree)
+
+  const arr = url.replace('#h', '').split('//_//')
+  let trashString = arr.join('')
+
+  for (const codeSet of trashCodesSet) {
+    trashString = trashString.replaceAll(stringToBase64(codeSet), '')
+  }
+
+  const finalString = base64ToString(trashString)
+  const qualitiesArr = finalString.split(',')
+  const qualities: StreamQuality[] = []
+  const seenUrls: string[] = []
+  for (const quality of qualitiesArr) {
+    const [qualityId, urls] = quality.slice(1).split(']')
+    const [streamUrl, downloadUrl] = urls.split(' or ')
+    if (seenUrls.includes(streamUrl) || seenUrls.includes(downloadUrl)) continue
+    seenUrls.push(streamUrl, downloadUrl)
+    const id = qualityId.replaceAll('4K', '2160p').replaceAll('2K', '1440p')
+    let altername = null
+    if (qualityId.includes('4K') || qualityId.includes('2K')) altername = qualityId
+    if (qualityId.includes('1080p')) altername = 'HD'
+    qualities.push({
+      id,
+      altername,
+      streamUrl,
+      downloadUrl,
+      downloadSize: 0,
+      downloadSizeStr: '0B',
+    })
+  }
+
+  return qualities
+}
+
+export function parseStream(data: StreamSuccessResponse): Stream {
+  return {
+    subtitles: parseStreamSubtitles(data.subtitle, data.subtitle_lns),
+    defaultSubtitle: data.subtitle_def || null,
+    message: data.message,
+    thumbnailsUrl: data.thumbnails,
+    thumbnails: new Thumbnails(),
+    qualities: parseStreamQualities(data.url),
+    defaultQuality: data.quality,
+  }
+}
+
+export function parseStreamSeasons(seasonsStr: string, episodesStr: string) {
+  const doc = new DOMParser().parseFromString(
+    `<div>
+      <div id='parse-seasons'>${seasonsStr}</div>
+      <div id='parse-episodes'>${episodesStr}</div>
+    </div>`,
+    'text/html',
+  )
+  const parser = new Parser(doc)
+
+  // Seasons
+  parser.switchToChild('#parse-seasons', true)
+  const results: StreamSeason[] = []
+  const seasons = parser.all('[data-tab_id]')
+  for (const season of seasons) {
+    parser.setParent(season)
+    const number = parser.attrInt('data-tab_id')
+    if (number === null) continue
+    const title = parser.text() || 'Untitled'
+    results.push({ number, title, episodes: [] })
+  }
+
+  // Episodes
+  parser.setParent(doc)
+  parser.switchToChild('#parse-episodes', true)
+  const episodes = parser.all('[data-episode_id]')
+  for (const episode of episodes) {
+    parser.setParent(episode)
+    const number = parser.attrInt('data-episode_id')
+    if (number === null) continue
+    const title = parser.text() || 'Untitled'
+    const season = parser.attrInt('data-season_id')
+    if (season === null) continue
+    const seasonIndex = results.findIndex((s) => s.number === season)
+    if (seasonIndex === -1) continue
+    results[seasonIndex].episodes.push({ number, title })
+  }
+
+  results.sort((a, b) => a.number - b.number)
+  results.forEach((season) => season.episodes.sort((a, b) => a.number - b.number))
+
+  return results
 }

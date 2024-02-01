@@ -1,3 +1,5 @@
+import { Thumbnails } from '@/core'
+
 import { RequestArgs } from './request.types'
 import { NavigationItemCollection } from './router.types'
 
@@ -101,12 +103,103 @@ export interface BaseItem extends ItemFullID {
 
 export interface ItemMovie extends BaseItem {
   ogType: 'video.movie'
-  type: 'movie'
+  itemType: 'movie'
 }
 
 export interface ItemSeries extends BaseItem {
   ogType: 'video.tv_series'
-  type: 'series'
+  itemType: 'series'
 }
 
 export type Item = ItemMovie | ItemSeries
+
+// Stream Types
+export interface FetchStreamBaseArgs extends RequestArgs {
+  id: number
+  translatorId: number
+  favsId: string
+}
+
+export interface FetchMovieStreamArgs extends FetchStreamBaseArgs {
+  isCamrip: boolean
+  isAds: boolean
+  isDirector: boolean
+}
+
+export interface FetchSeriesStreamArgs extends FetchStreamBaseArgs {
+  season: number
+  episode: number
+}
+
+export interface FetchSeriesEpisodesStreamArgs extends FetchStreamBaseArgs {
+  season?: number
+  episode?: number
+}
+
+export interface StreamBaseResponse {
+  message: string
+}
+
+export interface StreamBaseSuccessResponse extends StreamBaseResponse {
+  success: true
+}
+
+export interface StreamBaseErrorResponse extends StreamBaseResponse {
+  success: false
+}
+
+export interface StreamSuccessResponse extends StreamBaseSuccessResponse {
+  thumbnails: string
+  url: string
+  subtitle: false | string
+  subtitle_def: false | string
+  subtitle_lns: false | Record<string, string>
+  quality: string
+}
+
+export type StreamResponse = StreamSuccessResponse | StreamBaseErrorResponse
+
+export interface SeriesEpisodesStreamSuccessResponse extends StreamSuccessResponse {
+  seasons: string
+  episodes: string
+}
+
+export type SeriesEpisodesStreamResponse =
+  | SeriesEpisodesStreamSuccessResponse
+  | StreamBaseErrorResponse
+
+export interface StreamSubtitle {
+  id: string | null
+  title: string | null
+  url: string | null
+}
+
+export interface StreamQuality {
+  id: string
+  altername: string | null
+  streamUrl: string
+  downloadUrl: string
+  downloadSize: number
+  downloadSizeStr: string
+}
+
+export interface Stream {
+  subtitles: StreamSubtitle[]
+  defaultSubtitle: string | null
+  message: string
+  thumbnailsUrl: string
+  thumbnails: Thumbnails
+  defaultQuality: string
+  qualities: StreamQuality[]
+}
+
+export interface StreamEpisode {
+  number: number
+  title: string
+}
+
+export interface StreamSeason {
+  number: number
+  title: string
+  episodes: StreamEpisode[]
+}
