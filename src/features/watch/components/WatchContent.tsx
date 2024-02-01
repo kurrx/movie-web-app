@@ -6,6 +6,7 @@ import { ItemFullID } from '@/types'
 import { FallbackView } from '@/views/FallbackView'
 
 import { getItem, selectWatchItemOptional } from '../watch.slice'
+import { WatchInfo } from './WatchInfo'
 
 export interface WatchContentProps {
   fullId: ItemFullID
@@ -32,7 +33,9 @@ export function WatchContent({ fullId }: WatchContentProps) {
       error={watchItem?.error}
       onReload={get}
     >
-      <div className='flex-1 flex flex-col'>TEST</div>
+      <div className='flex-1 flex flex-col'>
+        <WatchInfo id={fullId.id} />
+      </div>
     </FallbackView>
   )
 }

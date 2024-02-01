@@ -149,6 +149,25 @@ export const selectWatchItemStateEpisode = (state: AppStoreState, id: number) =>
   state.watch.states[id]!.episode
 export const selectWatchItemStateSubtitle = (state: AppStoreState, id: number) =>
   state.watch.states[id]!.subtitle
+export const selectWatchItemStream = createSelector(
+  selectWatchItem,
+  selectWatchItemStateTranslatorId,
+  selectWatchItemStateSeason,
+  selectWatchItemStateEpisode,
+  (item, translatorId, season, episode) => {
+    if (item.itemType === 'series') {
+      return item.streams
+        .find((s) => s.translatorId === translatorId)!
+        .seasons!.find((s) => s.number === season)!
+        .episodes.find((e) => e.number === episode)!.stream!
+    }
+    return item.streams.find((s) => s.translatorId === translatorId)!.stream!
+  },
+)
+export const selectWatchItemQualities = createSelector(
+  selectWatchItemStream,
+  (stream) => stream.qualities,
+)
 export const selectWatchItemTitle = createSelector(
   selectWatchItem,
   selectWatchItemStateTranslatorId,
