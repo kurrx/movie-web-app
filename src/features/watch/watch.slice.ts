@@ -150,6 +150,11 @@ export const { switchQuality, updateTime } = watchSlice.actions
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
 export const selectWatchItem = createSelector(selectWatchItemOptional, (item) => item!.item!)
+export const selectWatchItemFetchState = createSelector(
+  selectWatchItemOptional,
+  (item) => item!.state,
+)
+export const selectWatchItemError = createSelector(selectWatchItemOptional, (item) => item!.error)
 export const selectWatchItemStateTranslatorId = (state: AppStoreState, id: number) =>
   state.watch.states[id]!.translatorId
 export const selectWatchItemStateTimestamp = (state: AppStoreState, id: number) =>
