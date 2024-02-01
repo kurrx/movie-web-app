@@ -30,6 +30,7 @@ export interface WatchPlaylistItemFranchise {
 }
 
 export interface WatchPlaylistItemEpisode {
+  type: 'episode'
   number: number
   title: string
   originalTitle: string | null

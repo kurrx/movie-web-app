@@ -275,6 +275,7 @@ export const selectWatchItemPlaylist = createSelector(
           const episodeIndex = episode.number - 1
           const episodeDetail = item.episodesInfo?.[seasonIndex]?.[episodeIndex]
           seasonItem.episodes.push({
+            type: 'episode',
             number: episode.number,
             title: `${episode.number}. ${episodeDetail?.title || 'Серия'}`,
             originalTitle: episodeDetail?.originalTitle || null,
