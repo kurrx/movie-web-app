@@ -18,8 +18,8 @@ export interface ThunkApiConfig {
   rejectValue: SerializedError
 }
 
-export interface FetchableState {
-  state: FetchState
+export interface FetchableState<T = FetchState> {
+  state: T
   error: SerializedError | null
   requestId: string | null
 }

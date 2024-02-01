@@ -1,5 +1,11 @@
+import { SwitchState } from '@/core'
+
 import { Item } from './ajax.types'
 import { FetchableState } from './store.types'
+
+export interface WatchItemSwitchState extends FetchableState<SwitchState> {
+  id: number
+}
 
 export interface WatchItemState {
   translatorId: number
@@ -18,6 +24,7 @@ export interface WatchItem extends FetchableState {
 export interface WatchStoreState {
   items: WatchItem[]
   states: Record<number, WatchItemState | undefined>
+  switchStates: WatchItemSwitchState[]
 }
 
 export interface WatchPlaylistItemFranchise {

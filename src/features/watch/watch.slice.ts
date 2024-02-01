@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { fetchItem } from '@/api'
-import { FetchState } from '@/core'
+import { fetchItem, fetchSeriesStream } from '@/api'
+import { FetchState, SwitchState } from '@/core'
 import {
   AppStoreState,
   ItemFullID,
+  ItemSeries,
   Stream,
   ThunkApiConfig,
   WatchItemState,
@@ -17,6 +18,7 @@ import {
 const initialState: WatchStoreState = {
   items: [],
   states: {},
+  switchStates: [],
 }
 
 type GetItemReturnType = Awaited<ReturnType<typeof fetchItem>>
@@ -39,6 +41,39 @@ export const getItem = createAsyncThunk<GetItemReturnType, GetItemParamType, Thu
       const findItem = items.find((i) => i.id === arg.id)
       if (!findItem) return true
       return findItem.state !== FetchState.SUCCESS
+    },
+  },
+)
+
+type SEReturnType = Awaited<ReturnType<typeof fetchSeriesStream>> | null
+interface SEParamType {
+  id: number
+  season: number
+  episode: number
+}
+export const switchEpisode = createAsyncThunk<SEReturnType, SEParamType, ThunkApiConfig>(
+  'watch/switchEpisode',
+  async ({ id, season, episode }, { signal, getState }) => {
+    const item = getState().watch.items.find((i) => i.id === id)!.item! as ItemSeries
+    const itemState = getState().watch.states[id]!
+    const stream = item.streams
+      .find((s) => s.translatorId === itemState.translatorId)!
+      .seasons!.find((s) => s.number === season)!
+      .episodes.find((e) => e.number === episode)!.stream
+    if (stream) return null
+    return await fetchSeriesStream({
+      id,
+      favsId: item.favsId,
+      translatorId: itemState.translatorId,
+      season,
+      episode,
+      signal,
+    })
+  },
+  {
+    condition(arg, api) {
+      const switchState = api.getState().watch.switchStates.find((s) => s.id === arg.id)!
+      return switchState.state !== SwitchState.LOADING
     },
   },
 )
@@ -77,7 +112,7 @@ const watchSlice = createSlice({
         }
       })
       .addCase(getItem.fulfilled, (state, action) => {
-        const item = state.items.find((i) => i.id === action.meta.arg.id)
+        const item = state.items.find((i) => i.requestId === action.meta.requestId)
         if (item && item.state === FetchState.LOADING) {
           const fetchedItem = action.payload
           const currentState = state.states[action.meta.arg.id]
@@ -90,11 +125,7 @@ const watchSlice = createSlice({
               subtitle: 'null',
             } as WatchItemState)
           let stream: Stream
-          if (fetchedItem.itemType === 'movie') {
-            stream = fetchedItem.streams.find(
-              (s) => s.translatorId === nextState.translatorId,
-            )!.stream!
-          } else {
+          if (fetchedItem.itemType === 'series') {
             const seasons = fetchedItem.streams.find(
               (s) => s.translatorId === nextState.translatorId,
             )!.seasons!
@@ -111,6 +142,10 @@ const watchSlice = createSlice({
               }
               if (found) break
             }
+          } else {
+            stream = fetchedItem.streams.find(
+              (s) => s.translatorId === nextState.translatorId,
+            )!.stream!
           }
           const isQualityPresent = stream!.qualities.some((q) => q.id === nextState.quality)
           if (!isQualityPresent) {
@@ -123,6 +158,7 @@ const watchSlice = createSlice({
           if (!currentState) {
             state.states[action.meta.arg.id] = nextState
           }
+          item.requestId = null
           item.state = FetchState.SUCCESS
           item.item = fetchedItem
         }
@@ -130,6 +166,7 @@ const watchSlice = createSlice({
       .addCase(getItem.rejected, (state, action) => {
         const item = state.items.find((q) => q.requestId === action.meta.requestId)
         if (item && item.state === FetchState.LOADING) {
+          item.requestId = null
           item.state = FetchState.ERROR
           if (action.error.code === '404') {
             item.error = {
@@ -139,6 +176,62 @@ const watchSlice = createSlice({
             }
           } else {
             item.error = action.error
+          }
+        }
+      })
+
+    builder
+      .addCase(switchEpisode.pending, (state, action) => {
+        const switchState = state.switchStates.find((s) => s.id === action.meta.arg.id)
+        if (!switchState) {
+          state.switchStates.push({
+            id: action.meta.arg.id,
+            state: SwitchState.IDLE,
+            error: null,
+            requestId: null,
+          })
+        } else {
+          switchState.state = SwitchState.LOADING
+          switchState.error = null
+          switchState.requestId = action.meta.requestId
+        }
+      })
+      .addCase(switchEpisode.fulfilled, (state, action) => {
+        const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
+        if (switchState && switchState.state === SwitchState.LOADING) {
+          const item = state.items.find((i) => i.id === action.meta.arg.id)!.item! as ItemSeries
+          const itemState = state.states[action.meta.arg.id]!
+          let stream = action.payload
+          if (!stream) {
+            stream = item.streams
+              .find((s) => s.translatorId === itemState.translatorId)!
+              .seasons!.find((s) => s.number === action.meta.arg.season)!
+              .episodes.find((e) => e.number === action.meta.arg.episode)!.stream!
+          }
+          const isQualityPresent = stream.qualities.some((q) => q.id === itemState.quality)
+          if (!isQualityPresent) {
+            itemState.quality = stream.defaultQuality
+          }
+          const isSubtitlePresent = stream.subtitles.some((s) => s.id === itemState.subtitle)
+          if (!isSubtitlePresent) {
+            itemState.subtitle = stream.defaultSubtitle
+          }
+          itemState.timestamp = 0
+          itemState.season = action.meta.arg.season
+          itemState.episode = action.meta.arg.episode
+          switchState.state = SwitchState.IDLE
+          switchState.requestId = null
+        }
+      })
+      .addCase(switchEpisode.rejected, (state, action) => {
+        const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
+        if (switchState && switchState.state === SwitchState.LOADING) {
+          switchState.requestId = null
+          switchState.state = SwitchState.ERROR
+          switchState.error = {
+            code: 'Switch Error',
+            name: 'Switch Episode Error',
+            message: 'Error while changing episode! Try again.',
           }
         }
       })

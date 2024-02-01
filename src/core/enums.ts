@@ -3,3 +3,9 @@ export enum FetchState {
   SUCCESS,
   ERROR,
 }
+
+export enum SwitchState {
+  IDLE,
+  LOADING,
+  ERROR,
+}
