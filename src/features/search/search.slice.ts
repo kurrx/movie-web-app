@@ -22,7 +22,7 @@ export const search = createAsyncThunk<SearchReturnType, SearchParamType, ThunkA
       const queries = api.getState().search.queries
       const findQuery = queries.find((q) => q.query === arg)
       if (!findQuery) return true
-      return findQuery.state !== FetchState.SUCCESS
+      return findQuery.state === FetchState.ERROR
     },
   },
 )
