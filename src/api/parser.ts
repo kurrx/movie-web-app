@@ -718,8 +718,8 @@ function parseStreamQualities(url: string) {
     seenUrls.push(streamUrl, downloadUrl)
     const id = qualityId.replaceAll('4K', '2160p').replaceAll('2K', '1440p')
     let altername = null
-    if (qualityId.includes('4K') || qualityId.includes('2K')) altername = qualityId
-    if (qualityId.includes('1080p')) altername = 'HD'
+    if (qualityId === '4K' || qualityId === '2K') altername = qualityId
+    if (qualityId === '1080p') altername = 'HD'
     qualities.push({
       id,
       altername,
