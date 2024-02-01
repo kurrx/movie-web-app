@@ -30,6 +30,9 @@ export interface SearchItem extends ItemFullID {
 // Item Types
 export interface FetchItemArgs extends RequestArgs {
   fullId: ItemFullID
+  translatorId?: number
+  season?: number
+  episode?: number
 }
 
 export interface ItemRating {

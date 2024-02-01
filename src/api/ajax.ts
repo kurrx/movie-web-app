@@ -36,14 +36,35 @@ export async function fetchSearch({ query, signal }: FetchSearchArgs) {
 }
 
 export async function fetchItem(args: FetchItemArgs) {
-  const { signal, fullId } = args
+  const { signal, fullId, translatorId, season, episode } = args
   const uri = `/${fullId.typeId}/${fullId.genreId}/${fullId.slug}.html`
   const { data } = await html.get<Document>(uri, { signal })
   const baseItem = parseItemDocument(data, fullId)
+  const translator =
+    baseItem.translators.find((t) => t.id === translatorId) || baseItem.translators[0]
   if (baseItem.ogType === 'video.movie') {
     console.log('movie', baseItem)
+    const stream = await fetchMovieStream({
+      id: baseItem.id,
+      translatorId: translator.id,
+      favsId: baseItem.favsId,
+      isCamrip: translator.isCamrip,
+      isAds: translator.isAds,
+      isDirector: translator.isDirector,
+      signal,
+    })
+    console.log('movie stream', stream)
   } else {
     console.log('series', baseItem)
+    const { stream, seasons, streamFor } = await fetchSeriesEpisodesStream({
+      id: baseItem.id,
+      translatorId: translator.id,
+      favsId: baseItem.favsId,
+      season,
+      episode,
+      signal,
+    })
+    console.log({ stream, seasons, streamFor })
   }
 }
 
@@ -139,9 +160,9 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
   const seasons = parseStreamSeasons(data.seasons, data.episodes)
   const stream = await fetchStream(data)
   return {
-    stream,
     seasons,
-    for: {
+    stream,
+    streamFor: {
       season: season || seasons[0].number,
       episode: episode || seasons[0].episodes[0].number,
     },
