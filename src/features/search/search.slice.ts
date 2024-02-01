@@ -11,7 +11,7 @@ const initialState: SearchStoreState = {
   queries: [],
 }
 
-type SearchReturnType = Awaited<ReturnType<typeof fetchSearch>> | null
+type SearchReturnType = Awaited<ReturnType<typeof fetchSearch>>
 type SearchParamType = string
 export const search = createAsyncThunk<SearchReturnType, SearchParamType, ThunkApiConfig>(
   'search/rezkaSearch',
