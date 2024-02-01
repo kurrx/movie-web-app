@@ -3,6 +3,7 @@ import { explore } from '@/features'
 import {
   BaseItem,
   ItemCollection,
+  ItemEpisodeInfo,
   ItemFranchise,
   ItemFranchiseItem,
   ItemFullID,
@@ -383,6 +384,62 @@ function parseItemTranslators(
   }
 
   return results
+}
+
+export function parseItemDocumentEpisodes(document: Document) {
+  const parser = new Parser(document)
+  parser.setDefaultError(NOT_AVAILABLE_ERROR)
+  parser.switchToChild('.b-content__main', true)
+
+  const seasonElems = parser.all('.b-post__schedule_table')
+  const seasons: ItemEpisodeInfo[][] = []
+  if (seasonElems.length) {
+    for (const seasonElem of seasonElems) {
+      parser.setParent(seasonElem)
+      const season: ItemEpisodeInfo[] = []
+      const episodeElems = parser.all('tr')
+      for (const episodeElem of episodeElems) {
+        parser.setParent(episodeElem)
+        if (parser.hasChild('.load-more')) continue
+
+        // Title
+        const titleElem = parser.switchToChild('.td-2 b')
+        let title = 'Untitled'
+        if (titleElem) {
+          const titleStrNull = parser.text()
+          if (titleStrNull) {
+            title = titleStrNull
+          } else {
+            parser.setParent(episodeElem)
+            const fallbackTitleElem = parser.switchToChild('.td-2')
+            if (fallbackTitleElem) {
+              title = parser.text() || title
+            }
+          }
+        }
+
+        // Original Title
+        parser.setParent(episodeElem)
+        const originalTitleElem = parser.switchToChild('.td-2 span')
+        let originalTitle: null | string = null
+        if (originalTitleElem) {
+          originalTitle = parser.text()
+        }
+
+        // Release Date
+        parser.setParent(episodeElem)
+        const releaseDateElem = parser.switchToChild('.td-4')
+        let releaseDate: null | string = null
+        if (releaseDateElem) {
+          releaseDate = parser.text()
+        }
+
+        season.unshift({ title, originalTitle, releaseDate })
+      }
+      seasons.unshift(season)
+    }
+  }
+  return seasons
 }
 
 export function parseItemDocument(document: Document, fullId: ItemFullID): BaseItem {

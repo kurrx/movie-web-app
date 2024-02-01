@@ -104,14 +104,45 @@ export interface BaseItem extends ItemFullID {
   genreIds: string[]
 }
 
+export interface ItemMovieStream {
+  translatorId: number
+  stream: Stream | null
+}
+
 export interface ItemMovie extends BaseItem {
   ogType: 'video.movie'
   itemType: 'movie'
+  streams: ItemMovieStream[]
+}
+
+export interface ItemEpisodeInfo {
+  title: string | null
+  originalTitle: string | null
+  releaseDate: string | null
+}
+
+export interface ItemSeriesEpisodeStream {
+  number: number
+  title: string
+  stream: Stream | null
+}
+
+export interface ItemSeriesSeasonStream {
+  number: number
+  title: string
+  episodes: ItemSeriesEpisodeStream[]
+}
+
+export interface ItemSeriesStream {
+  translatorId: number
+  seasons: ItemSeriesSeasonStream[] | null
 }
 
 export interface ItemSeries extends BaseItem {
   ogType: 'video.tv_series'
   itemType: 'series'
+  streams: ItemSeriesStream[]
+  episodesInfo: ItemEpisodeInfo[][]
 }
 
 export type Item = ItemMovie | ItemSeries

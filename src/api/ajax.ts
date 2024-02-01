@@ -2,11 +2,19 @@ import axios from 'axios'
 
 import { Request } from '@/core'
 import {
+  BaseItem,
   FetchItemArgs,
   FetchMovieStreamArgs,
   FetchSearchArgs,
   FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
+  Item,
+  ItemMovie,
+  ItemMovieStream,
+  ItemSeries,
+  ItemSeriesSeasonStream,
+  ItemSeriesStream,
+  ItemTranslator,
   SeriesEpisodesStreamResponse,
   Stream,
   StreamResponse,
@@ -15,7 +23,13 @@ import {
 
 import { PROVIDER_URL, PROXY_URL } from './env'
 import { convertDataToDom, parseProxiedCookies, sendProxiedCookies } from './interceptors'
-import { parseItemDocument, parseSearchDocument, parseStream, parseStreamSeasons } from './parser'
+import {
+  parseItemDocument,
+  parseItemDocumentEpisodes,
+  parseSearchDocument,
+  parseStream,
+  parseStreamSeasons,
+} from './parser'
 import { bytesToStr } from './utils'
 
 export const html = new Request({
@@ -35,7 +49,75 @@ export async function fetchSearch({ query, signal }: FetchSearchArgs) {
   return parseSearchDocument(data)
 }
 
-export async function fetchItem(args: FetchItemArgs) {
+export async function fetchItemMovie(
+  baseItem: BaseItem,
+  translator: ItemTranslator,
+  signal?: AbortSignal,
+): Promise<ItemMovie> {
+  const stream = await fetchMovieStream({
+    id: baseItem.id,
+    translatorId: translator.id,
+    favsId: baseItem.favsId,
+    isCamrip: translator.isCamrip,
+    isAds: translator.isAds,
+    isDirector: translator.isDirector,
+    signal,
+  })
+  const streams: ItemMovieStream[] = baseItem.translators.map((t) => ({
+    translatorId: t.id,
+    stream: t.id === translator.id ? stream : null,
+  }))
+  return {
+    ...baseItem,
+    ogType: 'video.movie',
+    itemType: 'movie',
+    streams,
+  }
+}
+
+export async function fetchItemSeries(
+  baseItem: BaseItem,
+  translator: ItemTranslator,
+  document: Document,
+  signal?: AbortSignal,
+  season?: number,
+  episode?: number,
+): Promise<ItemSeries> {
+  const episodesInfo = parseItemDocumentEpisodes(document)
+  const { stream, seasons, streamFor } = await fetchSeriesEpisodesStream({
+    id: baseItem.id,
+    translatorId: translator.id,
+    favsId: baseItem.favsId,
+    season,
+    episode,
+    signal,
+  })
+  const streams: ItemSeriesStream[] = baseItem.translators.map((t) => {
+    const translatorId = t.id
+    let translatorSeasons: ItemSeriesSeasonStream[] | null = null
+    if (translatorId === translator.id) {
+      translatorSeasons = seasons.map((s) => ({
+        number: s.number,
+        title: s.title,
+        episodes: s.episodes.map((e) => ({
+          number: e.number,
+          title: e.title,
+          stream: s.number === streamFor.season && e.number === streamFor.episode ? stream : null,
+        })),
+      }))
+    }
+    return { translatorId, seasons: translatorSeasons }
+  })
+  return {
+    ...baseItem,
+    ogType: 'video.tv_series',
+    itemType: 'series',
+    episodesInfo,
+    streams,
+  }
+}
+
+export async function fetchItem(args: FetchItemArgs): Promise<Item> {
   const { signal, fullId, translatorId, season, episode } = args
   const uri = `/${fullId.typeId}/${fullId.genreId}/${fullId.slug}.html`
   const { data } = await html.get<Document>(uri, { signal })
@@ -43,28 +125,9 @@ export async function fetchItem(args: FetchItemArgs) {
   const translator =
     baseItem.translators.find((t) => t.id === translatorId) || baseItem.translators[0]
   if (baseItem.ogType === 'video.movie') {
-    console.log('movie', baseItem)
-    const stream = await fetchMovieStream({
-      id: baseItem.id,
-      translatorId: translator.id,
-      favsId: baseItem.favsId,
-      isCamrip: translator.isCamrip,
-      isAds: translator.isAds,
-      isDirector: translator.isDirector,
-      signal,
-    })
-    console.log('movie stream', stream)
+    return await fetchItemMovie(baseItem, translator, signal)
   } else {
-    console.log('series', baseItem)
-    const { stream, seasons, streamFor } = await fetchSeriesEpisodesStream({
-      id: baseItem.id,
-      translatorId: translator.id,
-      favsId: baseItem.favsId,
-      season,
-      episode,
-      signal,
-    })
-    console.log({ stream, seasons, streamFor })
+    return await fetchItemSeries(baseItem, translator, data, signal, season, episode)
   }
 }
 
