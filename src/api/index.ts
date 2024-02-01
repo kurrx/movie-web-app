@@ -1,4 +1,5 @@
 export * from './ajax'
 export * from './env'
+export * from './parser'
 export * from './rest'
 export * from './utils'
