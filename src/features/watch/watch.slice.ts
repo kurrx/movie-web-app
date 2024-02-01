@@ -59,7 +59,15 @@ const watchSlice = createSlice({
         const item = state.items.find((q) => q.requestId === action.meta.requestId)
         if (item && item.state === FetchState.LOADING) {
           item.state = FetchState.ERROR
-          item.error = action.error
+          if (action.error.code === '404') {
+            item.error = {
+              code: '404',
+              name: '404',
+              message: 'Title not found.',
+            }
+          } else {
+            item.error = action.error
+          }
         }
       })
   },

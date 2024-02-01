@@ -26,6 +26,7 @@ export function WatchContent({ fullId }: WatchContentProps) {
 
   return (
     <FallbackView
+      dismissible
       state={state}
       text='Be patient. Title is loading...'
       error={watchItem?.error}
