@@ -19,3 +19,34 @@ export interface WatchStoreState {
   items: WatchItem[]
   states: Record<number, WatchItemState | undefined>
 }
+
+export interface WatchPlaylistItemFranchise {
+  type: 'franchise'
+  title: string
+  to: string
+  year: number | null
+  rating: number | null
+  isCurrent?: boolean
+}
+
+export interface WatchPlaylistItemEpisode {
+  number: number
+  title: string
+  originalTitle: string | null
+  releaseDate: string | null
+  isCurrent?: boolean
+}
+
+export interface WatchPlaylistItemSeason {
+  type: 'season'
+  number: number
+  isCurrent?: boolean
+  episodes: WatchPlaylistItemEpisode[]
+}
+
+export type WatchPlaylistItem = WatchPlaylistItemFranchise | WatchPlaylistItemSeason
+
+export interface WatchPlaylist {
+  title: string
+  items: WatchPlaylistItem[]
+}

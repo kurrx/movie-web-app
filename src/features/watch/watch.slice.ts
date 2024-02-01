@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { fetchItem } from '@/api'
 import { FetchState } from '@/core'
@@ -8,6 +8,9 @@ import {
   Stream,
   ThunkApiConfig,
   WatchItemState,
+  WatchPlaylist,
+  WatchPlaylistItemFranchise,
+  WatchPlaylistItemSeason,
   WatchStoreState,
 } from '@/types'
 
@@ -44,7 +47,15 @@ const watchSlice = createSlice({
   name: 'watch',
   initialState,
 
-  reducers: {},
+  reducers: {
+    switchQuality(state, action: PayloadAction<{ id: number; quality: string }>) {
+      state.states[action.payload.id]!.quality = action.payload.quality
+    },
+
+    updateTime(state, action: PayloadAction<{ id: number; time: number }>) {
+      state.states[action.payload.id]!.timestamp = action.payload.time
+    },
+  },
 
   extraReducers(builder) {
     builder
@@ -134,6 +145,8 @@ const watchSlice = createSlice({
   },
 })
 
+export const { switchQuality, updateTime } = watchSlice.actions
+
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
 export const selectWatchItem = createSelector(selectWatchItemOptional, (item) => item!.item!)
@@ -168,6 +181,24 @@ export const selectWatchItemQualities = createSelector(
   selectWatchItemStream,
   (stream) => stream.qualities,
 )
+export const selectWatchItemQuality = createSelector(
+  selectWatchItemQualities,
+  selectWatchItemStateQuality,
+  (qualities, quality) => qualities.find((q) => q.id === quality)!,
+)
+export const selectWatchItemTranslators = createSelector(
+  selectWatchItem,
+  (item) => item.translators,
+)
+export const selectWatchItemTranslator = createSelector(
+  selectWatchItemTranslators,
+  selectWatchItemStateTranslatorId,
+  (translators, translatorId) => translators.find((t) => t.id === translatorId)!,
+)
+export const selectWatchItemThumbnails = createSelector(
+  selectWatchItemStream,
+  (stream) => stream.thumbnails,
+)
 export const selectWatchItemTitle = createSelector(
   selectWatchItem,
   selectWatchItemStateTranslatorId,
@@ -182,6 +213,86 @@ export const selectWatchItemTitle = createSelector(
       return `${item.title}: ${currentSeason.title} ${currentEpisode.title}`
     }
     return item.title
+  },
+)
+export const selectWatchItemPlaylist = createSelector(
+  selectWatchItem,
+  selectWatchItemStateTranslatorId,
+  selectWatchItemStateSeason,
+  selectWatchItemStateEpisode,
+  (item, translatorId, stateSeason, stateEpisode) => {
+    const franchise = item.franchise
+    const playlist: WatchPlaylist = {
+      title: franchise?.title || item.title,
+      items: [],
+    }
+
+    const beforeFranchise: WatchPlaylistItemFranchise[] = []
+    const seasons: WatchPlaylistItemSeason[] = []
+    const afterFranchise: WatchPlaylistItemFranchise[] = []
+
+    let currentFranchiseIndex = -1
+    if (franchise) {
+      let passedCurrent = false
+      for (let i = franchise.items.length - 1; i >= 0; i--) {
+        const item = franchise.items[i]
+        if (item.isCurrent) {
+          passedCurrent = true
+          currentFranchiseIndex = i
+          continue
+        }
+        const franchiseItem: WatchPlaylistItemFranchise = {
+          type: 'franchise',
+          title: item.title,
+          to: `/watch/${item.typeId}/${item.genreId}/${item.slug}`,
+          year: item.year,
+          rating: item.rating,
+        }
+        if (passedCurrent) {
+          afterFranchise.push(franchiseItem)
+        } else {
+          beforeFranchise.push(franchiseItem)
+        }
+      }
+    }
+
+    if (item.itemType === 'series') {
+      const translatorSeasons = item.streams.find((t) => t.translatorId === translatorId)!.seasons!
+      for (const season of translatorSeasons) {
+        const seasonItem: WatchPlaylistItemSeason = {
+          type: 'season',
+          number: season.number,
+          isCurrent: season.number === stateSeason,
+          episodes: [],
+        }
+        const seasonIndex = season.number - 1
+        for (const episode of season.episodes) {
+          const episodeIndex = episode.number - 1
+          const episodeDetail = item.episodesInfo?.[seasonIndex]?.[episodeIndex]
+          seasonItem.episodes.push({
+            number: episode.number,
+            title: `${episode.number}. ${episodeDetail?.title || 'Серия'}`,
+            originalTitle: episodeDetail?.originalTitle || null,
+            releaseDate: episodeDetail?.releaseDate || null,
+            isCurrent: seasonItem.isCurrent && episode.number === stateEpisode,
+          })
+        }
+        seasons.push(seasonItem)
+      }
+    } else if (franchise && currentFranchiseIndex !== -1) {
+      const currentFranchiseItem = franchise.items[currentFranchiseIndex]
+      beforeFranchise.push({
+        type: 'franchise',
+        title: item.title,
+        to: `/watch/${item.typeId}/${item.genreId}/${item.slug}`,
+        year: currentFranchiseItem.year,
+        rating: currentFranchiseItem.rating,
+        isCurrent: true,
+      })
+    }
+
+    playlist.items.concat(beforeFranchise).concat(seasons).concat(afterFranchise)
+    return playlist
   },
 )
 
