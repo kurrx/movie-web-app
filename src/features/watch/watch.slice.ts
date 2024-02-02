@@ -18,6 +18,8 @@ import {
   WatchStoreState,
 } from '@/types'
 
+import { getItemStates } from './watch.schemas'
+
 type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
 type GetItemReturn = Awaited<ReturnType<typeof fetchItem>>
@@ -63,7 +65,7 @@ function checkState(stream: Stream, state: WatchItemState) {
 
 const initialState: WatchStoreState = {
   items: [],
-  states: {},
+  states: getItemStates(),
   switchStates: [],
 }
 
@@ -315,6 +317,7 @@ export const selectWatchItemFetchState = createSelector(
   (item) => item!.state,
 )
 export const selectWatchItemError = createSelector(selectWatchItemOptional, (item) => item!.error)
+export const selectWatchItemStates = (state: AppStoreState) => state.watch.states
 export const selectWatchItemStateTranslatorId = (state: AppStoreState, id: number) =>
   state.watch.states[id]!.translatorId
 export const selectWatchItemStateTimestamp = (state: AppStoreState, id: number) =>
