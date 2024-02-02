@@ -1,4 +1,6 @@
 export * from './components'
+export * from './device'
+export * from './player'
 export * from './router'
 export * from './search'
 export * from './store'

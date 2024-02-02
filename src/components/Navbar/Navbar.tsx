@@ -1,9 +1,17 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { APP_NAME, cn, SOCIAL_GITHUB_URL, SOCIAL_X_URL } from '@/api'
 import { GithubLogoIcon, LogoIcon, XLogoIcon } from '@/assets'
-import { explore, SearchButton, selectSearchDisabled, ThemeSwitcher } from '@/features'
+import {
+  explore,
+  SearchButton,
+  selectDeviceIsMobile,
+  selectPlayerInitialized,
+  selectPlayerTheater,
+  selectSearchDisabled,
+  ThemeSwitcher,
+} from '@/features'
 import { useAppSelector, useElementRect } from '@/hooks'
 
 import { NavbarExplore } from './NavbarExplore'
@@ -35,11 +43,18 @@ const classes = {
 export function Navbar() {
   const ref = useRef<HTMLElement>(null)
   const searchDisabled = useAppSelector(selectSearchDisabled)
+  const playerInitialized = useAppSelector(selectPlayerInitialized)
+  const playerTheater = useAppSelector(selectPlayerTheater)
+  const isMobile = useAppSelector(selectDeviceIsMobile)
+  const isDark = useMemo(
+    () => (isMobile ? playerInitialized : playerInitialized && playerTheater),
+    [isMobile, playerInitialized, playerTheater],
+  )
 
   useElementRect(ref, 'navbar')
 
   return (
-    <header ref={ref} className={classes.root}>
+    <header ref={ref} className={cn(classes.root, isDark && 'dark text-white')}>
       <div className={classes.container}>
         <NavbarExplore navigation={explore}>
           <NavLink className={classes.logo.link} to='/'>
