@@ -734,6 +734,7 @@ function parseStreamQualities(url: string) {
 }
 
 export function parseStream(data: StreamSuccessResponse): Stream {
+  if (!data.url) throw new Error(NOT_AVAILABLE_ERROR)
   return {
     subtitles: parseStreamSubtitles(data.subtitle, data.subtitle_lns),
     defaultSubtitle: data.subtitle_def || null,
