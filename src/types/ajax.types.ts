@@ -35,6 +35,19 @@ export interface FetchItemArgs extends RequestArgs {
   episode?: number
 }
 
+export interface FetchItemMovieArgs extends RequestArgs {
+  baseItem: BaseItem
+  translator: ItemTranslator
+}
+
+export interface FetchItemSeriesArgs extends RequestArgs {
+  baseItem: BaseItem
+  translator: ItemTranslator
+  document: Document
+  season?: number
+  episode?: number
+}
+
 export interface ItemRating {
   rate: number
   votes: number

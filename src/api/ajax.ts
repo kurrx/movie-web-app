@@ -2,8 +2,9 @@ import axios from 'axios'
 
 import { Request } from '@/core'
 import {
-  BaseItem,
   FetchItemArgs,
+  FetchItemMovieArgs,
+  FetchItemSeriesArgs,
   FetchMovieStreamArgs,
   FetchSearchArgs,
   FetchSeriesEpisodesStreamArgs,
@@ -14,7 +15,6 @@ import {
   ItemSeries,
   ItemSeriesSeasonStream,
   ItemSeriesStream,
-  ItemTranslator,
   SeriesEpisodesStreamResponse,
   Stream,
   StreamResponse,
@@ -49,11 +49,8 @@ export async function fetchSearch({ query, signal }: FetchSearchArgs) {
   return parseSearchDocument(data)
 }
 
-export async function fetchItemMovie(
-  baseItem: BaseItem,
-  translator: ItemTranslator,
-  signal?: AbortSignal,
-): Promise<ItemMovie> {
+export async function fetchItemMovie(args: FetchItemMovieArgs): Promise<ItemMovie> {
+  const { baseItem, translator, signal } = args
   const stream = await fetchMovieStream({
     id: baseItem.id,
     translatorId: translator.id,
@@ -75,14 +72,8 @@ export async function fetchItemMovie(
   }
 }
 
-export async function fetchItemSeries(
-  baseItem: BaseItem,
-  translator: ItemTranslator,
-  document: Document,
-  signal?: AbortSignal,
-  season?: number,
-  episode?: number,
-): Promise<ItemSeries> {
+export async function fetchItemSeries(args: FetchItemSeriesArgs): Promise<ItemSeries> {
+  const { baseItem, translator, document, signal, season, episode } = args
   const episodesInfo = parseItemDocumentEpisodes(document)
   const { stream, seasons, streamFor } = await fetchSeriesEpisodesStream({
     id: baseItem.id,
@@ -125,9 +116,16 @@ export async function fetchItem(args: FetchItemArgs): Promise<Item> {
   const translator =
     baseItem.translators.find((t) => t.id === translatorId) || baseItem.translators[0]
   if (baseItem.ogType === 'video.movie') {
-    return await fetchItemMovie(baseItem, translator, signal)
+    return await fetchItemMovie({ baseItem, translator, signal })
   } else {
-    return await fetchItemSeries(baseItem, translator, data, signal, season, episode)
+    return await fetchItemSeries({
+      baseItem,
+      translator,
+      document: data,
+      signal,
+      season,
+      episode,
+    })
   }
 }
 
