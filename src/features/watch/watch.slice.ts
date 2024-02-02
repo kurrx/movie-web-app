@@ -11,6 +11,8 @@ import {
   ThunkApiConfig,
   WatchItemState,
   WatchPlaylist,
+  WatchPlaylistAdjacent,
+  WatchPlaylistItem,
   WatchPlaylistItemFranchise,
   WatchPlaylistItemSeason,
   WatchStoreState,
@@ -455,8 +457,75 @@ export const selectWatchItemPlaylist = createSelector(
       })
     }
 
-    playlist.items.concat(beforeFranchise).concat(seasons).concat(afterFranchise)
+    playlist.items.push(...beforeFranchise)
+    playlist.items.push(...seasons)
+    playlist.items.push(...afterFranchise)
     return playlist
+  },
+)
+export const selectWatchItemPlaylistAdjacents = createSelector(
+  selectWatchItemPlaylist,
+  (playlist) => {
+    const currentIndex = playlist.items.findIndex((i) => i.isCurrent)
+    if (currentIndex === -1) {
+      return { prev: null, next: null }
+    }
+    const current = playlist.items[currentIndex]
+    if (current.type === 'season') {
+      const episodeIndex = current.episodes.findIndex((i) => i.isCurrent)
+      if (episodeIndex === -1) {
+        return { prev: null, next: null }
+      }
+      let prev: WatchPlaylistAdjacent | null = null
+      let next: WatchPlaylistAdjacent | null = null
+      if (episodeIndex > 0) {
+        prev = {
+          type: 'episode',
+          season: current.number,
+          episode: current.episodes[episodeIndex - 1],
+        }
+      } else if (currentIndex > 0) {
+        const prevPlaylistItem = playlist.items[currentIndex - 1]
+        if (prevPlaylistItem.type === 'franchise') {
+          prev = prevPlaylistItem
+        } else {
+          prev = {
+            type: 'episode',
+            season: prevPlaylistItem.number,
+            episode: prevPlaylistItem.episodes[prevPlaylistItem.episodes.length - 1],
+          }
+        }
+      }
+      if (episodeIndex < current.episodes.length - 1) {
+        next = {
+          type: 'episode',
+          season: current.number,
+          episode: current.episodes[episodeIndex + 1],
+        }
+      } else if (currentIndex < playlist.items.length - 1) {
+        const nextPlaylistItem = playlist.items[currentIndex + 1]
+        if (nextPlaylistItem.type === 'franchise') {
+          next = nextPlaylistItem
+        } else {
+          next = {
+            type: 'episode',
+            season: nextPlaylistItem.number,
+            episode: nextPlaylistItem.episodes[0],
+          }
+        }
+      }
+      return { prev, next }
+    } else {
+      let prev: WatchPlaylistItem | null = null
+      let next: WatchPlaylistItem | null = null
+      if (currentIndex > 0) {
+        prev = playlist.items[currentIndex - 1]
+      }
+      if (currentIndex < playlist.items.length - 1) {
+        next = playlist.items[currentIndex + 1]
+      }
+      return { prev, next }
+    }
   },
 )
 

@@ -58,3 +58,11 @@ export interface WatchPlaylist {
   title: string
   items: WatchPlaylistItem[]
 }
+
+export interface WatchPlaylistAdjacentEpisode {
+  type: 'episode'
+  season: number
+  episode: WatchPlaylistItemEpisode
+}
+
+export type WatchPlaylistAdjacent = WatchPlaylistItemFranchise | WatchPlaylistAdjacentEpisode
