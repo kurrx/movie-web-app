@@ -2,6 +2,7 @@ import { Thumbnails } from '@/core'
 
 import { RequestArgs } from './request.types'
 import { NavigationItemCollection } from './router.types'
+import { WatchItemState } from './watch.types'
 
 // Common Types
 export interface ItemID {
@@ -250,3 +251,44 @@ export interface StreamSeason {
   title: string
   episodes: StreamEpisode[]
 }
+
+export interface FetchTranslatorBaseArgs extends RequestArgs {
+  translatorId: number
+}
+
+export interface FetchMovieTranslatorArgs extends FetchTranslatorBaseArgs {
+  item: ItemMovie
+}
+
+export interface FetchMovieTranslatorResponse {
+  type: 'movie'
+  stream?: Stream
+}
+
+export interface FetchSeriesTranslatorArgs extends FetchTranslatorBaseArgs {
+  item: ItemSeries
+  state: WatchItemState
+}
+
+export interface FetchSeriesTranslatorResponse {
+  type: 'series'
+  stateTo: {
+    season: number
+    episode: number
+  }
+  initial?: ItemSeriesSeasonStream[]
+  next?: {
+    stream: Stream
+    streamFor: {
+      season: number
+      episode: number
+    }
+  }
+}
+
+export interface FetchTranslatorArgs extends FetchTranslatorBaseArgs {
+  item: Item
+  state: WatchItemState
+}
+
+export type FetchTranslatorResponse = FetchMovieTranslatorResponse | FetchSeriesTranslatorResponse

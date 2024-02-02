@@ -6,13 +6,19 @@ import {
   FetchItemMovieArgs,
   FetchItemSeriesArgs,
   FetchMovieStreamArgs,
+  FetchMovieTranslatorArgs,
   FetchSearchArgs,
   FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
+  FetchSeriesTranslatorArgs,
+  FetchSeriesTranslatorResponse,
+  FetchTranslatorArgs,
+  FetchTranslatorResponse,
   Item,
   ItemMovie,
   ItemMovieStream,
   ItemSeries,
+  ItemSeriesEpisodeStream,
   ItemSeriesSeasonStream,
   ItemSeriesStream,
   SeriesEpisodesStreamResponse,
@@ -227,5 +233,97 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
       season: season || seasons[0].number,
       episode: episode || seasons[0].episodes[0].number,
     },
+  }
+}
+
+export async function fetchMovieTranslator(args: FetchMovieTranslatorArgs) {
+  const { item, translatorId, signal } = args
+  const foundStream = item.streams.find((s) => s.translatorId === translatorId)!.stream
+  if (foundStream) return { type: 'movie' as const }
+  const translator = item.translators.find((t) => t.id === translatorId)!
+  const stream = await fetchMovieStream({
+    id: item.id,
+    favsId: item.favsId,
+    translatorId,
+    isCamrip: translator.isCamrip,
+    isAds: translator.isAds,
+    isDirector: translator.isDirector,
+    signal,
+  })
+  return { type: 'movie' as const, stream }
+}
+
+export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs) {
+  const { item, translatorId, state, signal } = args
+  const stateTo = { season: state.season!, episode: state.episode! }
+  let initial: FetchSeriesTranslatorResponse['initial']
+  let seasons = item.streams.find((s) => s.translatorId === translatorId)!.seasons!
+  if (!seasons) {
+    // Translator not fetched yet
+    const res = await fetchSeriesEpisodesStream({
+      id: item.id,
+      translatorId,
+      favsId: item.favsId,
+      signal,
+    })
+    const { seasons: newSeasons, stream, streamFor } = res
+    seasons = newSeasons.map((s) => ({
+      number: s.number,
+      title: s.title,
+      episodes: s.episodes.map((e) => ({
+        number: e.number,
+        title: e.title,
+        stream: s.number === streamFor.season && e.number === streamFor.episode ? stream : null,
+      })),
+    }))
+    initial = seasons
+  }
+  let season = seasons.find((s) => s.number === stateTo.season)
+  let episode: ItemSeriesEpisodeStream | undefined
+  if (!season) {
+    // Season doesn't exists on this translator,
+    // reset to first available season
+    season = seasons[0]
+    stateTo.season = season.number
+    // and episode
+    episode = season.episodes[0]
+    stateTo.episode = episode.number
+  } else {
+    // Season exists, search for episode
+    episode = season.episodes.find((e) => e.number === stateTo.episode)
+  }
+  if (!episode) {
+    // Episode doesn't exists on this translator,
+    // reset to first available episode
+    episode = season.episodes[0]
+    stateTo.episode = episode.number
+  }
+  let next: FetchSeriesTranslatorResponse['next']
+  if (!episode.stream) {
+    // Stream not fetched yet, start fetching
+    const stream = await fetchSeriesStream({
+      id: item.id,
+      translatorId,
+      favsId: item.favsId,
+      season: stateTo.season,
+      episode: stateTo.season,
+      signal,
+    })
+    next = { stream, streamFor: stateTo }
+  }
+  return {
+    type: 'series' as const,
+    stateTo,
+    initial,
+    next,
+  }
+}
+
+export async function fetchTranslator(args: FetchTranslatorArgs): Promise<FetchTranslatorResponse> {
+  const { item, translatorId, state, signal } = args
+  if (item.itemType === 'series') {
+    return await fetchSeriesTranslator({ item, translatorId, signal, state })
+  } else {
+    return await fetchMovieTranslator({ item, translatorId, signal })
   }
 }
