@@ -152,8 +152,8 @@ export async function fetchStreamThumbnails(stream: Stream) {
   stream.thumbnails.parse(data)
 }
 
-export async function fetchStream(args: StreamSuccessResponse) {
-  const stream = parseStream(args)
+export async function fetchStream(rawStream: StreamSuccessResponse) {
+  const stream = parseStream(rawStream)
   const promises = stream.qualities.map((q) => fetchStreamDownloadSize(stream, q.id))
   promises.push(fetchStreamThumbnails(stream))
   await Promise.all(promises)
