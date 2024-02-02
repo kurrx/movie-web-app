@@ -11,10 +11,10 @@ import {
   ThunkApiConfig,
   WatchItemState,
   WatchPlaylist,
-  WatchPlaylistAdjacent,
   WatchPlaylistItem,
   WatchPlaylistItemFranchise,
   WatchPlaylistItemSeason,
+  WatchPlaylistPlayItem,
   WatchStoreState,
 } from '@/types'
 
@@ -312,6 +312,8 @@ export const { switchQuality, updateTime } = watchSlice.actions
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
 export const selectWatchItem = createSelector(selectWatchItemOptional, (item) => item!.item!)
+export const selectWatchItemSwitchState = (state: AppStoreState, id: number) =>
+  state.watch.switchStates.find((s) => s.id === id)!
 export const selectWatchItemFetchState = createSelector(
   selectWatchItemOptional,
   (item) => item!.state,
@@ -402,7 +404,7 @@ export const selectWatchItemPlaylist = createSelector(
     let currentFranchiseIndex = -1
     if (franchise) {
       let passedCurrent = false
-      for (let i = franchise.items.length - 1; i >= 0; i--) {
+      for (let i = 0; i < franchise.items.length; i++) {
         const item = franchise.items[i]
         if (item.isCurrent) {
           passedCurrent = true
@@ -439,6 +441,7 @@ export const selectWatchItemPlaylist = createSelector(
           const episodeDetail = item.episodesInfo?.[seasonIndex]?.[episodeIndex]
           seasonItem.episodes.push({
             type: 'episode',
+            season: season.number,
             number: episode.number,
             title: `${episode.number}. ${episodeDetail?.title || 'Серия'}`,
             originalTitle: episodeDetail?.originalTitle || null,
@@ -460,9 +463,7 @@ export const selectWatchItemPlaylist = createSelector(
       })
     }
 
-    playlist.items.push(...beforeFranchise)
-    playlist.items.push(...seasons)
-    playlist.items.push(...afterFranchise)
+    playlist.items = playlist.items.concat(beforeFranchise).concat(seasons).concat(afterFranchise)
     return playlist
   },
 )
@@ -479,42 +480,26 @@ export const selectWatchItemPlaylistAdjacents = createSelector(
       if (episodeIndex === -1) {
         return { prev: null, next: null }
       }
-      let prev: WatchPlaylistAdjacent | null = null
-      let next: WatchPlaylistAdjacent | null = null
+      let prev: WatchPlaylistPlayItem | null = null
+      let next: WatchPlaylistPlayItem | null = null
       if (episodeIndex > 0) {
-        prev = {
-          type: 'episode',
-          season: current.number,
-          episode: current.episodes[episodeIndex - 1],
-        }
+        prev = current.episodes[episodeIndex - 1]
       } else if (currentIndex > 0) {
         const prevPlaylistItem = playlist.items[currentIndex - 1]
         if (prevPlaylistItem.type === 'franchise') {
           prev = prevPlaylistItem
         } else {
-          prev = {
-            type: 'episode',
-            season: prevPlaylistItem.number,
-            episode: prevPlaylistItem.episodes[prevPlaylistItem.episodes.length - 1],
-          }
+          prev = prevPlaylistItem.episodes[prevPlaylistItem.episodes.length - 1]
         }
       }
       if (episodeIndex < current.episodes.length - 1) {
-        next = {
-          type: 'episode',
-          season: current.number,
-          episode: current.episodes[episodeIndex + 1],
-        }
+        next = current.episodes[episodeIndex + 1]
       } else if (currentIndex < playlist.items.length - 1) {
         const nextPlaylistItem = playlist.items[currentIndex + 1]
         if (nextPlaylistItem.type === 'franchise') {
           next = nextPlaylistItem
         } else {
-          next = {
-            type: 'episode',
-            season: nextPlaylistItem.number,
-            episode: nextPlaylistItem.episodes[0],
-          }
+          next = nextPlaylistItem.episodes[0]
         }
       }
       return { prev, next }
@@ -522,10 +507,10 @@ export const selectWatchItemPlaylistAdjacents = createSelector(
       let prev: WatchPlaylistItem | null = null
       let next: WatchPlaylistItem | null = null
       if (currentIndex > 0) {
-        prev = playlist.items[currentIndex - 1]
+        prev = playlist.items[currentIndex - 1] as WatchPlaylistItemFranchise
       }
       if (currentIndex < playlist.items.length - 1) {
-        next = playlist.items[currentIndex + 1]
+        next = playlist.items[currentIndex + 1] as WatchPlaylistItemFranchise
       }
       return { prev, next }
     }

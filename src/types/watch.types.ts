@@ -38,6 +38,7 @@ export interface WatchPlaylistItemFranchise {
 
 export interface WatchPlaylistItemEpisode {
   type: 'episode'
+  season: number
   number: number
   title: string
   originalTitle: string | null
@@ -59,15 +60,9 @@ export interface WatchPlaylist {
   items: WatchPlaylistItem[]
 }
 
-export interface WatchPlaylistAdjacentEpisode {
-  type: 'episode'
-  season: number
-  episode: WatchPlaylistItemEpisode
-}
-
-export type WatchPlaylistAdjacent = WatchPlaylistItemFranchise | WatchPlaylistAdjacentEpisode
+export type WatchPlaylistPlayItem = WatchPlaylistItemFranchise | WatchPlaylistItemEpisode
 
 export interface WatchPlaylistAdjacents {
-  prev: WatchPlaylistAdjacent | null
-  next: WatchPlaylistAdjacent | null
+  prev: WatchPlaylistPlayItem | null
+  next: WatchPlaylistPlayItem | null
 }
