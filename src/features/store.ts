@@ -6,7 +6,7 @@ import { deviceReducer } from './device'
 import { playerReducer } from './player'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
-import { watchReducer } from './watch'
+import { updateTime, watchReducer } from './watch'
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +25,6 @@ export const store = configureStore({
 
   devTools: IS_DEV && {
     name: APP_NAME,
-    actionsDenylist: [],
+    actionsDenylist: [updateTime.type],
   },
 })
