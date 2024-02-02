@@ -19,7 +19,7 @@ export function WatchInfoDownload({ title, qualities }: WatchInfoDownloadProps) 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className='rounded-full'>
+        <Button className='rounded-full' variant='secondary'>
           <DownloadIcon className='mr-2 h-4 w-4' />
           Download
         </Button>
