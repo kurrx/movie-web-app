@@ -1,4 +1,5 @@
 export type * from './ajax.types'
+export type * from './player.types'
 export type * from './request.types'
 export type * from './router.types'
 export type * from './search.types'
