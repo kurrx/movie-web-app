@@ -66,3 +66,8 @@ export interface WatchPlaylistAdjacentEpisode {
 }
 
 export type WatchPlaylistAdjacent = WatchPlaylistItemFranchise | WatchPlaylistAdjacentEpisode
+
+export interface WatchPlaylistAdjacents {
+  prev: WatchPlaylistAdjacent | null
+  next: WatchPlaylistAdjacent | null
+}
