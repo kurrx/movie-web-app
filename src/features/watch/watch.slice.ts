@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { fetchItem, fetchSeriesStream } from '@/api'
+import { fetchItem, fetchSeriesStream, fetchTranslator } from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
   AppStoreState,
   ItemFullID,
+  ItemMovie,
   ItemSeries,
   Stream,
   ThunkApiConfig,
@@ -15,15 +16,56 @@ import {
   WatchStoreState,
 } from '@/types'
 
+type Thunk = ThunkApiConfig
+type ThunkConditionApi = { getState: () => AppStoreState }
+type GetItemReturn = Awaited<ReturnType<typeof fetchItem>>
+type GetItemParam = ItemFullID
+type SwitchParam = { id: number }
+type SEpisodeReturn = Awaited<ReturnType<typeof fetchSeriesStream>> | null
+type SEpisodeParam = { season: number; episode: number } & SwitchParam
+type STranslatorReturn = Awaited<ReturnType<typeof fetchTranslator>>
+type STtranslatorParam = { translatorId: number } & SwitchParam
+type SwitchAction = { meta: { arg: { id: number }; requestId: string } }
+
+function switchPending(state: WatchStoreState, action: SwitchAction) {
+  const switchState = state.switchStates.find((s) => s.id === action.meta.arg.id)!
+  switchState.state = SwitchState.LOADING
+  switchState.error = null
+  switchState.requestId = action.meta.requestId
+}
+function switchRejected(type: 'episode' | 'translator') {
+  const error = {
+    code: 'Switch Error',
+    name: 'Switch Error',
+    message: `Error while changing ${type}! Try again.`,
+  }
+  return function (state: WatchStoreState, action: SwitchAction) {
+    const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
+    if (switchState && switchState.state === SwitchState.LOADING) {
+      switchState.requestId = null
+      switchState.state = SwitchState.ERROR
+      switchState.error = error
+    }
+  }
+}
+function checkState(stream: Stream, state: WatchItemState) {
+  const isQualityPresent = stream.qualities.some((q) => q.id === state.quality)
+  if (!isQualityPresent) {
+    state.quality = stream.defaultQuality
+  }
+  const isSubtitlePresent = stream.subtitles.some((s) => s.id === state.subtitle)
+  if (!isSubtitlePresent) {
+    state.subtitle = stream.defaultSubtitle
+  }
+}
+
 const initialState: WatchStoreState = {
   items: [],
   states: {},
   switchStates: [],
 }
 
-type GetItemReturnType = Awaited<ReturnType<typeof fetchItem>>
-type GetItemParamType = ItemFullID
-export const getItem = createAsyncThunk<GetItemReturnType, GetItemParamType, ThunkApiConfig>(
+export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
   async (fullId, { signal, getState }) => {
     const itemState = getState().watch.states[fullId.id]
@@ -45,37 +87,42 @@ export const getItem = createAsyncThunk<GetItemReturnType, GetItemParamType, Thu
   },
 )
 
-type SEReturnType = Awaited<ReturnType<typeof fetchSeriesStream>> | null
-interface SEParamType {
-  id: number
-  season: number
-  episode: number
+const switchOptions = {
+  condition({ id }: SwitchParam, { getState }: ThunkConditionApi): boolean {
+    const switchStates = getState().watch.switchStates
+    const switchState = switchStates.find((s) => s.id === id)!
+    return switchState.state !== SwitchState.LOADING
+  },
 }
-export const switchEpisode = createAsyncThunk<SEReturnType, SEParamType, ThunkApiConfig>(
+export const switchEpisode = createAsyncThunk<SEpisodeReturn, SEpisodeParam, Thunk>(
   'watch/switchEpisode',
   async ({ id, season, episode }, { signal, getState }) => {
     const item = getState().watch.items.find((i) => i.id === id)!.item! as ItemSeries
-    const itemState = getState().watch.states[id]!
+    const state = getState().watch.states[id]!
     const stream = item.streams
-      .find((s) => s.translatorId === itemState.translatorId)!
+      .find((s) => s.translatorId === state.translatorId)!
       .seasons!.find((s) => s.number === season)!
       .episodes.find((e) => e.number === episode)!.stream
     if (stream) return null
     return await fetchSeriesStream({
       id,
       favsId: item.favsId,
-      translatorId: itemState.translatorId,
+      translatorId: state.translatorId,
       season,
       episode,
       signal,
     })
   },
-  {
-    condition(arg, api) {
-      const switchState = api.getState().watch.switchStates.find((s) => s.id === arg.id)!
-      return switchState.state !== SwitchState.LOADING
-    },
+  switchOptions,
+)
+export const switchTranslator = createAsyncThunk<STranslatorReturn, STtranslatorParam, Thunk>(
+  'watch/switchTranslator',
+  async ({ id, translatorId }, { signal, getState }) => {
+    const item = getState().watch.items.find((i) => i.id === id)!.item!
+    const state = getState().watch.states[id]!
+    return await fetchTranslator({ item, translatorId, state, signal })
   },
+  switchOptions,
 )
 
 const watchSlice = createSlice({
@@ -103,6 +150,12 @@ const watchSlice = createSlice({
             error: null,
             requestId: action.meta.requestId,
             item: null,
+          })
+          state.switchStates.push({
+            id: action.meta.arg.id,
+            state: SwitchState.IDLE,
+            error: null,
+            requestId: null,
           })
         } else {
           item.state = FetchState.LOADING
@@ -147,14 +200,7 @@ const watchSlice = createSlice({
               (s) => s.translatorId === nextState.translatorId,
             )!.stream!
           }
-          const isQualityPresent = stream!.qualities.some((q) => q.id === nextState.quality)
-          if (!isQualityPresent) {
-            nextState.quality = stream!.defaultQuality
-          }
-          const isSubtitlePresent = stream!.subtitles.some((s) => s.id === nextState.subtitle)
-          if (!isSubtitlePresent) {
-            nextState.subtitle = stream!.defaultSubtitle
-          }
+          checkState(stream!, nextState)
           if (!currentState) {
             state.states[action.meta.arg.id] = nextState
           }
@@ -181,58 +227,77 @@ const watchSlice = createSlice({
       })
 
     builder
-      .addCase(switchEpisode.pending, (state, action) => {
-        const switchState = state.switchStates.find((s) => s.id === action.meta.arg.id)
-        if (!switchState) {
-          state.switchStates.push({
-            id: action.meta.arg.id,
-            state: SwitchState.IDLE,
-            error: null,
-            requestId: null,
-          })
-        } else {
-          switchState.state = SwitchState.LOADING
-          switchState.error = null
-          switchState.requestId = action.meta.requestId
-        }
-      })
+      .addCase(switchEpisode.pending, switchPending)
+      .addCase(switchEpisode.rejected, switchRejected('episode'))
       .addCase(switchEpisode.fulfilled, (state, action) => {
         const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
         if (switchState && switchState.state === SwitchState.LOADING) {
-          const item = state.items.find((i) => i.id === action.meta.arg.id)!.item! as ItemSeries
-          const itemState = state.states[action.meta.arg.id]!
+          const { id, season, episode } = action.meta.arg
+          const itemState = state.states[id]!
           let stream = action.payload
           if (!stream) {
+            const item = state.items.find((i) => i.id === id)!.item! as ItemSeries
             stream = item.streams
               .find((s) => s.translatorId === itemState.translatorId)!
-              .seasons!.find((s) => s.number === action.meta.arg.season)!
-              .episodes.find((e) => e.number === action.meta.arg.episode)!.stream!
+              .seasons!.find((s) => s.number === season)!
+              .episodes.find((e) => e.number === episode)!.stream!
           }
-          const isQualityPresent = stream.qualities.some((q) => q.id === itemState.quality)
-          if (!isQualityPresent) {
-            itemState.quality = stream.defaultQuality
-          }
-          const isSubtitlePresent = stream.subtitles.some((s) => s.id === itemState.subtitle)
-          if (!isSubtitlePresent) {
-            itemState.subtitle = stream.defaultSubtitle
-          }
+          checkState(stream, itemState)
           itemState.timestamp = 0
-          itemState.season = action.meta.arg.season
-          itemState.episode = action.meta.arg.episode
+          itemState.season = season
+          itemState.episode = episode
+
           switchState.state = SwitchState.IDLE
           switchState.requestId = null
         }
       })
-      .addCase(switchEpisode.rejected, (state, action) => {
+
+    builder
+      .addCase(switchTranslator.pending, switchPending)
+      .addCase(switchTranslator.rejected, switchRejected('translator'))
+      .addCase(switchTranslator.fulfilled, (state, action) => {
         const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
         if (switchState && switchState.state === SwitchState.LOADING) {
-          switchState.requestId = null
-          switchState.state = SwitchState.ERROR
-          switchState.error = {
-            code: 'Switch Error',
-            name: 'Switch Episode Error',
-            message: 'Error while changing episode! Try again.',
+          const { id, translatorId } = action.meta.arg
+          const payload = action.payload
+          const item = state.items.find((i) => i.id === id)!.item!
+          const itemState = state.states[id]!
+          let stream: Stream
+          if (payload.type === 'series') {
+            const { stateTo, initial, next } = payload
+            const translator = (item as ItemSeries).streams.find(
+              (s) => s.translatorId === translatorId,
+            )!
+            if (initial) translator.seasons = initial
+            const seasons = translator.seasons!
+            if (next) {
+              const { stream: nextStream, streamFor } = next
+              const find = seasons
+                .find((s) => s.number === streamFor.season)!
+                .episodes.find((e) => e.number === streamFor.episode)!
+              stream = find.stream = nextStream
+            } else {
+              stream = seasons
+                .find((s) => s.number === stateTo.season)!
+                .episodes.find((e) => e.number === stateTo.episode)!.stream!
+            }
+            if (itemState.season !== stateTo.season || itemState.episode !== stateTo.episode) {
+              itemState.timestamp = 0
+            }
+            itemState.season = stateTo.season
+            itemState.episode = stateTo.episode
+          } else {
+            const translator = (item as ItemMovie).streams.find(
+              (s) => s.translatorId === translatorId,
+            )!
+            if (payload.stream) translator.stream = payload.stream
+            stream = translator.stream!
           }
+          checkState(stream, itemState)
+          itemState.translatorId = translatorId
+
+          switchState.state = SwitchState.IDLE
+          switchState.requestId = null
         }
       })
   },
