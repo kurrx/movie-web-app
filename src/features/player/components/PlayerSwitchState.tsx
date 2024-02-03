@@ -27,7 +27,7 @@ export function PlayerSwitchState() {
         open={switchState.state === SwitchState.ERROR}
         error={switchState.error}
         container={content}
-        className='[&_*]:!select-text'
+        className='[&_*]:select-text'
         onReload={onSwitchRetry}
       />
     </div>
