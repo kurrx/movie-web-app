@@ -94,4 +94,7 @@ export const selectPlayerSettings = createSelector(
   }),
 )
 
+export const selectPlayerFullscreen = () => false
+export const selectPlayerDesktopControlsVisible = () => true
+
 export const playerReducer = playerSlice.reducer
