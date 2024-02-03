@@ -9,7 +9,7 @@ function Root({ children }: PropsWithChildren) {
 
   return (
     <div
-      id='player-bottom-controls'
+      id='player-controls'
       className={cn(
         'absolute left-0 bottom-0 transition-opacity',
         'data-[visible="false"]:opacity-0 w-full px-3',
@@ -34,4 +34,4 @@ function ButtonsRight({ children }: PropsWithChildren) {
   return <div className='flex items-center shrink-0 justify-end'>{children}</div>
 }
 
-export const BottomControls = { Root, Buttons, ButtonsLeft, ButtonsRight }
+export const Controls = { Root, Buttons, ButtonsLeft, ButtonsRight }
