@@ -1,3 +1,4 @@
+import { BottomControls } from './BottomControls'
 import { Gradient } from './Gradient'
 import { Loader } from './Loader'
 import { TopInfo } from './TopInfo'
@@ -10,6 +11,12 @@ export function DesktopControls() {
       <Gradient position='bottom' />
       <Loader />
       <TopInfo />
+      <BottomControls.Root>
+        <BottomControls.Buttons>
+          <BottomControls.ButtonsLeft></BottomControls.ButtonsLeft>
+          <BottomControls.ButtonsRight></BottomControls.ButtonsRight>
+        </BottomControls.Buttons>
+      </BottomControls.Root>
     </Wrapper>
   )
 }
