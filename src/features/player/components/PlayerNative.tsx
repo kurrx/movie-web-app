@@ -12,6 +12,8 @@ export function PlayerNative() {
       <ReactPlayer
         ref={setPlayer}
         className='player'
+        width='100%'
+        height='100%'
         url={mediaUrl}
         controls={false}
         playsinline={true}

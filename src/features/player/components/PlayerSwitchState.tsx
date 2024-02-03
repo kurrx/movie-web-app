@@ -12,8 +12,9 @@ export function PlayerSwitchState() {
 
   return (
     <div
+      id='player-switch-state'
       className={cn(
-        'z-[2] absolute top-0 left-0 w-full h-full',
+        'z-[4] absolute top-0 left-0 w-full h-full',
         'items-center justify-center text-white bg-black',
         'data-[visible="true"]:flex data-[visible="false"]:hidden',
       )}
