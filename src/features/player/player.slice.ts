@@ -94,6 +94,7 @@ export const selectPlayerSettings = createSelector(
   }),
 )
 
+export const selectPlayerLoading = () => true
 export const selectPlayerFullscreen = () => false
 export const selectPlayerDesktopControlsVisible = () => true
 
