@@ -16,8 +16,8 @@ export function DesktopControls() {
       </Heading.Root>
       <Controls.Root>
         <Controls.Buttons>
-          <Controls.ButtonsLeft></Controls.ButtonsLeft>
-          <Controls.ButtonsRight></Controls.ButtonsRight>
+          <Controls.Side side='left'></Controls.Side>
+          <Controls.Side side='right'></Controls.Side>
         </Controls.Buttons>
       </Controls.Root>
     </Wrapper>

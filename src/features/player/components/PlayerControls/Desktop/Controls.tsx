@@ -23,15 +23,30 @@ function Root({ children }: PropsWithChildren) {
 }
 
 function Buttons({ children }: PropsWithChildren) {
-  return <div className='flex items-center justify-between'>{children}</div>
+  return (
+    <div id='player-controls-buttons' className='flex items-center justify-between'>
+      {children}
+    </div>
+  )
 }
 
-function ButtonsLeft({ children }: PropsWithChildren) {
-  return <div className='flex items-center flex-1 justify-start'>{children}</div>
+export interface ControlsSideProps extends PropsWithChildren {
+  side: 'left' | 'right'
 }
 
-function ButtonsRight({ children }: PropsWithChildren) {
-  return <div className='flex items-center shrink-0 justify-end'>{children}</div>
+function Side({ side, children }: ControlsSideProps) {
+  return (
+    <div
+      id={`player-controls-buttons-${side}`}
+      className={cn(
+        'flex items-center',
+        side === 'left' && 'justify-start flex-1',
+        side === 'right' && 'justify-end shrink-0',
+      )}
+    >
+      {children}
+    </div>
+  )
 }
 
-export const Controls = { Root, Buttons, ButtonsLeft, ButtonsRight }
+export const Controls = { Root, Buttons, Side }
