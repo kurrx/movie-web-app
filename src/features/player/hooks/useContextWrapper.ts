@@ -1,5 +1,4 @@
-import type { Context } from 'react'
-import { useContext } from 'react'
+import { Context, useContext } from 'react'
 
 export function useContextWrapper<T>(ReactContext: Context<T>, name: string) {
   const context = useContext(ReactContext)

@@ -1,6 +1,6 @@
 import { AlertSuper, CommandGroup } from '@/components'
 import { FetchState } from '@/core'
-import type { SearchQuery } from '@/types'
+import { SearchQuery } from '@/types'
 
 import { SearchItem } from './SearchItem'
 import { SearchItemSkeleton } from './SearchItemSkeleton'
