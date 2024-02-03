@@ -1,3 +1,5 @@
+import { Wrapper } from './Wrapper'
+
 export function DesktopControls() {
-  return null
+  return <Wrapper></Wrapper>
 }
