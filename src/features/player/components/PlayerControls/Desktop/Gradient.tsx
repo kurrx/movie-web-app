@@ -1,22 +1,23 @@
 import { useMemo } from 'react'
 
 import { cn } from '@/api'
+import { useAppSelector } from '@/hooks'
+
 import {
   selectPlayerDesktopControlsVisible,
-  selectPlayerFullscreen,
-} from '@/features/player/player.slice'
-import { useAppSelector } from '@/hooks'
+  selectPlayerDesktopTopVisible,
+} from '../../../player.slice'
 
 export interface GradientProps {
   position: 'top' | 'bottom'
 }
 
 export function Gradient({ position }: GradientProps) {
+  const topVisible = useAppSelector(selectPlayerDesktopTopVisible)
   const controlsVisible = useAppSelector(selectPlayerDesktopControlsVisible)
-  const fullscreen = useAppSelector(selectPlayerFullscreen)
   const visible = useMemo(
-    () => (position === 'top' ? controlsVisible && fullscreen : controlsVisible),
-    [controlsVisible, fullscreen, position],
+    () => (position === 'top' ? topVisible : controlsVisible),
+    [topVisible, controlsVisible, position],
   )
 
   return (

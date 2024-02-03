@@ -1,7 +1,8 @@
 import { cn } from '@/api'
 import { LoaderIcon } from '@/assets'
-import { selectPlayerLoading } from '@/features/player/player.slice'
 import { useAppSelector } from '@/hooks'
+
+import { selectPlayerLoading } from '../../../player.slice'
 
 export function Loader() {
   const loading = useAppSelector(selectPlayerLoading)

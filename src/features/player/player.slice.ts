@@ -94,8 +94,13 @@ export const selectPlayerSettings = createSelector(
   }),
 )
 
-export const selectPlayerLoading = () => false
-export const selectPlayerFullscreen = () => false
-export const selectPlayerDesktopControlsVisible = () => true
+export const selectPlayerLoading = (state: AppStoreState) => false
+export const selectPlayerFullscreen = (state: AppStoreState) => false
+export const selectPlayerDesktopControlsVisible = (state: AppStoreState) => true
+export const selectPlayerDesktopTopVisible = createSelector(
+  selectPlayerFullscreen,
+  selectPlayerDesktopControlsVisible,
+  (fullscreen, controlsVisible) => fullscreen && controlsVisible,
+)
 
 export const playerReducer = playerSlice.reducer
