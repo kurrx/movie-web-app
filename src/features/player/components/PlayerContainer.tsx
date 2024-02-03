@@ -6,7 +6,7 @@ import { useAppSelector } from '@/hooks'
 import { selectPlayerTheater } from '../player.slice'
 import { useNodes } from './PlayerNodes'
 
-function Root({ children }: PropsWithChildren) {
+export function PlayerContainer({ children }: PropsWithChildren) {
   const { setContainer, setContent } = useNodes()
   const fullscreen = false
   const theater = useAppSelector(selectPlayerTheater)
@@ -23,9 +23,3 @@ function Root({ children }: PropsWithChildren) {
     </div>
   )
 }
-
-function Wrapper({ children }: PropsWithChildren) {
-  return <div className='player-wrapper'>{children}</div>
-}
-
-export const PlayerContainer = { Root, Wrapper }

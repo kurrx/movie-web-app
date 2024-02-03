@@ -27,7 +27,7 @@
   .player-container.theater,
   .player-container.fullscreen {
     margin: 0;
-    padding: 0;
+    padding: 0 !important;
     max-width: initial;
     height: auto;
     position: sticky;
