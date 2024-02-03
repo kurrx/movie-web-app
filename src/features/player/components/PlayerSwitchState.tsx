@@ -14,9 +14,8 @@ export function PlayerSwitchState() {
     <div
       id='player-switch-state'
       className={cn(
-        'z-[4] absolute top-0 left-0 w-full h-full',
-        'items-center justify-center text-white bg-black',
-        'data-[visible="true"]:flex data-[visible="false"]:hidden',
+        'player-abs player-full player-flex text-white',
+        'bg-black data-[visible="false"]:hidden',
       )}
       data-visible={switchState.state !== SwitchState.IDLE}
     >
