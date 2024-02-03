@@ -1,4 +1,5 @@
 import { Gradient } from './Gradient'
+import { Loader } from './Loader'
 import { Wrapper } from './Wrapper'
 
 export function DesktopControls() {
@@ -6,6 +7,7 @@ export function DesktopControls() {
     <Wrapper>
       <Gradient position='top' />
       <Gradient position='bottom' />
+      <Loader />
     </Wrapper>
   )
 }
