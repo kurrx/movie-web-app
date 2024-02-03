@@ -5,7 +5,7 @@ import { useAppSelector } from '@/hooks'
 
 import {
   selectPlayerDesktopControlsVisible,
-  selectPlayerDesktopTopVisible,
+  selectPlayerDesktopHeadingVisible,
 } from '../../../player.slice'
 
 export interface GradientProps {
@@ -13,11 +13,11 @@ export interface GradientProps {
 }
 
 export function Gradient({ position }: GradientProps) {
-  const topVisible = useAppSelector(selectPlayerDesktopTopVisible)
+  const headingVisible = useAppSelector(selectPlayerDesktopHeadingVisible)
   const controlsVisible = useAppSelector(selectPlayerDesktopControlsVisible)
   const visible = useMemo(
-    () => (position === 'top' ? topVisible : controlsVisible),
-    [topVisible, controlsVisible, position],
+    () => (position === 'top' ? headingVisible : controlsVisible),
+    [headingVisible, controlsVisible, position],
   )
 
   return (
