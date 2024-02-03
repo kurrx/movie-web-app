@@ -1,7 +1,7 @@
-import { SwitchState } from '@/core'
+import type { SwitchState } from '@/core'
 
-import { Item } from './ajax.types'
-import { FetchableState } from './store.types'
+import type { Item } from './ajax.types'
+import type { FetchableState } from './store.types'
 
 export interface WatchItemSwitchState extends FetchableState<SwitchState> {
   id: number

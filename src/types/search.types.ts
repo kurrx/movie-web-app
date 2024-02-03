@@ -1,5 +1,5 @@
-import { SearchItem } from './ajax.types'
-import { FetchableState } from './store.types'
+import type { SearchItem } from './ajax.types'
+import type { FetchableState } from './store.types'
 
 export interface SearchQuery extends FetchableState {
   query: string

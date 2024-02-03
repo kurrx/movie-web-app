@@ -1,8 +1,8 @@
-import { Thumbnails } from '@/core'
+import type { Thumbnails } from '@/core'
 
-import { RequestArgs } from './request.types'
-import { NavigationItemCollection } from './router.types'
-import { WatchItemState } from './watch.types'
+import type { RequestArgs } from './request.types'
+import type { NavigationItemCollection } from './router.types'
+import type { WatchItemState } from './watch.types'
 
 // Common Types
 export interface ItemID {

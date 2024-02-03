@@ -1,5 +1,5 @@
 import type { SerializedError } from '@reduxjs/toolkit'
-import { TypedUseSelectorHook } from 'react-redux'
+import type { TypedUseSelectorHook } from 'react-redux'
 
 import type { FetchState } from '@/core'
 import type { store } from '@/features'
