@@ -16,12 +16,24 @@ export interface AlertErrorDialogProps {
   open?: boolean
   error?: SerializedError | null
   dismissible?: boolean
+  container?: HTMLElement | null
+  className?: string
   onReload?: () => void
   onClose?: () => void
 }
 
 export function AlertErrorDialog(props: AlertErrorDialogProps) {
-  const { title, description, open = true, error, dismissible, onReload, onClose } = props
+  const {
+    title,
+    description,
+    open = true,
+    error,
+    dismissible,
+    container,
+    className,
+    onReload,
+    onClose,
+  } = props
   const [closed, setClosed] = useState(false)
   const isOpen = useMemo(() => !!open && !closed, [open, closed])
 
@@ -32,7 +44,7 @@ export function AlertErrorDialog(props: AlertErrorDialogProps) {
 
   return (
     <AlertDialog open={isOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent container={container} className={className}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title || 'Oops!'}</AlertDialogTitle>
           <AlertDialogDescription>
