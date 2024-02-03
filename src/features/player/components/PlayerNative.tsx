@@ -11,10 +11,8 @@ export function PlayerNative() {
     <div className='player-wrapper'>
       <ReactPlayer
         ref={setPlayer}
-        url={mediaUrl}
         className='player'
-        width='100%'
-        height='100%'
+        url={mediaUrl}
         controls={false}
         playsinline={true}
         loop={false}

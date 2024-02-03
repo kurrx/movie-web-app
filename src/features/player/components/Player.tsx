@@ -9,6 +9,7 @@ import { PlayerContainer } from './PlayerContainer'
 import { PlayerNative } from './PlayerNative'
 import { PlayerNodesProvider } from './PlayerNodes'
 import { PlayerProps, PlayerPropsProvider } from './PlayerProps'
+import { PlayerSwitchState } from './PlayerSwitchState'
 
 export function Player(props: PlayerProps) {
   const dispatch = useAppDispatch()
@@ -25,6 +26,7 @@ export function Player(props: PlayerProps) {
       <PlayerNodesProvider>
         <PlayerContainer>
           <PlayerNative />
+          <PlayerSwitchState />
         </PlayerContainer>
       </PlayerNodesProvider>
     </PlayerPropsProvider>

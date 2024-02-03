@@ -4,7 +4,7 @@
 }
 
 .player-container * {
-  user-select: none !important;
+  user-select: none;
 }
 
 .player-container.theater,
@@ -67,6 +67,7 @@
 }
 
 .player-wrapper {
+  z-index: 1;
   position: relative;
   height: 100%;
   pointer-events: none;
@@ -86,8 +87,9 @@
 }
 
 .player {
-  z-index: 1;
   position: absolute;
   top: 0;
   left: 0;
+  width: 100% !important;
+  height: 100% !important;
 }
