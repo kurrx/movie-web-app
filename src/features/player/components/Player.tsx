@@ -6,6 +6,7 @@ import { useAppDispatch } from '@/hooks'
 
 import { setPlayerInitialized } from '../player.slice'
 import { PlayerContainer } from './PlayerContainer'
+import { PlayerControls } from './PlayerControls'
 import { PlayerNative } from './PlayerNative'
 import { PlayerNodesProvider } from './PlayerNodes'
 import { PlayerProps, PlayerPropsProvider } from './PlayerProps'
@@ -26,6 +27,8 @@ export function Player(props: PlayerProps) {
       <PlayerNodesProvider>
         <PlayerContainer>
           <PlayerNative />
+          {/* TODO: Thumbnails Overlay */}
+          <PlayerControls />
           <PlayerSwitchState />
         </PlayerContainer>
       </PlayerNodesProvider>
