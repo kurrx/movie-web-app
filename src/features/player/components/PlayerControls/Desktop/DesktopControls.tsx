@@ -1,3 +1,4 @@
+import { AdjacentButton } from './Buttons'
 import { Controls } from './Controls'
 import { Gradient } from './Gradient'
 import { Heading } from './Heading'
@@ -16,7 +17,10 @@ export function DesktopControls() {
       </Heading.Root>
       <Controls.Root>
         <Controls.Buttons>
-          <Controls.Side side='left'></Controls.Side>
+          <Controls.Side side='left'>
+            <AdjacentButton type='prev' />
+            <AdjacentButton type='next' />
+          </Controls.Side>
           <Controls.Side side='right'></Controls.Side>
         </Controls.Buttons>
       </Controls.Root>
