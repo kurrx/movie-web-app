@@ -1,5 +1,7 @@
 /// <reference types="vite-plugin-svgr/client" />
 export { default as DownloadIcon } from './download.svg?react'
+export { default as FullscreenOffIcon } from './fullscreen-off.svg?react'
+export { default as FullscreenOnIcon } from './fullscreen-on.svg?react'
 export { default as GithubLogoIcon } from './github-logo.svg?react'
 export { default as LoaderIcon } from './loader.svg?react'
 export { default as LogoIcon } from './logo.svg?react'
