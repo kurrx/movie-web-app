@@ -23,4 +23,5 @@ export interface PlayerStoreState {
   tooltipHovered: boolean
 
   fullscreen: boolean
+  pip: boolean
 }

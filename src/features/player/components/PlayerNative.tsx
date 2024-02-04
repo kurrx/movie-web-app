@@ -1,12 +1,15 @@
 import { useCallback, useEffect } from 'react'
+import { isIOS, isMobileOnly, isMobileSafari } from 'react-device-detect'
 import { OnProgressProps } from 'react-player/base'
 import ReactPlayer from 'react-player/file'
 
-import { useStore } from '@/hooks'
+import { useStore, useStoreBoolean } from '@/hooks'
 
+import { useFullscreen } from '../hooks'
 import {
   resetPlayerState,
   selectPlayerMuted,
+  selectPlayerPip,
   selectPlayerPlaybackSpeed,
   selectPlayerPlaying,
   selectPlayerVolume,
@@ -14,6 +17,7 @@ import {
   setPlayerDuration,
   setPlayerEnded,
   setPlayerLoaded,
+  setPlayerPip,
   setPlayerPlaybackSpeed,
   setPlayerPlaying,
   setPlayerProgress,
@@ -26,10 +30,12 @@ export function PlayerNative() {
   const [dispatch, selector] = useStore()
   const { setPlayer, player } = useNodes()
   const { mediaUrl, startTime, onTimeUpdate } = useProps()
+  const { exitFullscreen } = useFullscreen()
   const playing = selector(selectPlayerPlaying)
   const volume = selector(selectPlayerVolume)
   const muted = selector(selectPlayerMuted)
   const playbackSpeed = selector(selectPlayerPlaybackSpeed)
+  const pip = selector(selectPlayerPip)
 
   const onReady = useCallback(() => {
     dispatch(setPlayerReady())
@@ -82,9 +88,14 @@ export function PlayerNative() {
     [dispatch],
   )
 
+  const { setTrue: onEnablePIP, setFalse: onDisablePIP } = useStoreBoolean(setPlayerPip)
+
   const onEnded = useCallback(() => {
     dispatch(setPlayerEnded())
-  }, [dispatch])
+    if (isIOS && (isMobileOnly || isMobileSafari)) {
+      exitFullscreen()
+    }
+  }, [dispatch, exitFullscreen])
 
   useEffect(() => {
     return () => {
@@ -114,6 +125,7 @@ export function PlayerNative() {
         muted={muted}
         playbackRate={playbackSpeed}
         progressInterval={1000 / playbackSpeed}
+        pip={pip}
         onReady={onReady}
         onDuration={onDuration}
         onBuffer={onBuffer}
@@ -123,6 +135,8 @@ export function PlayerNative() {
         onProgress={onProgress}
         onSeek={onSeek}
         onPlaybackRateChange={onPlaybackRateChange}
+        onEnablePIP={onEnablePIP}
+        onDisablePIP={onDisablePIP}
         onError={(err) => {
           console.log('error', err)
         }}

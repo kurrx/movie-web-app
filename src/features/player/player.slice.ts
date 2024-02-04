@@ -26,6 +26,7 @@ const initialState: PlayerStoreState = {
   tooltipHovered: false,
 
   fullscreen: false,
+  pip: false,
 }
 
 const playerSlice = createSlice({
@@ -110,6 +111,7 @@ const playerSlice = createSlice({
     setPlayerEnded(state) {
       state.ended = true
       state.playing = false
+      state.pip = false
     },
 
     setPlayerDuration(state, action: PayloadAction<number>) {
@@ -147,6 +149,19 @@ const playerSlice = createSlice({
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.fullscreen) : payload
       state.fullscreen = next
+      if (next) {
+        state.pip = false
+      }
+    },
+
+    setPlayerPip(state, action: PayloadAction<SetStateAction<boolean>>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
+      if (state.ended) return
+      if (state.fullscreen) return
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.pip) : payload
+      state.pip = next
     },
 
     resetPlayerState(state) {
@@ -185,6 +200,7 @@ export const {
   setPlayerFocused,
   setPlayerTooltipHovered,
   setPlayerFullscreen,
+  setPlayerPip,
   resetPlayerState,
 } = playerSlice.actions
 
@@ -228,6 +244,7 @@ export const selectPlayerFocused = (state: AppStoreState) => state.player.focuse
 export const selectPlayerTooltipHovered = (state: AppStoreState) => state.player.tooltipHovered
 
 export const selectPlayerFullscreen = (state: AppStoreState) => state.player.fullscreen
+export const selectPlayerPip = (state: AppStoreState) => state.player.pip
 
 export const selectPlayerFetched = createSelector(
   selectPlayerReady,
