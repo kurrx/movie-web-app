@@ -2,6 +2,7 @@ import './Player.css'
 
 import { useEffect } from 'react'
 
+import { SwitchState } from '@/core'
 import { useAppDispatch } from '@/hooks'
 
 import { setPlayerInitialized } from '../player.slice'
@@ -13,6 +14,7 @@ import { PlayerProps, PlayerPropsProvider } from './PlayerProps'
 import { PlayerSwitchState } from './PlayerSwitchState'
 
 export function Player(props: PlayerProps) {
+  const { mediaUrl, switchState } = props
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -26,9 +28,13 @@ export function Player(props: PlayerProps) {
     <PlayerPropsProvider {...props}>
       <PlayerNodesProvider>
         <PlayerContainer>
-          <PlayerNative />
-          {/* TODO: Thumbnails Overlay */}
-          <PlayerControls />
+          {switchState.state === SwitchState.IDLE && (
+            <>
+              <PlayerNative key={mediaUrl} />
+              {/* TODO: Thumbnails Overlay */}
+              <PlayerControls />
+            </>
+          )}
           <PlayerSwitchState />
         </PlayerContainer>
       </PlayerNodesProvider>

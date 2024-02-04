@@ -8,4 +8,13 @@ export interface PlayerStoreState {
   muted: boolean
   playbackSpeed: number
   jumpStep: number
+
+  ready: boolean
+  buffering: boolean
+  playing: boolean
+  ended: boolean
+  durationFetched: boolean
+  duration: number
+  progress: number
+  loaded: number
 }

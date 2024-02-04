@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { APP_NAME, IS_DEV } from '@/api'
 
 import { deviceReducer } from './device'
-import { playerReducer } from './player'
+import { playerReducer, setPlayerLoaded, setPlayerProgress } from './player'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
 import { updateTime, watchReducer } from './watch'
@@ -25,6 +25,6 @@ export const store = configureStore({
 
   devTools: IS_DEV && {
     name: APP_NAME,
-    actionsDenylist: [updateTime.type],
+    actionsDenylist: [updateTime.type, setPlayerProgress.type, setPlayerLoaded.type],
   },
 })

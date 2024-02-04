@@ -11,6 +11,15 @@ const initialState: PlayerStoreState = {
   canAutoStart: false,
 
   ...getPlayerSettings(),
+
+  ready: false,
+  buffering: false,
+  playing: false,
+  ended: false,
+  durationFetched: false,
+  duration: 0,
+  progress: 0,
+  loaded: 0,
 }
 
 const playerSlice = createSlice({
@@ -28,12 +37,14 @@ const playerSlice = createSlice({
 
     setPlayerTheater(state, action: PayloadAction<SetStateAction<boolean>>) {
       const payload = action.payload
-      state.theater = typeof payload === 'function' ? payload(state.theater) : payload
+      const next = typeof payload === 'function' ? payload(state.theater) : payload
+      state.theater = next
     },
 
     setPlayerAutoPlay(state, action: PayloadAction<SetStateAction<boolean>>) {
       const payload = action.payload
-      state.autoPlay = typeof payload === 'function' ? payload(state.autoPlay) : payload
+      const next = typeof payload === 'function' ? payload(state.autoPlay) : payload
+      state.autoPlay = next
     },
 
     setPlayerVolume(state, action: PayloadAction<SetStateAction<number>>) {
@@ -57,12 +68,65 @@ const playerSlice = createSlice({
 
     setPlayerPlaybackSpeed(state, action: PayloadAction<SetStateAction<number>>) {
       const payload = action.payload
-      state.playbackSpeed = typeof payload === 'function' ? payload(state.playbackSpeed) : payload
+      const next = typeof payload === 'function' ? payload(state.playbackSpeed) : payload
+      const clampedNext = clamp(next, 0.25, 2)
+      state.playbackSpeed = clampedNext
     },
 
     setPlayerJumpStep(state, action: PayloadAction<SetStateAction<number>>) {
       const payload = action.payload
-      state.jumpStep = typeof payload === 'function' ? payload(state.jumpStep) : payload
+      const next = typeof payload === 'function' ? payload(state.jumpStep) : payload
+      const clampedNext = clamp(next, 1, 60)
+      state.jumpStep = clampedNext
+    },
+
+    setPlayerReady(state) {
+      state.ready = true
+      if (state.canAutoStart) {
+        state.playing = true
+      }
+    },
+
+    setPlayerBuffering(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.buffering) : payload
+      state.buffering = next
+    },
+
+    setPlayerPlaying(state, action: PayloadAction<SetStateAction<boolean>>) {
+      if (!state.ready) return
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.playing) : payload
+      state.playing = next
+    },
+
+    setPlayerEnded(state) {
+      state.ended = true
+      state.playing = false
+    },
+
+    setPlayerDuration(state, action: PayloadAction<number>) {
+      state.durationFetched = true
+      state.duration = action.payload
+    },
+
+    setPlayerProgress(state, action: PayloadAction<number>) {
+      state.progress = action.payload
+    },
+
+    setPlayerLoaded(state, action: PayloadAction<number>) {
+      state.loaded = action.payload
+    },
+
+    resetPlayerState(state) {
+      state.ready = false
+      state.buffering = false
+      state.playing = false
+      state.ended = false
+      state.durationFetched = false
+      state.duration = 0
+      state.progress = 0
+      state.loaded = 0
     },
   },
 })
@@ -76,6 +140,14 @@ export const {
   setPlayerMuted,
   setPlayerPlaybackSpeed,
   setPlayerJumpStep,
+  setPlayerReady,
+  setPlayerBuffering,
+  setPlayerPlaying,
+  setPlayerEnded,
+  setPlayerDuration,
+  setPlayerProgress,
+  setPlayerLoaded,
+  resetPlayerState,
 } = playerSlice.actions
 
 export const selectPlayerInitialized = (state: AppStoreState) => state.player.initialized
@@ -104,9 +176,24 @@ export const selectPlayerSettings = createSelector(
   }),
 )
 
-export const selectPlayerLoading = (state: AppStoreState) => false
+export const selectPlayerReady = (state: AppStoreState) => state.player.ready
+export const selectPlayerBuffering = (state: AppStoreState) => state.player.buffering
+export const selectPlayerPlaying = (state: AppStoreState) => state.player.playing
+export const selectPlayerEnded = (state: AppStoreState) => state.player.ended
+
+export const selectPlayerLoading = (state: AppStoreState) => {
+  if (!state.player.ready) return true
+  if (!state.player.durationFetched) return true
+  return state.player.buffering
+}
 export const selectPlayerFullscreen = (state: AppStoreState) => false
-export const selectPlayerDesktopControlsVisible = (state: AppStoreState) => true
+export const selectPlayerDesktopControlsVisible = (state: AppStoreState) => {
+  if (!state.player.ready) return false
+  if (!state.player.durationFetched) return false
+  if (state.player.ended) return true
+  if (!state.player.playing) return true
+  return false
+}
 export const selectPlayerDesktopHeadingVisible = createSelector(
   selectPlayerFullscreen,
   selectPlayerDesktopControlsVisible,
