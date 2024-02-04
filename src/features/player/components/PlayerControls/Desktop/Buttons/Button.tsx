@@ -1,4 +1,4 @@
-import { Children, forwardRef, PropsWithChildren, useCallback, useMemo } from 'react'
+import { Children, forwardRef, Fragment, PropsWithChildren, useMemo } from 'react'
 
 import { cn } from '@/api'
 import { IconSwap } from '@/components'
@@ -24,29 +24,24 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     tooltipDisabled,
     disabled,
     className,
-    visible,
+    visible = true,
     onClick,
     children,
   } = props
   const [Icon, ...Others] = useMemo(() => Children.toArray(children), [children])
 
-  const renderContent = useCallback(
-    () => (
-      <p>
-        {tooltip}
-        {tooltipHotkey && (
-          <>
-            &#32;(<span className='font-mono font-medium'>{tooltipHotkey}</span>)
-          </>
-        )}
-      </p>
-    ),
-    [tooltip, tooltipHotkey],
-  )
-
   return (
     <PlayerTooltip
-      content={renderContent()}
+      content={
+        <p>
+          {tooltip}
+          {tooltipHotkey && (
+            <Fragment>
+              &#32;(<span className='font-mono font-medium'>{tooltipHotkey}</span>)
+            </Fragment>
+          )}
+        </p>
+      }
       className='max-w-[15.625rem]'
       disabled={tooltipDisabled}
     >
