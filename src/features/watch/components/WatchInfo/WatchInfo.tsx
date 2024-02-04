@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
 
@@ -13,7 +15,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
 
   return (
-    <>
+    <Fragment>
       <Title>{title}</Title>
       <div className='container mt-4'>
         <div className='flex items-center justify-between'>
@@ -21,6 +23,6 @@ export function WatchInfo({ id }: WatchInfoProps) {
           <WatchInfoDownload title={title} qualities={qualities} />
         </div>
       </div>
-    </>
+    </Fragment>
   )
 }

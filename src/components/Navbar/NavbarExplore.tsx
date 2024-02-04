@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+import { Fragment, PropsWithChildren } from 'react'
 
 import { Navigation } from '@/types'
 
@@ -11,9 +11,9 @@ export interface NavbarExploreProps extends PropsWithChildren {
 
 export function NavbarExplore(props: NavbarExploreProps) {
   return (
-    <>
+    <Fragment>
       <NavbarExploreDesktop {...props} />
       <NavbarExploreMobile {...props} />
-    </>
+    </Fragment>
   )
 }

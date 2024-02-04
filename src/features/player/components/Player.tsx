@@ -1,6 +1,6 @@
 import './Player.css'
 
-import { useEffect } from 'react'
+import { Fragment, useEffect } from 'react'
 
 import { SwitchState } from '@/core'
 import { useAppDispatch } from '@/hooks'
@@ -29,11 +29,11 @@ export function Player(props: PlayerProps) {
       <PlayerNodesProvider>
         <PlayerContainer>
           {switchState.state === SwitchState.IDLE && (
-            <>
+            <Fragment>
               <PlayerNative key={mediaUrl} />
               {/* TODO: Thumbnails Overlay */}
               <PlayerControls />
-            </>
+            </Fragment>
           )}
           <PlayerSwitchState />
         </PlayerContainer>

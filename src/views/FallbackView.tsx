@@ -1,5 +1,5 @@
 import { SerializedError } from '@reduxjs/toolkit'
-import { PropsWithChildren } from 'react'
+import { Fragment, PropsWithChildren } from 'react'
 
 import { AlertErrorDialog } from '@/components'
 import { FetchState } from '@/core'
@@ -25,7 +25,7 @@ export function FallbackView(props: FallbackViewProps) {
 
   if (state === FetchState.ERROR) {
     return (
-      <>
+      <Fragment>
         <ErrorView title={error?.name} subtitle={error?.message} />
         <AlertErrorDialog
           error={error}
@@ -33,7 +33,7 @@ export function FallbackView(props: FallbackViewProps) {
           onReload={onReload}
           onClose={onClose}
         />
-      </>
+      </Fragment>
     )
   }
 
