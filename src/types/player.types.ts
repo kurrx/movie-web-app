@@ -1,3 +1,5 @@
+export type PlayerMenu = 'settings' | 'playlist' | null
+
 export interface PlayerStoreState {
   initialized: boolean
   canAutoStart: boolean
@@ -24,4 +26,6 @@ export interface PlayerStoreState {
 
   fullscreen: boolean
   pip: boolean
+
+  menu: PlayerMenu
 }

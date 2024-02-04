@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
 import { clamp } from '@/api'
-import { AppStoreState, PlayerStoreState } from '@/types'
+import { AppStoreState, PlayerMenu, PlayerStoreState } from '@/types'
 
 import { getPlayerSettings } from './player.schemas'
 
@@ -27,6 +27,8 @@ const initialState: PlayerStoreState = {
 
   fullscreen: false,
   pip: false,
+
+  menu: null,
 }
 
 const playerSlice = createSlice({
@@ -164,6 +166,10 @@ const playerSlice = createSlice({
       state.pip = next
     },
 
+    setPlayerMenu(state, action: PayloadAction<PlayerMenu>) {
+      state.menu = action.payload
+    },
+
     resetPlayerState(state) {
       state.ready = false
       state.buffering = false
@@ -176,6 +182,7 @@ const playerSlice = createSlice({
       state.interacted = false
       state.focused = false
       state.tooltipHovered = false
+      state.menu = null
     },
   },
 })
@@ -201,6 +208,7 @@ export const {
   setPlayerTooltipHovered,
   setPlayerFullscreen,
   setPlayerPip,
+  setPlayerMenu,
   resetPlayerState,
 } = playerSlice.actions
 
@@ -246,6 +254,8 @@ export const selectPlayerTooltipHovered = (state: AppStoreState) => state.player
 export const selectPlayerFullscreen = (state: AppStoreState) => state.player.fullscreen
 export const selectPlayerPip = (state: AppStoreState) => state.player.pip
 
+export const selectPlayerMenu = (state: AppStoreState) => state.player.menu
+
 export const selectPlayerFetched = createSelector(
   selectPlayerReady,
   selectPlayerDurationFetched,
@@ -263,9 +273,10 @@ export const selectPlayerDesktopControlsVisible = createSelector(
   selectPlayerInteracted,
   selectPlayerFocused,
   selectPlayerPlaying,
-  (fetched, ended, tooltipHovered, interacted, focused, playing) => {
+  selectPlayerMenu,
+  (fetched, ended, tooltipHovered, interacted, focused, playing, menu) => {
     if (!fetched) return false
-    return ended || tooltipHovered || interacted || focused || !playing
+    return ended || tooltipHovered || interacted || focused || !playing || menu !== null
   },
 )
 export const selectPlayerDesktopMouseVisible = createSelector(

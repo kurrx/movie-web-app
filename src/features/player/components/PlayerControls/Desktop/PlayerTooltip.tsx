@@ -1,10 +1,10 @@
-import { PropsWithChildren, ReactNode, useCallback, useEffect, useState } from 'react'
+import { PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components'
-import { useAppDispatch } from '@/hooks'
+import { useStore } from '@/hooks'
 
-import { setPlayerTooltipHovered } from '../../../player.slice'
+import { selectPlayerMenu, setPlayerTooltipHovered } from '../../../player.slice'
 import { useNodes } from '../../PlayerNodes'
 
 export interface PlayerTooltipProps extends PropsWithChildren {
@@ -14,25 +14,27 @@ export interface PlayerTooltipProps extends PropsWithChildren {
 }
 
 export function PlayerTooltip({ content, className, disabled, children }: PlayerTooltipProps) {
-  const dispatch = useAppDispatch()
+  const [dispatch, selector] = useStore()
   const { content: container } = useNodes()
+  const menu = selector(selectPlayerMenu)
   const [open, setOpen] = useState(false)
+  const combinedDisabled = useMemo(() => disabled || menu !== null, [disabled, menu])
 
   const onOpenChange = useCallback(
     (open: boolean) => {
-      if (disabled && open) return
+      if (combinedDisabled && open) return
       setOpen(open)
       dispatch(setPlayerTooltipHovered(open))
     },
-    [dispatch, disabled],
+    [dispatch, combinedDisabled],
   )
 
   useEffect(() => {
-    if (disabled) {
+    if (combinedDisabled) {
       setOpen(false)
       dispatch(setPlayerTooltipHovered(false))
     }
-  }, [dispatch, disabled])
+  }, [dispatch, combinedDisabled])
 
   return (
     <Tooltip disableHoverableContent open={open} onOpenChange={onOpenChange}>
