@@ -1,17 +1,75 @@
-import { PropsWithChildren } from 'react'
+import { FocusEvent, PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
-import { useAppSelector } from '@/hooks'
+import { selectDeviceIsTouch } from '@/features/device'
+import { useAppDispatch, useAppSelector } from '@/hooks'
 
-import { selectPlayerDesktopMouseVisible } from '../../../player.slice'
+import { useInteract } from '../../../hooks'
+import {
+  selectPlayerDesktopMouseVisible,
+  selectPlayerFullscreen,
+  selectPlayerPlaying,
+  setPlayerFocused,
+  setPlayerInteracted,
+} from '../../../player.slice'
 
 export function Wrapper({ children }: PropsWithChildren) {
+  const dispatch = useAppDispatch()
+  const interact = useInteract()
   const visible = useAppSelector(selectPlayerDesktopMouseVisible)
+  const isTouch = useAppSelector(selectDeviceIsTouch)
+  const playing = useAppSelector(selectPlayerPlaying)
+  const fullscreen = useAppSelector(selectPlayerFullscreen)
+  const downRef = useRef(false)
+
+  const cancelInteract = useCallback(() => {
+    if (isTouch) return
+    dispatch(setPlayerInteracted(false))
+  }, [dispatch, isTouch])
+
+  const onPointerChange = useCallback(
+    (down: boolean) => {
+      downRef.current = down
+      interact()
+    },
+    [interact],
+  )
+  const onPointerDown = useCallback(() => onPointerChange(true), [onPointerChange])
+  const onPointerUp = useCallback(() => onPointerChange(false), [onPointerChange])
+
+  const onFocus = useCallback(
+    (e: FocusEvent) => {
+      if (downRef.current) {
+        const target = e.target
+        interact()
+        if (target instanceof HTMLElement) {
+          target.blur()
+        }
+      } else {
+        dispatch(setPlayerFocused(true))
+      }
+    },
+    [dispatch, interact],
+  )
+  const onBlur = useCallback(() => {
+    dispatch(setPlayerFocused(false))
+  }, [dispatch])
+
+  useEffect(interact, [interact, playing, fullscreen])
 
   return (
     <div
       id='player-desktop-controls'
       className={'player-abs player-full data-[visible="false"]:cursor-none'}
       data-visible={visible}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerMove={interact}
+      onPointerEnter={interact}
+      onPointerOver={interact}
+      onPointerLeave={cancelInteract}
+      onPointerOut={cancelInteract}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       {children}
     </div>

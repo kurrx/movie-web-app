@@ -2,7 +2,9 @@ import { PropsWithChildren, ReactNode, useCallback, useEffect, useState } from '
 
 import { cn } from '@/api'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components'
+import { useAppDispatch } from '@/hooks'
 
+import { setPlayerTooltipHovered } from '../../../player.slice'
 import { useNodes } from '../../PlayerNodes'
 
 export interface PlayerTooltipProps extends PropsWithChildren {
@@ -12,23 +14,25 @@ export interface PlayerTooltipProps extends PropsWithChildren {
 }
 
 export function PlayerTooltip({ content, className, disabled, children }: PlayerTooltipProps) {
+  const dispatch = useAppDispatch()
   const { content: container } = useNodes()
   const [open, setOpen] = useState(false)
 
   const onOpenChange = useCallback(
     (open: boolean) => {
-      if (!disabled) {
-        setOpen(open)
-      }
+      if (disabled && open) return
+      setOpen(open)
+      dispatch(setPlayerTooltipHovered(open))
     },
-    [disabled],
+    [dispatch, disabled],
   )
 
   useEffect(() => {
     if (disabled) {
       setOpen(false)
+      dispatch(setPlayerTooltipHovered(false))
     }
-  }, [disabled])
+  }, [dispatch, disabled])
 
   return (
     <Tooltip disableHoverableContent open={open} onOpenChange={onOpenChange}>

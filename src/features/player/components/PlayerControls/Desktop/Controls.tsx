@@ -1,8 +1,9 @@
 import { PropsWithChildren } from 'react'
 
 import { cn } from '@/api'
-import { selectPlayerDesktopControlsVisible } from '@/features/player/player.slice'
 import { useAppSelector } from '@/hooks'
+
+import { selectPlayerDesktopControlsVisible } from '../../../player.slice'
 
 function Root({ children }: PropsWithChildren) {
   const visible = useAppSelector(selectPlayerDesktopControlsVisible)

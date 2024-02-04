@@ -17,4 +17,8 @@ export interface PlayerStoreState {
   duration: number
   progress: number
   loaded: number
+
+  interacted: boolean
+  focused: boolean
+  tooltipHovered: boolean
 }

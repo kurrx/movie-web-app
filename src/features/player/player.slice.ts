@@ -20,6 +20,10 @@ const initialState: PlayerStoreState = {
   duration: 0,
   progress: 0,
   loaded: 0,
+
+  interacted: false,
+  focused: false,
+  tooltipHovered: false,
 }
 
 const playerSlice = createSlice({
@@ -118,6 +122,24 @@ const playerSlice = createSlice({
       state.loaded = action.payload
     },
 
+    setPlayerInteracted(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.interacted) : payload
+      state.interacted = next
+    },
+
+    setPlayerFocused(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.focused) : payload
+      state.focused = next
+    },
+
+    setPlayerTooltipHovered(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.tooltipHovered) : payload
+      state.tooltipHovered = next
+    },
+
     resetPlayerState(state) {
       state.ready = false
       state.buffering = false
@@ -127,6 +149,9 @@ const playerSlice = createSlice({
       state.duration = 0
       state.progress = 0
       state.loaded = 0
+      state.interacted = false
+      state.focused = false
+      state.tooltipHovered = false
     },
   },
 })
@@ -147,6 +172,9 @@ export const {
   setPlayerDuration,
   setPlayerProgress,
   setPlayerLoaded,
+  setPlayerInteracted,
+  setPlayerFocused,
+  setPlayerTooltipHovered,
   resetPlayerState,
 } = playerSlice.actions
 
@@ -180,29 +208,43 @@ export const selectPlayerReady = (state: AppStoreState) => state.player.ready
 export const selectPlayerBuffering = (state: AppStoreState) => state.player.buffering
 export const selectPlayerPlaying = (state: AppStoreState) => state.player.playing
 export const selectPlayerEnded = (state: AppStoreState) => state.player.ended
+export const selectPlayerDurationFetched = (state: AppStoreState) => state.player.durationFetched
+export const selectPlayerDuration = (state: AppStoreState) => state.player.duration
+export const selectPlayerProgress = (state: AppStoreState) => state.player.progress
+export const selectPlayerLoaded = (state: AppStoreState) => state.player.loaded
 
-export const selectPlayerLoading = (state: AppStoreState) => {
-  if (!state.player.ready) return true
-  if (!state.player.durationFetched) return true
-  return state.player.buffering
-}
+export const selectPlayerInteracted = (state: AppStoreState) => state.player.interacted
+export const selectPlayerFocused = (state: AppStoreState) => state.player.focused
+export const selectPlayerTooltipHovered = (state: AppStoreState) => state.player.tooltipHovered
+
 export const selectPlayerFullscreen = (state: AppStoreState) => false
-export const selectPlayerDesktopControlsVisible = (state: AppStoreState) => {
-  if (!state.player.ready) return false
-  if (!state.player.durationFetched) return false
-  if (state.player.ended) return true
-  if (!state.player.playing) return true
-  return false
-}
-export const selectPlayerDesktopMouseVisible = createSelector(
-  (state: AppStoreState) => state.player.ready,
-  (state: AppStoreState) => state.player.durationFetched,
-  selectPlayerDesktopControlsVisible,
-  (ready, durationFetched, controlsVisible) => {
-    if (!ready) return true
-    if (!durationFetched) return true
-    return controlsVisible
+
+export const selectPlayerFetched = createSelector(
+  selectPlayerReady,
+  selectPlayerDurationFetched,
+  (ready, durationFetched) => ready && durationFetched,
+)
+export const selectPlayerLoading = createSelector(
+  selectPlayerFetched,
+  selectPlayerBuffering,
+  (fetched, buffering) => !fetched || buffering,
+)
+export const selectPlayerDesktopControlsVisible = createSelector(
+  selectPlayerFetched,
+  selectPlayerEnded,
+  selectPlayerTooltipHovered,
+  selectPlayerInteracted,
+  selectPlayerFocused,
+  selectPlayerPlaying,
+  (fetched, ended, tooltipHovered, interacted, focused, playing) => {
+    if (!fetched) return false
+    return ended || tooltipHovered || interacted || focused || !playing
   },
+)
+export const selectPlayerDesktopMouseVisible = createSelector(
+  selectPlayerFetched,
+  selectPlayerDesktopControlsVisible,
+  (fetched, controlsVisible) => !fetched || controlsVisible,
 )
 export const selectPlayerDesktopHeadingVisible = createSelector(
   selectPlayerFullscreen,
