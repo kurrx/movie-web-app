@@ -238,13 +238,16 @@ const watchSlice = createSlice({
         if (switchState && switchState.state === SwitchState.LOADING) {
           const { id, season, episode } = action.meta.arg
           const itemState = state.states[id]!
+          const item = state.items.find((i) => i.id === id)!.item! as ItemSeries
+          const episodeStream = item.streams
+            .find((s) => s.translatorId === itemState.translatorId)!
+            .seasons!.find((s) => s.number === season)!
+            .episodes.find((e) => e.number === episode)!
           let stream = action.payload
           if (!stream) {
-            const item = state.items.find((i) => i.id === id)!.item! as ItemSeries
-            stream = item.streams
-              .find((s) => s.translatorId === itemState.translatorId)!
-              .seasons!.find((s) => s.number === season)!
-              .episodes.find((e) => e.number === episode)!.stream!
+            stream = episodeStream.stream!
+          } else {
+            episodeStream.stream = stream
           }
           checkState(stream, itemState)
           itemState.timestamp = 0
