@@ -194,6 +194,16 @@ export const selectPlayerDesktopControlsVisible = (state: AppStoreState) => {
   if (!state.player.playing) return true
   return false
 }
+export const selectPlayerDesktopMouseVisible = createSelector(
+  (state: AppStoreState) => state.player.ready,
+  (state: AppStoreState) => state.player.durationFetched,
+  selectPlayerDesktopControlsVisible,
+  (ready, durationFetched, controlsVisible) => {
+    if (!ready) return true
+    if (!durationFetched) return true
+    return controlsVisible
+  },
+)
 export const selectPlayerDesktopHeadingVisible = createSelector(
   selectPlayerFullscreen,
   selectPlayerDesktopControlsVisible,

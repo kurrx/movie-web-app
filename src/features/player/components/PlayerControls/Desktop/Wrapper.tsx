@@ -2,10 +2,10 @@ import { PropsWithChildren } from 'react'
 
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerDesktopControlsVisible } from '../../../player.slice'
+import { selectPlayerDesktopMouseVisible } from '../../../player.slice'
 
 export function Wrapper({ children }: PropsWithChildren) {
-  const visible = useAppSelector(selectPlayerDesktopControlsVisible)
+  const visible = useAppSelector(selectPlayerDesktopMouseVisible)
 
   return (
     <div
