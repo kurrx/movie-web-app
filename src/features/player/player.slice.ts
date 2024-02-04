@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
+import { clamp } from '@/api'
 import { AppStoreState, PlayerStoreState } from '@/types'
 
 import { getPlayerSettings } from './player.schemas'
@@ -37,12 +38,21 @@ const playerSlice = createSlice({
 
     setPlayerVolume(state, action: PayloadAction<SetStateAction<number>>) {
       const payload = action.payload
-      state.volume = typeof payload === 'function' ? payload(state.volume) : payload
+      const next = typeof payload === 'function' ? payload(state.volume) : payload
+      const clampedNext = clamp(next, 0, 100)
+      state.volume = clampedNext
+      if (clampedNext === 0) {
+        state.muted = true
+      }
     },
 
     setPlayerMuted(state, action: PayloadAction<SetStateAction<boolean>>) {
       const payload = action.payload
-      state.muted = typeof payload === 'function' ? payload(state.muted) : payload
+      const next = typeof payload === 'function' ? payload(state.muted) : payload
+      state.muted = next
+      if (!next && state.volume === 0) {
+        state.volume = 100
+      }
     },
 
     setPlayerPlaybackSpeed(state, action: PayloadAction<SetStateAction<number>>) {
