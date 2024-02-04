@@ -25,7 +25,7 @@ export function Gradient({ position }: GradientProps) {
       id={`player-${position}-gradient`}
       className={cn(
         'absolute w-full h-[30%] pointer-events-none',
-        'transition-opacity data-[visible="false"]:opacity-0',
+        'transition-opacity data-[visible=false]:opacity-0',
       )}
       style={{
         top: position === 'top' ? 0 : 'auto',

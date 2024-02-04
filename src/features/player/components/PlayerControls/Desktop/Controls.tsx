@@ -13,8 +13,8 @@ function Root({ children }: PropsWithChildren) {
       id='player-controls'
       className={cn(
         'absolute left-0 bottom-0 transition-opacity',
-        'data-[visible="false"]:opacity-0 w-full px-3',
-        'data-[visible="false"]:pointer-events-none',
+        'data-[visible=false]:opacity-0 w-full px-3',
+        'data-[visible=false]:pointer-events-none',
       )}
       data-visible={visible}
     >

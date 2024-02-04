@@ -53,7 +53,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
           'bg-none text-white [&_svg]:w-[1em] [&_svg]:h-[1em]',
           'focus-visible:outline-none focus-visible:ring-2',
           'focus-visible:ring-ring rounded-md',
-          'data-[visible="false"]:hidden',
+          'data-[visible=false]:hidden',
           className,
         )}
         disabled={disabled}

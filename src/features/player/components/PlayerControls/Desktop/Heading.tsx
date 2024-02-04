@@ -15,8 +15,8 @@ function Root({ children }: PropsWithChildren) {
       className={cn(
         'absolute left-0 top-0 w-full transition-opacity',
         'flex items-center justify-between',
-        'data-[visible="false"]:opacity-0 px-6 pt-4',
-        'data-[visible="false"]:pointer-events-none',
+        'data-[visible=false]:opacity-0 px-6 pt-4',
+        'data-[visible=false]:pointer-events-none',
       )}
       data-visible={visible}
     >

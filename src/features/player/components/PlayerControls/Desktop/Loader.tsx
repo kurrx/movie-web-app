@@ -12,7 +12,7 @@ export function Loader() {
       id='player-loader'
       className={cn(
         'player-abs player-full player-flex text-white',
-        'pointer-events-none data-[visible="false"]:hidden',
+        'pointer-events-none data-[visible=false]:hidden',
       )}
       data-visible={loading}
     >

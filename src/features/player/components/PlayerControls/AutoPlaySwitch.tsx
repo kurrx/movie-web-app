@@ -39,7 +39,7 @@ export function AutoPlaySwitch() {
             'focus-visible:outline-none focus-visible:ring-2',
             'focus-visible:ring-ring',
             'light border-2 border-black/15',
-            'data-[visible="false"]:hidden',
+            'data-[visible=false]:hidden',
           )}
           checked={autoPlay}
           data-visible={visible}

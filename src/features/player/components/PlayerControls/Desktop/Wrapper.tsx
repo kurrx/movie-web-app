@@ -59,7 +59,7 @@ export function Wrapper({ children }: PropsWithChildren) {
   return (
     <div
       id='player-desktop-controls'
-      className={'player-abs player-full data-[visible="false"]:cursor-none'}
+      className={'player-abs player-full data-[visible=false]:cursor-none'}
       data-visible={visible}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
