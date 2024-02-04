@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useClickAnyWhere } from 'usehooks-ts'
+import { useClickAnyWhere, useEventListener } from 'usehooks-ts'
 
 import { useStore } from '@/hooks'
 
@@ -15,7 +15,7 @@ export function useAppPlayer() {
   const canAutoStart = selector(selectPlayerCanAutoStart)
   const settings = selector(selectPlayerSettings)
 
-  const onClickAnywhere = useCallback(() => {
+  const onInteract = useCallback(() => {
     if (canAutoStart) return
     dispatch(enablePlayerCanAutoStart())
   }, [canAutoStart, dispatch])
@@ -24,5 +24,7 @@ export function useAppPlayer() {
     savePlayerSettings(settings)
   }, [settings])
 
-  useClickAnyWhere(onClickAnywhere)
+  useClickAnyWhere(onInteract)
+
+  useEventListener('keydown', onInteract)
 }
