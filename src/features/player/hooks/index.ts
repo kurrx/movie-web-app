@@ -1,3 +1,5 @@
 export * from './useAppPlayer'
 export * from './useContextWrapper'
+export * from './useFullscreen'
 export * from './useInteract'
+export * from './usePlayerFullscreen'

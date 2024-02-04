@@ -1,4 +1,4 @@
-import { AdjacentButton } from './Buttons'
+import { AdjacentButton, FullscreenButton } from './Buttons'
 import { Controls } from './Controls'
 import { Gradient } from './Gradient'
 import { Heading } from './Heading'
@@ -21,7 +21,9 @@ export function DesktopControls() {
             <AdjacentButton type='prev' />
             <AdjacentButton type='next' />
           </Controls.Side>
-          <Controls.Side side='right'></Controls.Side>
+          <Controls.Side side='right'>
+            <FullscreenButton />
+          </Controls.Side>
         </Controls.Buttons>
       </Controls.Root>
     </Wrapper>

@@ -48,6 +48,10 @@
     --input: 240 3.7% 15.9%;
     --ring: 211 96% 78%;
   }
+
+  .fullscreen {
+    font-size: 1.25rem;
+  }
 }
 
 @layer base {
@@ -80,6 +84,12 @@ body {
   display: flex;
   flex: 1 1 auto;
   min-height: calc(100vh - var(--navbar-height));
+}
+
+.svg-shadow {
+  stroke: #000;
+  stroke-opacity: 0.15;
+  stroke-width: 2px;
 }
 
 @media (max-width: 640px) {

@@ -21,4 +21,6 @@ export interface PlayerStoreState {
   interacted: boolean
   focused: boolean
   tooltipHovered: boolean
+
+  fullscreen: boolean
 }
