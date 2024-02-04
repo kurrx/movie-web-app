@@ -14,6 +14,7 @@ import {
   setPlayerDuration,
   setPlayerEnded,
   setPlayerLoaded,
+  setPlayerPlaybackSpeed,
   setPlayerPlaying,
   setPlayerProgress,
   setPlayerReady,
@@ -74,6 +75,13 @@ export function PlayerNative() {
     [dispatch],
   )
 
+  const onPlaybackRateChange = useCallback(
+    (rate: number) => {
+      dispatch(setPlayerPlaybackSpeed(rate))
+    },
+    [dispatch],
+  )
+
   const onEnded = useCallback(() => {
     dispatch(setPlayerEnded())
   }, [dispatch])
@@ -114,6 +122,10 @@ export function PlayerNative() {
         onPause={onPause}
         onProgress={onProgress}
         onSeek={onSeek}
+        onPlaybackRateChange={onPlaybackRateChange}
+        onError={(err) => {
+          console.log('error', err)
+        }}
         onEnded={onEnded}
       />
     </div>
