@@ -446,7 +446,7 @@ export const selectWatchItemPlaylist = createSelector(
             type: 'episode',
             season: season.number,
             number: episode.number,
-            title: `${episode.number}. ${episodeDetail?.title || 'Серия'}`,
+            title: `S${season.number}:E${episode.number} "${episodeDetail?.title || `Episode ${episode.number}`}"`,
             originalTitle: episodeDetail?.originalTitle || null,
             releaseDate: episodeDetail?.releaseDate || null,
             isCurrent: seasonItem.isCurrent && episode.number === stateEpisode,

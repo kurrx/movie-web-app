@@ -16,13 +16,6 @@ export function AdjacentButton({ type }: AdjacentButtonProps) {
   const { playlistAdjacents, onPlayItem } = useProps()
   const adjacent = useMemo(() => playlistAdjacents[type], [playlistAdjacents, type])
   const hotkey = useMemo(() => `shift+${type[0]}`, [type])
-  const tooltip = useMemo(() => {
-    if (!adjacent) return type.toUpperCase()
-    if (adjacent.type === 'episode') {
-      return `Сезон ${adjacent.season} Серия ${adjacent.number}`
-    }
-    return adjacent.title
-  }, [adjacent, type])
   const tooltipHotkey = useMemo(() => hotkey.toUpperCase(), [hotkey])
   const visible = useMemo(() => adjacent !== null, [adjacent])
 
@@ -36,7 +29,7 @@ export function AdjacentButton({ type }: AdjacentButtonProps) {
   return (
     <Button
       id={`play-${type}`}
-      tooltip={tooltip}
+      tooltip={adjacent?.title || type.toUpperCase()}
       tooltipHotkey={tooltipHotkey}
       tooltipDisabled={!visible}
       disabled={!visible}

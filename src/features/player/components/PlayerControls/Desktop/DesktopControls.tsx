@@ -1,4 +1,5 @@
 import { AutoPlaySwitch } from '../AutoPlaySwitch'
+import { PlaylistMenu } from '../PlaylistMenu'
 import { SettingsMenu } from '../SettingsMenu'
 import { AdjacentButton, FullscreenButton, PipButton, TheaterButton } from './Buttons'
 import { Controls } from './Controls'
@@ -25,6 +26,7 @@ export function DesktopControls() {
           </Controls.Side>
           <Controls.Side side='right'>
             <AutoPlaySwitch />
+            <PlaylistMenu />
             <SettingsMenu />
             <PipButton />
             <TheaterButton />
