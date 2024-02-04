@@ -306,7 +306,7 @@ export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs) {
       translatorId,
       favsId: item.favsId,
       season: stateTo.season,
-      episode: stateTo.season,
+      episode: stateTo.episode,
       signal,
     })
     next = { stream, streamFor: stateTo }
