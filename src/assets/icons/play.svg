@@ -1,0 +1,4 @@
+<svg width="24px" height="24px" version="1.1" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+  <use class="svg-shadow" href="#play-svg-icon"></use>
+  <path id="play-svg-icon" fill="currentColor" d="M 12,26 18.5,22 18.5,14 12,10 z M 18.5,22 25,18 25,18 18.5,14 z"></path>
+</svg>
