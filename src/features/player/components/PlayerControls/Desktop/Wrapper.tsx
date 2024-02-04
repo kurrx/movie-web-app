@@ -1,24 +1,26 @@
 import { FocusEvent, PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
 import { selectDeviceIsTouch } from '@/features/device'
-import { useAppDispatch, useAppSelector } from '@/hooks'
+import { useStore } from '@/hooks'
 
 import { useInteract } from '../../../hooks'
 import {
   selectPlayerDesktopMouseVisible,
   selectPlayerFullscreen,
+  selectPlayerMenu,
   selectPlayerPlaying,
   setPlayerFocused,
   setPlayerInteracted,
 } from '../../../player.slice'
 
 export function Wrapper({ children }: PropsWithChildren) {
-  const dispatch = useAppDispatch()
+  const [dispatch, selector] = useStore()
   const interact = useInteract()
-  const visible = useAppSelector(selectPlayerDesktopMouseVisible)
-  const isTouch = useAppSelector(selectDeviceIsTouch)
-  const playing = useAppSelector(selectPlayerPlaying)
-  const fullscreen = useAppSelector(selectPlayerFullscreen)
+  const visible = selector(selectPlayerDesktopMouseVisible)
+  const isTouch = selector(selectDeviceIsTouch)
+  const playing = selector(selectPlayerPlaying)
+  const fullscreen = selector(selectPlayerFullscreen)
+  const menu = selector(selectPlayerMenu)
   const downRef = useRef(false)
 
   const cancelInteract = useCallback(() => {
@@ -54,7 +56,7 @@ export function Wrapper({ children }: PropsWithChildren) {
     dispatch(setPlayerFocused(false))
   }, [dispatch])
 
-  useEffect(interact, [interact, playing, fullscreen])
+  useEffect(interact, [interact, playing, fullscreen, menu])
 
   return (
     <div
