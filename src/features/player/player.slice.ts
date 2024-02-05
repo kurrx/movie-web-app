@@ -67,7 +67,24 @@ const playerSlice = createSlice({
       state.volume = clampedNext
       if (clampedNext === 0) {
         state.muted = true
+      } else {
+        state.muted = false
       }
+    },
+
+    setPlayerVolumeWithAction(state, action: PayloadAction<SetStateAction<number>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.volume) : payload
+      const clampedNext = clamp(next, 0, 100)
+      state.action = clampedNext < state.volume ? 'volumeDown' : 'volumeUp'
+      state.volume = clampedNext
+      if (clampedNext === 0) {
+        state.muted = true
+        state.action = 'mute'
+      } else {
+        state.muted = false
+      }
+      state.actionTimestamp = Date.now()
     },
 
     setPlayerMuted(state, action: PayloadAction<SetStateAction<boolean>>) {
@@ -77,6 +94,17 @@ const playerSlice = createSlice({
       if (!next && state.volume === 0) {
         state.volume = 100
       }
+    },
+
+    setPlayerMutedWithAction(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.muted) : payload
+      state.muted = next
+      if (!next && state.volume === 0) {
+        state.volume = 100
+      }
+      state.action = next ? 'mute' : 'volumeUp'
+      state.actionTimestamp = Date.now()
     },
 
     setPlayerPlaybackSpeed(state, action: PayloadAction<SetStateAction<number>>) {
@@ -240,7 +268,9 @@ export const {
   setPlayerTheater,
   setPlayerAutoPlay,
   setPlayerVolume,
+  setPlayerVolumeWithAction,
   setPlayerMuted,
+  setPlayerMutedWithAction,
   setPlayerPlaybackSpeed,
   setPlayerJumpStep,
   setPlayerReady,

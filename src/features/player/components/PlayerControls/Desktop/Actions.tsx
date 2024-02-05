@@ -83,20 +83,17 @@ export function Actions() {
       )}
     >
       <FastForwarding />
-      {action === 'mute' ||
-        action === 'volumeUp' ||
-        (action === 'volumeDown' && (
-          <motion.div
-            className={cn(
-              'absolute top-[3rem] left-[50%] items-center',
-              'justify-center text-white py-2 px-4 text-center',
-              'bg-black/50 rounded-md translate-x-[-50%]',
-            )}
-            style={{ display }}
-          >
-            {volumeStr}
-          </motion.div>
-        ))}
+      {(action === 'mute' || action === 'volumeUp' || action === 'volumeDown') && (
+        <div
+          className={cn(
+            'absolute top-[3rem] left-[50%] items-center',
+            'justify-center text-white py-2 px-4 text-center',
+            'bg-black/50 rounded-md translate-x-[-50%]',
+          )}
+        >
+          {volumeStr}
+        </div>
+      )}
       <motion.div
         className={cn(
           'absolute top-[50%] left-[50%] w-[75px] h-[75px]',
