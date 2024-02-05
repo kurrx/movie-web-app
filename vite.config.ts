@@ -22,11 +22,6 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('radix')) {
-              return 'vendor-radix'
-            } else if (id.includes('framer-motion')) {
-              return 'vendor-framer-motion'
-            }
             return 'vendor'
           }
         },
