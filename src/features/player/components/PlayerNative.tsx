@@ -16,7 +16,7 @@ import {
   setPlayerBuffering,
   setPlayerDuration,
   setPlayerEnded,
-  setPlayerLoaded,
+  setPlayerLoadedProgress,
   setPlayerPip,
   setPlayerPlaybackSpeed,
   setPlayerPlaying,
@@ -68,7 +68,7 @@ export function PlayerNative() {
   const onProgress = useCallback(
     (progress: OnProgressProps) => {
       dispatch(setPlayerProgress(progress.playedSeconds))
-      dispatch(setPlayerLoaded(progress.loadedSeconds))
+      dispatch(setPlayerLoadedProgress(progress.loadedSeconds))
       onTimeUpdate(progress.playedSeconds)
     },
     [dispatch, onTimeUpdate],

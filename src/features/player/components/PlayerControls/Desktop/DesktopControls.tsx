@@ -8,6 +8,7 @@ import { Controls } from './Controls'
 import { Gradient } from './Gradient'
 import { Heading } from './Heading'
 import { Loader } from './Loader'
+import { Timeline } from './Timeline'
 import { Timer } from './Timer'
 import { VolumeSlider } from './VolumeSlider'
 import { Wrapper } from './Wrapper'
@@ -25,6 +26,7 @@ export function DesktopControls() {
         <Heading.Buttons>{/* TODO: Share Button */}</Heading.Buttons>
       </Heading.Root>
       <Controls.Root>
+        <Timeline />
         <Controls.Buttons>
           <Controls.Side side='left'>
             <AdjacentButton type='prev' />

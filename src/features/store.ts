@@ -4,12 +4,17 @@ import { APP_NAME, IS_DEV } from '@/api'
 
 import { deviceReducer } from './device'
 import {
+  endDragging,
+  endHovering,
   playerReducer,
   setPlayerFocused,
   setPlayerInteracted,
-  setPlayerLoaded,
+  setPlayerLoadedProgress,
   setPlayerProgress,
   setPlayerTooltipHovered,
+  startDragging,
+  startHovering,
+  timelineMove,
 } from './player'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
@@ -35,10 +40,15 @@ export const store = configureStore({
     actionsDenylist: [
       updateTime.type,
       setPlayerProgress.type,
-      setPlayerLoaded.type,
+      setPlayerLoadedProgress.type,
       setPlayerInteracted.type,
       setPlayerFocused.type,
       setPlayerTooltipHovered.type,
+      startHovering.type,
+      startDragging.type,
+      timelineMove.type,
+      endHovering.type,
+      endDragging.type,
     ],
   },
 })

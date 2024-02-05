@@ -19,7 +19,10 @@ export interface PlayerStoreState {
   durationFetched: boolean
   duration: number
   progress: number
-  loaded: number
+  loadedProgress: number
+  isTimelineHovering: boolean
+  isTimelineDragging: boolean
+  timelineSeekProgress: number
 
   interacted: boolean
   focused: boolean

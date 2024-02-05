@@ -3,10 +3,10 @@ import { useMemo } from 'react'
 import { clamp, convertSeconds } from '@/api'
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerDuration, selectPlayerProgress } from '../../../player.slice'
+import { selectPlayerDuration, selectPlayerTime } from '../../../player.slice'
 
 export function Timer() {
-  const time = useAppSelector(selectPlayerProgress)
+  const time = useAppSelector(selectPlayerTime)
   const duration = useAppSelector(selectPlayerDuration)
   const text = useMemo(
     () => `${convertSeconds(clamp(time, 0, duration))} / ${convertSeconds(duration)}`,

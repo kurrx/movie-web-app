@@ -19,7 +19,10 @@ const initialState: PlayerStoreState = {
   durationFetched: false,
   duration: 0,
   progress: 0,
-  loaded: 0,
+  loadedProgress: 0,
+  isTimelineHovering: false,
+  isTimelineDragging: false,
+  timelineSeekProgress: 0,
 
   interacted: false,
   focused: false,
@@ -140,6 +143,7 @@ const playerSlice = createSlice({
       if (!state.durationFetched) return
       if (state.ended) return
       if (state.fastForwarding) return
+      if (state.isTimelineDragging) return
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.playing) : payload
       state.playing = next
@@ -185,8 +189,35 @@ const playerSlice = createSlice({
       state.progress = action.payload
     },
 
-    setPlayerLoaded(state, action: PayloadAction<number>) {
-      state.loaded = action.payload
+    setPlayerLoadedProgress(state, action: PayloadAction<number>) {
+      state.loadedProgress = action.payload
+    },
+
+    startHovering(state, action: PayloadAction<number>) {
+      state.isTimelineHovering = true
+      state.timelineSeekProgress = action.payload
+    },
+
+    startDragging(state, action: PayloadAction<number>) {
+      state.isTimelineDragging = true
+      state.timelineSeekProgress = action.payload
+    },
+
+    timelineMove(state, action: PayloadAction<number>) {
+      state.timelineSeekProgress = action.payload
+    },
+
+    endHovering(state) {
+      state.isTimelineHovering = false
+    },
+
+    endDragging(state) {
+      state.isTimelineDragging = false
+      state.progress = state.timelineSeekProgress
+      if (state.ended) {
+        state.ended = false
+        state.playing = true
+      }
     },
 
     setPlayerInteracted(state, action: PayloadAction<SetStateAction<boolean>>) {
@@ -251,13 +282,16 @@ const playerSlice = createSlice({
       state.durationFetched = false
       state.duration = 0
       state.progress = 0
-      state.loaded = 0
+      state.loadedProgress = 0
       state.interacted = false
       state.focused = false
       state.tooltipHovered = false
       state.menu = null
       state.action = null
       state.fastForwarding = false
+      state.isTimelineHovering = false
+      state.isTimelineDragging = false
+      state.timelineSeekProgress = 0
     },
   },
 })
@@ -282,7 +316,12 @@ export const {
   setPlayerEnded,
   setPlayerDuration,
   setPlayerProgress,
-  setPlayerLoaded,
+  setPlayerLoadedProgress,
+  startHovering,
+  startDragging,
+  timelineMove,
+  endDragging,
+  endHovering,
   setPlayerInteracted,
   setPlayerFocused,
   setPlayerTooltipHovered,
@@ -327,7 +366,7 @@ export const selectPlayerEnded = (state: AppStoreState) => state.player.ended
 export const selectPlayerDurationFetched = (state: AppStoreState) => state.player.durationFetched
 export const selectPlayerDuration = (state: AppStoreState) => state.player.duration
 export const selectPlayerProgress = (state: AppStoreState) => state.player.progress
-export const selectPlayerLoaded = (state: AppStoreState) => state.player.loaded
+export const selectPlayerLoadedProgress = (state: AppStoreState) => state.player.loadedProgress
 
 export const selectPlayerInteracted = (state: AppStoreState) => state.player.interacted
 export const selectPlayerFocused = (state: AppStoreState) => state.player.focused
@@ -341,10 +380,44 @@ export const selectPlayerAction = (state: AppStoreState) => state.player.action
 export const selectPlayerActionTimestamp = (state: AppStoreState) => state.player.actionTimestamp
 export const selectPlayerFastForwarding = (state: AppStoreState) => state.player.fastForwarding
 
+export const selectPlayerIsTimelineHovering = (state: AppStoreState) =>
+  state.player.isTimelineHovering
+export const selectPlayerIsTimelineDragging = (state: AppStoreState) =>
+  state.player.isTimelineDragging
+export const selectPlayerTimelineSeekProgress = (state: AppStoreState) =>
+  state.player.timelineSeekProgress
+
 export const selectPlayerPlayingCombined = createSelector(
   selectPlayerPlaying,
   selectPlayerFastForwarding,
-  (playing, fastForwarding) => playing || fastForwarding,
+  selectPlayerIsTimelineDragging,
+  (playing, fastForwarding, isTimelineDragging) =>
+    (playing || fastForwarding) && !isTimelineDragging,
+)
+export const selectPlayerTime = createSelector(
+  selectPlayerProgress,
+  selectPlayerIsTimelineDragging,
+  selectPlayerTimelineSeekProgress,
+  (progress, isTimelineDragging, timelineSeekProgree) =>
+    isTimelineDragging ? timelineSeekProgree : progress,
+)
+export const selectPlayerThumbnailsProgress = createSelector(
+  selectPlayerIsTimelineHovering,
+  selectPlayerIsTimelineDragging,
+  selectPlayerTimelineSeekProgress,
+  (isTimelineHovering, isTimelineDragging, timelineSeekProgress) => {
+    if (!isTimelineHovering && !isTimelineDragging) return 0
+    return timelineSeekProgress
+  },
+)
+export const selectPlayerHoverProgress = createSelector(
+  selectPlayerIsTimelineHovering,
+  selectPlayerIsTimelineDragging,
+  selectPlayerTimelineSeekProgress,
+  (isTimelineHovering, isTimelineDragging, timelineSeekProgress) => {
+    if (isTimelineDragging || !isTimelineHovering) return 0
+    return timelineSeekProgress
+  },
 )
 export const selectPlayerPlaybackSpeedCombined = createSelector(
   selectPlayerPlaybackSpeed,
