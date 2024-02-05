@@ -15,6 +15,7 @@ import {
   clearPlayerAction,
   selectPlayerAction,
   selectPlayerActionTimestamp,
+  selectPlayerFastForwarding,
   selectPlayerMuted,
   selectPlayerVolume,
 } from '../../../player.slice'
@@ -29,6 +30,7 @@ export function Actions() {
   const timestamp = selector(selectPlayerActionTimestamp)
   const muted = selector(selectPlayerMuted)
   const volume = selector(selectPlayerVolume)
+  const fastForwarding = selector(selectPlayerFastForwarding)
   const volumeStr = useMemo(() => `${muted ? 0 : volume}%`, [muted, volume])
   const Icon = useMemo(() => {
     if (!action) return null
@@ -83,17 +85,18 @@ export function Actions() {
       )}
     >
       <FastForwarding />
-      {(action === 'mute' || action === 'volumeUp' || action === 'volumeDown') && (
-        <div
-          className={cn(
-            'absolute top-[3rem] left-[50%] items-center',
-            'justify-center text-white py-2 px-4 text-center',
-            'bg-black/50 rounded-md translate-x-[-50%]',
-          )}
-        >
-          {volumeStr}
-        </div>
-      )}
+      {(action === 'mute' || action === 'volumeUp' || action === 'volumeDown') &&
+        !fastForwarding && (
+          <div
+            className={cn(
+              'absolute top-[3rem] left-[50%] items-center',
+              'justify-center text-white py-2 px-4 text-center',
+              'bg-black/50 rounded-md translate-x-[-50%]',
+            )}
+          >
+            {volumeStr}
+          </div>
+        )}
       <motion.div
         className={cn(
           'absolute top-[50%] left-[50%] w-[75px] h-[75px]',
