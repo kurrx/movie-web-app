@@ -28,7 +28,9 @@ type SwitchParam = { id: number }
 type SEpisodeReturn = Awaited<ReturnType<typeof fetchSeriesStream>> | null
 type SEpisodeParam = { season: number; episode: number } & SwitchParam
 type STranslatorReturn = Awaited<ReturnType<typeof fetchTranslator>>
-type STtranslatorParam = { translatorId: number } & SwitchParam
+type STranslatorParam = { translatorId: number } & SwitchParam
+type SQualityReturn = Awaited<Promise<null>>
+type SQualityParam = { quality: string } & SwitchParam
 type SwitchAction = { meta: { arg: { id: number }; requestId: string } }
 
 function switchPending(state: WatchStoreState, action: SwitchAction) {
@@ -37,7 +39,7 @@ function switchPending(state: WatchStoreState, action: SwitchAction) {
   switchState.error = null
   switchState.requestId = action.meta.requestId
 }
-function switchRejected(type: 'episode' | 'translator') {
+function switchRejected(type: 'episode' | 'translator' | 'quality') {
   const error = {
     code: 'Switch Error',
     name: 'Switch Error',
@@ -119,7 +121,7 @@ export const switchEpisode = createAsyncThunk<SEpisodeReturn, SEpisodeParam, Thu
   },
   switchOptions,
 )
-export const switchTranslator = createAsyncThunk<STranslatorReturn, STtranslatorParam, Thunk>(
+export const switchTranslator = createAsyncThunk<STranslatorReturn, STranslatorParam, Thunk>(
   'watch/switchTranslator',
   async ({ id, translatorId }, { signal, getState }) => {
     const item = getState().watch.items.find((i) => i.id === id)!.item!
@@ -128,16 +130,17 @@ export const switchTranslator = createAsyncThunk<STranslatorReturn, STtranslator
   },
   switchOptions,
 )
+export const switchQuality = createAsyncThunk<SQualityReturn, SQualityParam, Thunk>(
+  'watch/switchQuality',
+  async () => null,
+  switchOptions,
+)
 
 const watchSlice = createSlice({
   name: 'watch',
   initialState,
 
   reducers: {
-    switchQuality(state, action: PayloadAction<{ id: number; quality: string }>) {
-      state.states[action.payload.id]!.quality = action.payload.quality
-    },
-
     updateTime(state, action: PayloadAction<{ id: number; time: number }>) {
       state.states[action.payload.id]!.timestamp = action.payload.time
     },
@@ -307,10 +310,22 @@ const watchSlice = createSlice({
           switchState.requestId = null
         }
       })
+
+    builder
+      .addCase(switchQuality.pending, switchPending)
+      .addCase(switchQuality.rejected, switchRejected('quality'))
+      .addCase(switchQuality.fulfilled, (state, action) => {
+        const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
+        if (switchState && switchState.state === SwitchState.LOADING) {
+          state.states[action.meta.arg.id]!.quality = action.meta.arg.quality
+          switchState.state = SwitchState.IDLE
+          switchState.requestId = null
+        }
+      })
   },
 })
 
-export const { switchQuality, updateTime } = watchSlice.actions
+export const { updateTime } = watchSlice.actions
 
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)

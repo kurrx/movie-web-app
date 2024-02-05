@@ -22,10 +22,11 @@ import {
   updateTime,
 } from '../watch.slice'
 
-type SwitchAction = 'episode' | 'translator' | null
+type SwitchAction = 'episode' | 'translator' | 'quality' | null
 type SwitchEpisodeArgs = { id: number; season: number; episode: number }
 type SwitchTranslatorArgs = { id: number; translatorId: number }
-type SwitchArgs = SwitchEpisodeArgs | SwitchTranslatorArgs | null
+type SwitchQualityArgs = { id: number; quality: string }
+type SwitchArgs = SwitchEpisodeArgs | SwitchTranslatorArgs | SwitchQualityArgs | null
 
 export interface WatchPlayerProps {
   id: number
@@ -62,6 +63,9 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
         case 'translator':
           dispatch(switchTranslator(nextArgs as SwitchTranslatorArgs))
           break
+        case 'quality':
+          dispatch(switchQuality(nextArgs as SwitchQualityArgs))
+          break
       }
     },
     [dispatch, switchAction, switchArgs],
@@ -75,6 +79,12 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const makeSwitchEpisode = useCallback(
     (season: number, episode: number) => {
       makeSwitch('episode', { id, season, episode })
+    },
+    [makeSwitch, id],
+  )
+  const makeSwitchQuality = useCallback(
+    (quality: string) => {
+      makeSwitch('quality', { id, quality })
     },
     [makeSwitch, id],
   )
@@ -107,9 +117,9 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   )
   const onQualityChange = useCallback(
     (quality: string) => {
-      dispatch(switchQuality({ id, quality }))
+      makeSwitchQuality(quality)
     },
-    [dispatch, id],
+    [makeSwitchQuality],
   )
 
   return (
