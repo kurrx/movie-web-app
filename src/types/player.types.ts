@@ -23,6 +23,8 @@ export interface PlayerStoreState {
   isTimelineHovering: boolean
   isTimelineDragging: boolean
   timelineSeekProgress: number
+  thumbnailsOverlayProgress: number
+  showThumbnailsOverlay: boolean
 
   interacted: boolean
   focused: boolean

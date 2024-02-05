@@ -13,6 +13,7 @@ import { PlayerNative } from './PlayerNative'
 import { PlayerNodesProvider } from './PlayerNodes'
 import { PlayerProps, PlayerPropsProvider } from './PlayerProps'
 import { PlayerSwitchState } from './PlayerSwitchState'
+import { PlayerThumbnailsOverlay } from './PlayerThumbnailsOverlay'
 
 export function Player(props: PlayerProps) {
   const { mediaUrl, switchState } = props
@@ -34,6 +35,7 @@ export function Player(props: PlayerProps) {
           {switchState.state === SwitchState.IDLE && (
             <Fragment>
               <PlayerNative key={mediaUrl} />
+              <PlayerThumbnailsOverlay />
               {/* TODO: Thumbnails Overlay */}
               <PlayerControls />
             </Fragment>

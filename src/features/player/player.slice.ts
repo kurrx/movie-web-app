@@ -23,6 +23,8 @@ const initialState: PlayerStoreState = {
   isTimelineHovering: false,
   isTimelineDragging: false,
   timelineSeekProgress: 0,
+  thumbnailsOverlayProgress: 0,
+  showThumbnailsOverlay: false,
 
   interacted: false,
   focused: false,
@@ -186,6 +188,9 @@ const playerSlice = createSlice({
     },
 
     setPlayerProgress(state, action: PayloadAction<number>) {
+      if (state.showThumbnailsOverlay && state.progress !== state.thumbnailsOverlayProgress) {
+        state.showThumbnailsOverlay = false
+      }
       state.progress = action.payload
     },
 
@@ -214,6 +219,8 @@ const playerSlice = createSlice({
     endDragging(state) {
       state.isTimelineDragging = false
       state.progress = state.timelineSeekProgress
+      state.thumbnailsOverlayProgress = state.timelineSeekProgress
+      state.showThumbnailsOverlay = true
       if (state.ended) {
         state.ended = false
         state.playing = true
@@ -283,15 +290,17 @@ const playerSlice = createSlice({
       state.duration = 0
       state.progress = 0
       state.loadedProgress = 0
+      state.isTimelineHovering = false
+      state.isTimelineDragging = false
+      state.timelineSeekProgress = 0
+      state.showThumbnailsOverlay = false
+      state.thumbnailsOverlayProgress = 0
       state.interacted = false
       state.focused = false
       state.tooltipHovered = false
       state.menu = null
       state.action = null
       state.fastForwarding = false
-      state.isTimelineHovering = false
-      state.isTimelineDragging = false
-      state.timelineSeekProgress = 0
     },
   },
 })
@@ -367,6 +376,16 @@ export const selectPlayerDurationFetched = (state: AppStoreState) => state.playe
 export const selectPlayerDuration = (state: AppStoreState) => state.player.duration
 export const selectPlayerProgress = (state: AppStoreState) => state.player.progress
 export const selectPlayerLoadedProgress = (state: AppStoreState) => state.player.loadedProgress
+export const selectPlayerIsTimelineHovering = (state: AppStoreState) =>
+  state.player.isTimelineHovering
+export const selectPlayerIsTimelineDragging = (state: AppStoreState) =>
+  state.player.isTimelineDragging
+export const selectPlayerTimelineSeekProgress = (state: AppStoreState) =>
+  state.player.timelineSeekProgress
+export const selectPlayerThumbnailsOverlayProgress = (state: AppStoreState) =>
+  state.player.thumbnailsOverlayProgress
+export const selectPlayerShowThumbnailsOverlay = (state: AppStoreState) =>
+  state.player.showThumbnailsOverlay
 
 export const selectPlayerInteracted = (state: AppStoreState) => state.player.interacted
 export const selectPlayerFocused = (state: AppStoreState) => state.player.focused
@@ -379,13 +398,6 @@ export const selectPlayerMenu = (state: AppStoreState) => state.player.menu
 export const selectPlayerAction = (state: AppStoreState) => state.player.action
 export const selectPlayerActionTimestamp = (state: AppStoreState) => state.player.actionTimestamp
 export const selectPlayerFastForwarding = (state: AppStoreState) => state.player.fastForwarding
-
-export const selectPlayerIsTimelineHovering = (state: AppStoreState) =>
-  state.player.isTimelineHovering
-export const selectPlayerIsTimelineDragging = (state: AppStoreState) =>
-  state.player.isTimelineDragging
-export const selectPlayerTimelineSeekProgress = (state: AppStoreState) =>
-  state.player.timelineSeekProgress
 
 export const selectPlayerPlayingCombined = createSelector(
   selectPlayerPlaying,
@@ -406,6 +418,24 @@ export const selectPlayerThumbnailsProgress = createSelector(
   selectPlayerIsTimelineDragging,
   selectPlayerTimelineSeekProgress,
   (isTimelineHovering, isTimelineDragging, timelineSeekProgress) => {
+    if (!isTimelineHovering && !isTimelineDragging) return 0
+    return timelineSeekProgress
+  },
+)
+export const selectPlayerThumbnailsOverlaySavedProgress = createSelector(
+  selectPlayerIsTimelineHovering,
+  selectPlayerIsTimelineDragging,
+  selectPlayerTimelineSeekProgress,
+  selectPlayerThumbnailsOverlayProgress,
+  selectPlayerShowThumbnailsOverlay,
+  (
+    isTimelineHovering,
+    isTimelineDragging,
+    timelineSeekProgress,
+    thumbnailsOverlayProgress,
+    showThumbnailsOverlay,
+  ) => {
+    if (showThumbnailsOverlay) return thumbnailsOverlayProgress
     if (!isTimelineHovering && !isTimelineDragging) return 0
     return timelineSeekProgress
   },
