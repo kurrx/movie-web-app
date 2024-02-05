@@ -18,6 +18,7 @@ import {
   selectPlayerMuted,
   selectPlayerVolume,
 } from '../../../player.slice'
+import { FastForwarding } from '../FastForwarding'
 
 type TrackerType = { cancel: (() => void) | null }
 const Tracker: TrackerType = { cancel: null }
@@ -76,11 +77,12 @@ export function Actions() {
     <div
       id='player-actions'
       className={cn(
-        'z-[3] absolute top-0 left-0 bottom-0 right-0',
+        'absolute top-0 left-0 bottom-0 right-0',
         'w-full h-full flex items-center justify-center',
         'select-none pointer-events-none overflow-hidden',
       )}
     >
+      <FastForwarding />
       {action === 'mute' ||
         action === 'volumeUp' ||
         (action === 'volumeDown' && (
