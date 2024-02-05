@@ -1,7 +1,7 @@
 import { AutoPlaySwitch } from '../AutoPlaySwitch'
 import { PlaylistMenu } from '../PlaylistMenu'
 import { SettingsMenu } from '../SettingsMenu'
-import { AdjacentButton, FullscreenButton, PipButton, TheaterButton } from './Buttons'
+import { AdjacentButton, FullscreenButton, PipButton, PlayButton, TheaterButton } from './Buttons'
 import { Controls } from './Controls'
 import { Gradient } from './Gradient'
 import { Heading } from './Heading'
@@ -22,6 +22,7 @@ export function DesktopControls() {
         <Controls.Buttons>
           <Controls.Side side='left'>
             <AdjacentButton type='prev' />
+            <PlayButton />
             <AdjacentButton type='next' />
           </Controls.Side>
           <Controls.Side side='right'>

@@ -6,9 +6,10 @@ import { useStore } from '@/hooks'
 import { useInteract } from '../../../hooks'
 import {
   selectPlayerDesktopMouseVisible,
+  selectPlayerFastForwarding,
   selectPlayerFullscreen,
   selectPlayerMenu,
-  selectPlayerPlaying,
+  selectPlayerPlayingCombined,
   setPlayerFocused,
   setPlayerInteracted,
 } from '../../../player.slice'
@@ -18,9 +19,10 @@ export function Wrapper({ children }: PropsWithChildren) {
   const interact = useInteract()
   const visible = selector(selectPlayerDesktopMouseVisible)
   const isTouch = selector(selectDeviceIsTouch)
-  const playing = selector(selectPlayerPlaying)
+  const playing = selector(selectPlayerPlayingCombined)
   const fullscreen = selector(selectPlayerFullscreen)
   const menu = selector(selectPlayerMenu)
+  const fastForwarding = selector(selectPlayerFastForwarding)
   const downRef = useRef(false)
 
   const cancelInteract = useCallback(() => {
@@ -56,7 +58,7 @@ export function Wrapper({ children }: PropsWithChildren) {
     dispatch(setPlayerFocused(false))
   }, [dispatch])
 
-  useEffect(interact, [interact, playing, fullscreen, menu])
+  useEffect(interact, [interact, playing, fullscreen, menu, fastForwarding])
 
   return (
     <div

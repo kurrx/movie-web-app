@@ -10,8 +10,8 @@ import {
   resetPlayerState,
   selectPlayerMuted,
   selectPlayerPip,
-  selectPlayerPlaybackSpeed,
-  selectPlayerPlaying,
+  selectPlayerPlaybackSpeedCombined,
+  selectPlayerPlayingCombined,
   selectPlayerVolume,
   setPlayerBuffering,
   setPlayerDuration,
@@ -31,10 +31,10 @@ export function PlayerNative() {
   const { setPlayer, player } = useNodes()
   const { mediaUrl, startTime, onTimeUpdate } = useProps()
   const { exitFullscreen } = useFullscreen()
-  const playing = selector(selectPlayerPlaying)
+  const playing = selector(selectPlayerPlayingCombined)
   const volume = selector(selectPlayerVolume)
   const muted = selector(selectPlayerMuted)
-  const playbackSpeed = selector(selectPlayerPlaybackSpeed)
+  const playbackSpeed = selector(selectPlayerPlaybackSpeedCombined)
   const pip = selector(selectPlayerPip)
 
   const onReady = useCallback(() => {

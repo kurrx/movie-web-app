@@ -1,4 +1,5 @@
 export type PlayerMenu = 'settings' | 'playlist' | null
+export type PlayerAction = 'play' | 'pause' | 'mute' | 'volumeUp' | 'volumeDown' | null
 
 export interface PlayerStoreState {
   initialized: boolean
@@ -28,4 +29,7 @@ export interface PlayerStoreState {
   pip: boolean
 
   menu: PlayerMenu
+  action: PlayerAction
+  actionTimestamp: number
+  fastForwarding: boolean
 }

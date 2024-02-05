@@ -29,6 +29,9 @@ const initialState: PlayerStoreState = {
   pip: false,
 
   menu: null,
+  action: null,
+  actionTimestamp: 0,
+  fastForwarding: false,
 }
 
 const playerSlice = createSlice({
@@ -77,6 +80,7 @@ const playerSlice = createSlice({
     },
 
     setPlayerPlaybackSpeed(state, action: PayloadAction<SetStateAction<number>>) {
+      if (state.fastForwarding) return
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.playbackSpeed) : payload
       const clampedNext = clamp(next, 0.25, 2)
@@ -105,15 +109,43 @@ const playerSlice = createSlice({
 
     setPlayerPlaying(state, action: PayloadAction<SetStateAction<boolean>>) {
       if (!state.ready) return
+      if (!state.durationFetched) return
+      if (state.ended) return
+      if (state.fastForwarding) return
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.playing) : payload
       state.playing = next
+    },
+
+    setPlayerPlayingWithAction(state, action: PayloadAction<SetStateAction<boolean>>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
+      if (state.ended) return
+      if (state.fastForwarding) return
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.playing) : payload
+      state.playing = next
+      state.action = next ? 'play' : 'pause'
+      state.actionTimestamp = Date.now()
+    },
+
+    startReplay(state) {
+      state.ended = false
+      state.playing = true
+    },
+
+    startReplayWithAction(state) {
+      state.ended = false
+      state.playing = true
+      state.action = 'play'
+      state.actionTimestamp = Date.now()
     },
 
     setPlayerEnded(state) {
       state.ended = true
       state.playing = false
       state.pip = false
+      state.fastForwarding = false
     },
 
     setPlayerDuration(state, action: PayloadAction<number>) {
@@ -170,6 +202,15 @@ const playerSlice = createSlice({
       state.menu = action.payload
     },
 
+    setPlayerFastForwarding(state, action: PayloadAction<SetStateAction<boolean>>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
+      if (state.ended) return
+      const payload = action.payload
+      const next = typeof payload === 'function' ? payload(state.fastForwarding) : payload
+      state.fastForwarding = next
+    },
+
     resetPlayerState(state) {
       state.ready = false
       state.buffering = false
@@ -183,6 +224,8 @@ const playerSlice = createSlice({
       state.focused = false
       state.tooltipHovered = false
       state.menu = null
+      state.action = null
+      state.fastForwarding = false
     },
   },
 })
@@ -199,6 +242,9 @@ export const {
   setPlayerReady,
   setPlayerBuffering,
   setPlayerPlaying,
+  setPlayerPlayingWithAction,
+  startReplay,
+  startReplayWithAction,
   setPlayerEnded,
   setPlayerDuration,
   setPlayerProgress,
@@ -209,6 +255,7 @@ export const {
   setPlayerFullscreen,
   setPlayerPip,
   setPlayerMenu,
+  setPlayerFastForwarding,
   resetPlayerState,
 } = playerSlice.actions
 
@@ -255,7 +302,20 @@ export const selectPlayerFullscreen = (state: AppStoreState) => state.player.ful
 export const selectPlayerPip = (state: AppStoreState) => state.player.pip
 
 export const selectPlayerMenu = (state: AppStoreState) => state.player.menu
+export const selectPlayerAction = (state: AppStoreState) => state.player.action
+export const selectPlayerActionTimestamp = (state: AppStoreState) => state.player.actionTimestamp
+export const selectPlayerFastForwarding = (state: AppStoreState) => state.player.fastForwarding
 
+export const selectPlayerPlayingCombined = createSelector(
+  selectPlayerPlaying,
+  selectPlayerFastForwarding,
+  (playing, fastForwarding) => playing || fastForwarding,
+)
+export const selectPlayerPlaybackSpeedCombined = createSelector(
+  selectPlayerPlaybackSpeed,
+  selectPlayerFastForwarding,
+  (playbackSpeed, fastForwarding) => (fastForwarding ? 2 : playbackSpeed),
+)
 export const selectPlayerFetched = createSelector(
   selectPlayerReady,
   selectPlayerDurationFetched,
@@ -274,15 +334,18 @@ export const selectPlayerDesktopControlsVisible = createSelector(
   selectPlayerFocused,
   selectPlayerPlaying,
   selectPlayerMenu,
-  (fetched, ended, tooltipHovered, interacted, focused, playing, menu) => {
+  selectPlayerFastForwarding,
+  (fetched, ended, tooltipHovered, interacted, focused, playing, menu, fastForwarding) => {
     if (!fetched) return false
+    if (fastForwarding) return false
     return ended || tooltipHovered || interacted || focused || !playing || menu !== null
   },
 )
 export const selectPlayerDesktopMouseVisible = createSelector(
   selectPlayerFetched,
   selectPlayerDesktopControlsVisible,
-  (fetched, controlsVisible) => !fetched || controlsVisible,
+  selectPlayerFastForwarding,
+  (fetched, controlsVisible, fastForwarding) => !fetched || fastForwarding || controlsVisible,
 )
 export const selectPlayerDesktopHeadingVisible = createSelector(
   selectPlayerFullscreen,
