@@ -16,6 +16,7 @@ export function FastForwarding() {
         'justify-center text-white sm:py-2 py-1 sm:px-4 px-2 text-center',
         'bg-black/50 rounded-md translate-x-[-50%]',
         'flex sm:text-sm text-xs font-medium rounded-full',
+        'pointer-events-none select-none',
       )}
     >
       2x

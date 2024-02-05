@@ -1,4 +1,5 @@
 import { AutoPlaySwitch } from '../AutoPlaySwitch'
+import { Ending } from '../Ending'
 import { PlaylistMenu } from '../PlaylistMenu'
 import { SettingsMenu } from '../SettingsMenu'
 import { Actions } from './Actions'
@@ -17,6 +18,7 @@ export function DesktopControls() {
       <Gradient position='bottom' />
       <Loader />
       <Actions />
+      <Ending />
       <Heading.Root>
         <Heading.Title />
         <Heading.Buttons>{/* TODO: Share Button */}</Heading.Buttons>
