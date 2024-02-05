@@ -202,6 +202,10 @@ const playerSlice = createSlice({
       state.menu = action.payload
     },
 
+    clearPlayerAction(state) {
+      state.action = null
+    },
+
     setPlayerFastForwarding(state, action: PayloadAction<SetStateAction<boolean>>) {
       if (!state.ready) return
       if (!state.durationFetched) return
@@ -255,6 +259,7 @@ export const {
   setPlayerFullscreen,
   setPlayerPip,
   setPlayerMenu,
+  clearPlayerAction,
   setPlayerFastForwarding,
   resetPlayerState,
 } = playerSlice.actions

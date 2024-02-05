@@ -1,6 +1,7 @@
 import { AutoPlaySwitch } from '../AutoPlaySwitch'
 import { PlaylistMenu } from '../PlaylistMenu'
 import { SettingsMenu } from '../SettingsMenu'
+import { Actions } from './Actions'
 import { AdjacentButton, FullscreenButton, PipButton, PlayButton, TheaterButton } from './Buttons'
 import { Controls } from './Controls'
 import { Gradient } from './Gradient'
@@ -14,6 +15,7 @@ export function DesktopControls() {
       <Gradient position='top' />
       <Gradient position='bottom' />
       <Loader />
+      <Actions />
       <Heading.Root>
         <Heading.Title />
         <Heading.Buttons>{/* TODO: Share Button */}</Heading.Buttons>
