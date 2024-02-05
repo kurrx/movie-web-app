@@ -398,7 +398,9 @@ export const selectWatchItemTitle = createSelector(
       const currentSeason = seasons.find((s) => s.number === season)!
       const episodes = currentSeason.episodes
       const currentEpisode = episodes.find((e) => e.number === episode)!
-      return `${item.title}: ${currentSeason.title} ${currentEpisode.title}`
+      const episodeDetail =
+        item.episodesInfo?.[currentSeason.number - 1]?.[currentEpisode.number - 1]
+      return `${item.title} - S${currentSeason.number}:E${currentEpisode.number} «${episodeDetail.title || `Эпизод ${currentEpisode.number}`}»`
     }
     return item.title
   },
@@ -461,7 +463,7 @@ export const selectWatchItemPlaylist = createSelector(
             type: 'episode',
             season: season.number,
             number: episode.number,
-            title: `S${season.number}:E${episode.number} «${episodeDetail?.title || `Episode ${episode.number}`}»`,
+            title: `S${season.number}:E${episode.number} «${episodeDetail?.title || `Эпизод ${episode.number}`}»`,
             originalTitle: episodeDetail?.originalTitle || null,
             releaseDate: episodeDetail?.releaseDate || null,
             isCurrent: seasonItem.isCurrent && episode.number === stateEpisode,
