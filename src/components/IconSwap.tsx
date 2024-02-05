@@ -8,7 +8,7 @@ export interface IconSwapProps extends PropsWithChildren {
 export function IconSwap({ id, children }: IconSwapProps) {
   return (
     <span className='relative pointer-events-none'>
-      <AnimatePresence mode='sync' initial={false}>
+      <AnimatePresence mode='wait' initial={false}>
         <motion.span
           key={id}
           className='absolute top-[50%] left-[50%]'
@@ -23,7 +23,7 @@ export function IconSwap({ id, children }: IconSwapProps) {
           exit={['center', 'hidden']}
           whileTap={{ scale: 1 }}
           whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.1, ease: [0.4, 0, 0.2, 1] }}
         >
           {children}
         </motion.span>
