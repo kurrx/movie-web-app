@@ -87,3 +87,30 @@ export function bytesToStr(bytes: number, digits = 2) {
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
 }
+
+const minuteInSeconds = 60
+const hourInSeconds = 60 * minuteInSeconds
+const dayInSeconds = 24 * hourInSeconds
+
+export function toDoubleDigit(input: number) {
+  return input < 10 ? `0${input}` : `${input}`
+}
+
+export function convertSeconds(input: number) {
+  const days = Math.floor(input / dayInSeconds)
+  const hours = Math.floor((input % dayInSeconds) / hourInSeconds)
+  const minutes = Math.floor(((input % dayInSeconds) % hourInSeconds) / minuteInSeconds)
+  const seconds = Math.floor(((input % dayInSeconds) % hourInSeconds) % minuteInSeconds)
+  let result = `${toDoubleDigit(seconds)}`
+  if (hours > 0 || days > 0) {
+    result = `${toDoubleDigit(minutes)}:${result}`
+    if (days > 0) {
+      result = `${days}${toDoubleDigit(hours)}:${result}`
+    } else {
+      result = `${hours}:${result}`
+    }
+  } else {
+    result = `${minutes}:${result}`
+  }
+  return result
+}

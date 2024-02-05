@@ -8,6 +8,7 @@ import { Controls } from './Controls'
 import { Gradient } from './Gradient'
 import { Heading } from './Heading'
 import { Loader } from './Loader'
+import { Timer } from './Timer'
 import { VolumeSlider } from './VolumeSlider'
 import { Wrapper } from './Wrapper'
 
@@ -30,6 +31,7 @@ export function DesktopControls() {
             <PlayButton />
             <AdjacentButton type='next' />
             <VolumeSlider />
+            <Timer />
           </Controls.Side>
           <Controls.Side side='right'>
             <AutoPlaySwitch />
