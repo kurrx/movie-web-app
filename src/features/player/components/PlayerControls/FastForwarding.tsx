@@ -12,14 +12,14 @@ export function FastForwarding() {
   return (
     <div
       className={cn(
-        'absolute top-[3rem] left-[50%] items-center',
-        'justify-center text-white py-2 px-4 text-center',
+        'absolute sm:top-[3rem] top-[1rem] left-[50%] items-center',
+        'justify-center text-white sm:py-2 py-1 sm:px-4 px-2 text-center',
         'bg-black/50 rounded-md translate-x-[-50%]',
-        'flex text-sm font-medium rounded-full',
+        'flex sm:text-sm text-xs font-medium rounded-full',
       )}
     >
       2x
-      <FastForwardIcon className='ml-2 w-3 h-3' />
+      <FastForwardIcon className='ml-2 sm:w-3 w-2 sm:h-3 h-2' />
     </div>
   )
 }
