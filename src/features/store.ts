@@ -9,6 +9,7 @@ import {
   setPlayerInteracted,
   setPlayerLoaded,
   setPlayerProgress,
+  setPlayerTooltipHovered,
 } from './player'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
@@ -37,6 +38,7 @@ export const store = configureStore({
       setPlayerLoaded.type,
       setPlayerInteracted.type,
       setPlayerFocused.type,
+      setPlayerTooltipHovered.type,
     ],
   },
 })
