@@ -232,6 +232,7 @@ export interface StreamQuality {
 }
 
 export interface Stream {
+  detailsFetched: boolean
   subtitles: StreamSubtitle[]
   defaultSubtitle: string | null
   message: string

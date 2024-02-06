@@ -44,7 +44,17 @@ export class Thumbnails {
 
   getSegment(time: number) {
     const segmentIndex = Math.floor(time / this.segmentDuration)
-    if (segmentIndex >= this.segments.length) return undefined
+    if (segmentIndex >= this.segments.length) {
+      return {
+        start: 0,
+        end: 0,
+        url: '',
+        width: 16,
+        height: 9,
+        x: 0,
+        y: 0,
+      }
+    }
     return this.segments[segmentIndex]
   }
 

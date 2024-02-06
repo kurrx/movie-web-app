@@ -24,7 +24,6 @@ import {
   SeriesEpisodesStreamResponse,
   Stream,
   StreamResponse,
-  StreamSuccessResponse,
 } from '@/types'
 
 import { PROVIDER_URL, PROXY_URL } from './env'
@@ -144,26 +143,23 @@ export const ajax = new Request({
   .useResponse(parseProxiedCookies)
   .construct()
 
-export async function fetchStreamDownloadSize(stream: Stream, id: string) {
-  const quality = stream.qualities.find((q) => q.id === id)
-  if (!quality) return
-  const res = await axios.head(quality.downloadUrl)
+export async function fetchStreamDownloadSize(stream: Stream, id: string, signal?: AbortSignal) {
+  const quality = stream.qualities.find((q) => q.id === id)!
+  const res = await axios.head(quality.downloadUrl, { signal })
   const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
-  quality.downloadSize = size
-  quality.downloadSizeStr = bytesToStr(size)
+  return { id, downloadSize: size, downloadSizeStr: bytesToStr(size) }
 }
 
-export async function fetchStreamThumbnails(stream: Stream) {
-  const { data } = await ajax.get<string>(stream.thumbnailsUrl)
-  stream.thumbnails.parse(data)
+export async function fetchStreamThumbnails(stream: Stream, signal?: AbortSignal) {
+  const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+  return data
 }
 
-export async function fetchStream(rawStream: StreamSuccessResponse) {
-  const stream = parseStream(rawStream)
-  const promises = stream.qualities.map((q) => fetchStreamDownloadSize(stream, q.id))
-  promises.push(fetchStreamThumbnails(stream))
-  await Promise.all(promises)
-  return stream
+export async function fetchStreamDetails(stream: Stream, signal?: AbortSignal) {
+  const thumbnailsPromise = fetchStreamThumbnails(stream, signal)
+  const promises = stream.qualities.map((q) => fetchStreamDownloadSize(stream, q.id, signal))
+  const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
+  return { thumbnails, sizes }
 }
 
 export async function fetchMovieStream(args: FetchMovieStreamArgs) {
@@ -184,7 +180,7 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs) {
   )
   if (!data.success)
     throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
-  return await fetchStream(data)
+  return parseStream(data)
 }
 
 export async function fetchSeriesStream(args: FetchSeriesStreamArgs) {
@@ -204,7 +200,7 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs) {
   )
   if (!data.success)
     throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
-  return await fetchStream(data)
+  return parseStream(data)
 }
 
 export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamArgs) {
@@ -225,7 +221,7 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
   if (!data.success)
     throw new Error(data.message || 'Unable to get episodes list. Try again later.')
   const seasons = parseStreamSeasons(data.seasons, data.episodes)
-  const stream = await fetchStream(data)
+  const stream = parseStream(data)
   return {
     seasons,
     stream,

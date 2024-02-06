@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { fetchItem, fetchSeriesStream, fetchTranslator } from '@/api'
+import { fetchItem, fetchSeriesStream, fetchStreamDetails, fetchTranslator } from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
   AppStoreState,
@@ -24,6 +24,8 @@ type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
 type GetItemReturn = Awaited<ReturnType<typeof fetchItem>>
 type GetItemParam = ItemFullID
+type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
+type GetStreamParam = number
 type SwitchParam = { id: number }
 type SEpisodeReturn = Awaited<ReturnType<typeof fetchSeriesStream>> | null
 type SEpisodeParam = { season: number; episode: number } & SwitchParam
@@ -64,6 +66,23 @@ function checkState(stream: Stream, state: WatchItemState) {
     state.subtitle = stream.defaultSubtitle
   }
 }
+function getItemStream(state: WatchStoreState, id: number) {
+  const item = state.items.find((i) => i.id === id)!.item!
+  const itemState = state.states[id]!
+  const translatorId = itemState.translatorId
+  let stream: Stream
+  if (item.itemType === 'series') {
+    const season = itemState.season!
+    const episode = itemState.episode!
+    stream = item.streams
+      .find((s) => s.translatorId === translatorId)!
+      .seasons!.find((s) => s.number === season)!
+      .episodes.find((e) => e.number === episode)!.stream!
+  } else {
+    stream = item.streams.find((s) => s.translatorId === translatorId)!.stream!
+  }
+  return stream
+}
 
 const initialState: WatchStoreState = {
   items: [],
@@ -89,6 +108,19 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
       const findItem = items.find((i) => i.id === arg.id)
       if (!findItem) return true
       return findItem.state !== FetchState.SUCCESS
+    },
+  },
+)
+export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam, Thunk>(
+  'watch/getStreamDetails',
+  async (id, { signal, getState }) => {
+    const stream = getItemStream(getState().watch, id)
+    return await fetchStreamDetails(stream, signal)
+  },
+  {
+    condition(id, { getState }) {
+      const stream = getItemStream(getState().watch, id)
+      return !stream.detailsFetched
     },
   },
 )
@@ -232,6 +264,17 @@ const watchSlice = createSlice({
           }
         }
       })
+
+    builder.addCase(getStreamDetails.fulfilled, (state, action) => {
+      const stream = getItemStream(state, action.meta.arg)
+      stream.detailsFetched = true
+      stream.thumbnails.parse(action.payload.thumbnails)
+      for (const size of action.payload.sizes) {
+        const quality = stream.qualities.find((q) => q.id === size.id)!
+        quality.downloadSize = size.downloadSize
+        quality.downloadSizeStr = size.downloadSizeStr
+      }
+    })
 
     builder
       .addCase(switchEpisode.pending, switchPending)

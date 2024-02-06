@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Player } from '@/features/player'
@@ -6,11 +6,13 @@ import { useStore } from '@/hooks'
 import { WatchPlaylistPlayItem } from '@/types'
 
 import {
+  getStreamDetails,
   selectWatchItemPlaylist,
   selectWatchItemPlaylistAdjacents,
   selectWatchItemQualities,
   selectWatchItemQuality,
   selectWatchItemStateTimestamp,
+  selectWatchItemStream,
   selectWatchItemSwitchState,
   selectWatchItemThumbnails,
   selectWatchItemTitle,
@@ -46,6 +48,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const translator = selector((state) => selectWatchItemTranslator(state, id))
   const translators = selector((state) => selectWatchItemTranslators(state, id))
   const thumbnails = selector((state) => selectWatchItemThumbnails(state, id))
+  const stream = selector((state) => selectWatchItemStream(state, id))
   const [switchAction, setSwitchAction] = useState<SwitchAction>(null)
   const [switchArgs, setSwitchArgs] = useState<SwitchArgs>(null)
 
@@ -121,6 +124,13 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
     },
     [makeSwitchQuality],
   )
+
+  useEffect(() => {
+    const signal = dispatch(getStreamDetails(id))
+    return () => {
+      signal.abort()
+    }
+  }, [dispatch, stream, id])
 
   return (
     <Player
