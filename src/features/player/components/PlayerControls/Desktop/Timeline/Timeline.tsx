@@ -1,6 +1,7 @@
 import './Timeline.css'
 
 import { motion, useMotionValue } from 'framer-motion'
+import type { MouseEvent as ReactMouseEvent } from 'react'
 import { PointerEvent, useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { clamp, convertSeconds } from '@/api'
@@ -102,6 +103,10 @@ export function Timeline() {
     },
     [dispatch, getTimeFromEvent, player, isTimelineDragging],
   )
+  const onContextMenu = useCallback((e: ReactMouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }, [])
 
   useEffect(() => {
     timeScaleX.set(time / duration)
@@ -140,6 +145,7 @@ export function Timeline() {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
+      onContextMenu={onContextMenu}
     >
       <div className='timeline-progress'>
         <div className='timeline-progress-container'>
