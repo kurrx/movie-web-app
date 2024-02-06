@@ -28,6 +28,7 @@ export interface PlayerStoreState {
   showThumbnailsOverlay: boolean
   seek: PlayerSeek
   accumulatedSeek: number
+  displayAccumulatedSeek: number
 
   interacted: boolean
   focused: boolean

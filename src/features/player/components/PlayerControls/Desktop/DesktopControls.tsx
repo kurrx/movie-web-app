@@ -2,6 +2,7 @@ import { AutoPlaySwitch } from '../AutoPlaySwitch'
 import { Ending } from '../Ending'
 import { Gestures } from '../Gestures'
 import { PlaylistMenu } from '../PlaylistMenu'
+import { SeekProgress } from '../SeekProgress'
 import { SettingsMenu } from '../SettingsMenu'
 import { Actions } from './Actions'
 import { AdjacentButton, FullscreenButton, PipButton, PlayButton, TheaterButton } from './Buttons'
@@ -21,6 +22,7 @@ export function DesktopControls() {
       <Gradient position='bottom' />
       <Loader />
       <Actions />
+      <SeekProgress />
       <Gestures />
       <Ending />
       <Heading.Root>

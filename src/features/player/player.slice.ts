@@ -28,6 +28,7 @@ const initialState: PlayerStoreState = {
   showThumbnailsOverlay: false,
   seek: null,
   accumulatedSeek: 0,
+  displayAccumulatedSeek: 0,
 
   interacted: false,
   focused: false,
@@ -234,13 +235,12 @@ const playerSlice = createSlice({
 
     seekTo(state, action: PayloadAction<NonNullable<PlayerSeek>>) {
       const seek = action.payload
-      if (state.seek === null) {
-        state.isTimelineDragging = true
-      }
       if (state.seek !== seek) {
-        state.accumulatedSeek = 0
+        state.displayAccumulatedSeek = 0
       }
-      state.accumulatedSeek += state.jumpStep * (seek === 'forward' ? 1 : -1)
+      const step = state.jumpStep * (seek === 'forward' ? 1 : -1)
+      state.accumulatedSeek += step
+      state.displayAccumulatedSeek += step
       const time = clamp(state.progress + state.accumulatedSeek, 0, state.duration - 1)
       state.timelineSeekProgress = time
       state.seek = seek
@@ -255,7 +255,7 @@ const playerSlice = createSlice({
       const time = clamp(state.progress + state.accumulatedSeek, 0, state.duration - 1)
       state.seek = null
       state.accumulatedSeek = 0
-      state.isTimelineDragging = false
+      state.displayAccumulatedSeek = 0
       state.progress = time
       state.thumbnailsOverlayProgress = time
       player.seekTo(time)
@@ -331,6 +331,7 @@ const playerSlice = createSlice({
       state.thumbnailsOverlayProgress = 0
       state.seek = null
       state.accumulatedSeek = 0
+      state.displayAccumulatedSeek = 0
       state.interacted = false
       state.focused = false
       state.tooltipHovered = false
@@ -426,6 +427,8 @@ export const selectPlayerShowThumbnailsOverlay = (state: AppStoreState) =>
   state.player.showThumbnailsOverlay
 export const selectPlayerSeek = (state: AppStoreState) => state.player.seek
 export const selectPlayerAccumulatedSeek = (state: AppStoreState) => state.player.accumulatedSeek
+export const selectPlayerDisplayAccumulatedSeek = (state: AppStoreState) =>
+  state.player.displayAccumulatedSeek
 
 export const selectPlayerInteracted = (state: AppStoreState) => state.player.interacted
 export const selectPlayerFocused = (state: AppStoreState) => state.player.focused
@@ -451,8 +454,9 @@ export const selectPlayerTime = createSelector(
   selectPlayerProgress,
   selectPlayerIsTimelineDragging,
   selectPlayerTimelineSeekProgress,
-  (progress, isTimelineDragging, timelineSeekProgree) =>
-    isTimelineDragging ? timelineSeekProgree : progress,
+  selectPlayerSeek,
+  (progress, isTimelineDragging, timelineSeekProgree, seek) =>
+    isTimelineDragging || seek !== null ? timelineSeekProgree : progress,
 )
 export const selectPlayerThumbnailsProgress = createSelector(
   selectPlayerIsTimelineHovering,
@@ -469,15 +473,17 @@ export const selectPlayerThumbnailsOverlaySavedProgress = createSelector(
   selectPlayerTimelineSeekProgress,
   selectPlayerThumbnailsOverlayProgress,
   selectPlayerShowThumbnailsOverlay,
+  selectPlayerSeek,
   (
     isTimelineHovering,
     isTimelineDragging,
     timelineSeekProgress,
     thumbnailsOverlayProgress,
     showThumbnailsOverlay,
+    seek,
   ) => {
     if (showThumbnailsOverlay) return thumbnailsOverlayProgress
-    if (!isTimelineHovering && !isTimelineDragging) return 0
+    if (!isTimelineHovering && !isTimelineDragging && seek === null) return 0
     return timelineSeekProgress
   },
 )
@@ -516,6 +522,7 @@ export const selectPlayerDesktopControlsVisible = createSelector(
   selectPlayerFastForwarding,
   selectPlayerIsTimelineHovering,
   selectPlayerIsTimelineDragging,
+  selectPlayerSeek,
   (
     fetched,
     ended,
@@ -527,6 +534,7 @@ export const selectPlayerDesktopControlsVisible = createSelector(
     fastForwarding,
     isTimelineHovering,
     isTimelineDragging,
+    seek,
   ) => {
     if (!fetched) return false
     if (fastForwarding) return false
@@ -538,7 +546,8 @@ export const selectPlayerDesktopControlsVisible = createSelector(
       !playing ||
       menu !== null ||
       isTimelineHovering ||
-      isTimelineDragging
+      isTimelineDragging ||
+      seek !== null
     )
   },
 )

@@ -4,6 +4,7 @@ import { useAppSelector, useElementRect } from '@/hooks'
 
 import {
   selectPlayerIsTimelineDragging,
+  selectPlayerSeek,
   selectPlayerShowThumbnailsOverlay,
   selectPlayerThumbnailsOverlaySavedProgress,
 } from '../player.slice'
@@ -14,6 +15,7 @@ export function PlayerThumbnailsOverlay() {
   const ref = useRef<HTMLDivElement>(null)
   const rect = useElementRect(ref)
   const isTimelineDragging = useAppSelector(selectPlayerIsTimelineDragging)
+  const seek = useAppSelector(selectPlayerSeek)
   const showThumbnailsOverlay = useAppSelector(selectPlayerShowThumbnailsOverlay)
   const thumbnailsProgress = useAppSelector(selectPlayerThumbnailsOverlaySavedProgress)
   const thumbnailsImage = useMemo(
@@ -26,7 +28,10 @@ export function PlayerThumbnailsOverlay() {
       ref={ref}
       id='seek-overlay'
       className='absolute w-full h-full top-0 left-0 pointer-events-none select-none'
-      style={{ visibility: isTimelineDragging || showThumbnailsOverlay ? 'visible' : 'hidden' }}
+      style={{
+        visibility:
+          isTimelineDragging || showThumbnailsOverlay || seek !== null ? 'visible' : 'hidden',
+      }}
     >
       <div
         id='seek-overlay-loader'
