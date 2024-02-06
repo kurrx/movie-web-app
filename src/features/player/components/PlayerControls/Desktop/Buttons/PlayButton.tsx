@@ -41,7 +41,10 @@ export function PlayButton() {
       if (document.activeElement !== document.body) return
       e.preventDefault()
       e.stopImmediatePropagation()
-      if (timeout.current) return
+      if (timeout.current) {
+        clearTimeout(timeout.current)
+        timeout.current = null
+      }
       timeout.current = setTimeout(() => {
         dispatch(setPlayerFastForwarding(true))
         timeout.current = null
