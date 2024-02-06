@@ -1,3 +1,4 @@
+/* eslint-disable simple-import-sort/exports */
 /// <reference types="vite-plugin-svgr/client" />
 export { default as DownloadIcon } from './download.svg?react'
 export { default as FastForwardIcon } from './fast-forward.svg?react'
@@ -15,6 +16,8 @@ export { default as PlayIcon } from './play.svg?react'
 export { default as PlaylistIcon } from './playlist.svg?react'
 export { default as QualityIcon } from './quality.svg?react'
 export { default as ReplayIcon } from './replay.svg?react'
+export { default as SeekBackwardIcon } from './seek-backward.svg?react'
+export { default as SeekForwardIcon } from './seek-forward.svg?react'
 export { default as SeekIcon } from './seek.svg?react'
 export { default as SettingsIcon } from './settings.svg?react'
 export { default as SpeedIcon } from './speed.svg?react'
