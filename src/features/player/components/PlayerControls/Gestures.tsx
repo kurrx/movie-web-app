@@ -1,18 +1,24 @@
 import { MouseEvent, PointerEvent, useCallback, useRef } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 
 import { selectDeviceIsMobile, selectDeviceIsTouch } from '@/features/device'
 import { useElementRect, useStore } from '@/hooks'
+import { PlayerSeek } from '@/types'
 
 import { useFullscreen, useInteract, usePlaying } from '../../hooks'
 import {
+  endSeeking,
+  seekTo,
   selectPlayerDesktopControlsVisible,
   selectPlayerFastForwarding,
   setPlayerFastForwarding,
   setPlayerInteracted,
 } from '../../player.slice'
+import { useNodes } from '../PlayerNodes'
 
 export function Gestures() {
   const [dispatch, selector] = useStore()
+  const { player } = useNodes()
   const isTouch = selector(selectDeviceIsTouch)
   const isMobile = selector(selectDeviceIsMobile)
   const fastForwarding = selector(selectPlayerFastForwarding)
@@ -20,11 +26,29 @@ export function Gestures() {
   const ref = useRef<HTMLDivElement>(null)
   const rect = useElementRect(ref)
   const fastForwardingTimeout = useRef<NodeJS.Timeout | null>(null)
-  const singleClickTimeout = useRef<NodeJS.Timeout | null>(null)
-  const doubleClickTimeout = useRef<NodeJS.Timeout | null>(null)
+  const clickTimeout = useRef<NodeJS.Timeout | null>(null)
+  const seekTimeout = useRef<NodeJS.Timeout | null>(null)
   const interact = useInteract()
   const { togglePlaying } = usePlaying()
   const { toggleFullscreen } = useFullscreen()
+
+  const makeSeek = useCallback(
+    (seek: NonNullable<PlayerSeek>) => {
+      if (!player) return
+      if (seekTimeout.current) {
+        clearTimeout(seekTimeout.current)
+        seekTimeout.current = null
+      }
+      dispatch(seekTo(seek))
+      seekTimeout.current = setTimeout(() => {
+        seekTimeout.current = null
+        dispatch(endSeeking(player))
+      }, 700)
+    },
+    [dispatch, player],
+  )
+  const seekBackward = useCallback(() => makeSeek('backward'), [makeSeek])
+  const seekForward = useCallback(() => makeSeek('forward'), [makeSeek])
 
   const clearFastForwarding = useCallback(() => {
     if (fastForwardingTimeout.current) {
@@ -55,29 +79,24 @@ export function Gestures() {
   }, [dispatch, togglePlaying, interact, isMobile, isTouch, controlsVisible])
   const onDoubleClick = useCallback(
     (e: PointerEvent) => {
-      if (doubleClickTimeout.current) {
-        clearTimeout(doubleClickTimeout.current)
-        doubleClickTimeout.current = null
-      }
       if (isTouch) {
         const region = (e.clientX - rect.x) / rect.width
         if (region > 0.3 && region < 0.7) {
-          toggleFullscreen()
+          if (!seekTimeout.current) {
+            toggleFullscreen()
+          }
         } else {
-          doubleClickTimeout.current = setTimeout(() => {
-            doubleClickTimeout.current = null
-          }, 700)
           if (region <= 0.3) {
-            console.log('backward')
+            makeSeek('backward')
           } else {
-            console.log('forward')
+            makeSeek('forward')
           }
         }
       } else {
         toggleFullscreen()
       }
     },
-    [toggleFullscreen, isTouch, rect],
+    [toggleFullscreen, makeSeek, isTouch, rect],
   )
 
   const onPointerDown = useCallback(
@@ -99,17 +118,17 @@ export function Gestures() {
       if (clearFastForwarding()) return
       if (target.hasPointerCapture(e.pointerId)) {
         target.releasePointerCapture(e.pointerId)
-        if (singleClickTimeout.current || doubleClickTimeout.current) {
-          if (singleClickTimeout.current) {
-            clearTimeout(singleClickTimeout.current)
-            singleClickTimeout.current = null
+        if (clickTimeout.current || seekTimeout.current) {
+          if (clickTimeout.current) {
+            clearTimeout(clickTimeout.current)
+            clickTimeout.current = null
           }
           onDoubleClick(e)
           return
         }
-        singleClickTimeout.current = setTimeout(() => {
+        clickTimeout.current = setTimeout(() => {
           onSingleClick()
-          singleClickTimeout.current = null
+          clickTimeout.current = null
         }, 300)
         e.preventDefault()
       }
@@ -137,6 +156,9 @@ export function Gestures() {
     },
     [dispatch, clearFastForwarding, isTouch, rect],
   )
+
+  useHotkeys('left', seekBackward, { preventDefault: true }, [seekBackward])
+  useHotkeys('right', seekForward, { preventDefault: true }, [seekForward])
 
   return (
     <div

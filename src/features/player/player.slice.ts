@@ -1,8 +1,9 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
+import ReactPlayer from 'react-player/file'
 
 import { clamp } from '@/api'
-import { AppStoreState, PlayerMenu, PlayerStoreState } from '@/types'
+import { AppStoreState, PlayerMenu, PlayerSeek, PlayerStoreState } from '@/types'
 
 import { getPlayerSettings } from './player.schemas'
 
@@ -25,6 +26,8 @@ const initialState: PlayerStoreState = {
   timelineSeekProgress: 0,
   thumbnailsOverlayProgress: 0,
   showThumbnailsOverlay: false,
+  seek: null,
+  accumulatedSeek: 0,
 
   interacted: false,
   focused: false,
@@ -146,6 +149,7 @@ const playerSlice = createSlice({
       if (state.ended) return
       if (state.fastForwarding) return
       if (state.isTimelineDragging) return
+      if (state.seek !== null) return
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.playing) : payload
       state.playing = next
@@ -156,6 +160,7 @@ const playerSlice = createSlice({
       if (!state.durationFetched) return
       if (state.ended) return
       if (state.fastForwarding) return
+      if (state.seek !== null) return
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.playing) : payload
       state.playing = next
@@ -227,6 +232,35 @@ const playerSlice = createSlice({
       }
     },
 
+    seekTo(state, action: PayloadAction<NonNullable<PlayerSeek>>) {
+      const seek = action.payload
+      if (state.seek === null) {
+        state.isTimelineDragging = true
+      }
+      if (state.seek !== seek) {
+        state.accumulatedSeek = 0
+      }
+      state.accumulatedSeek += state.jumpStep * (seek === 'forward' ? 1 : -1)
+      const time = clamp(state.progress + state.accumulatedSeek, 0, state.duration - 1)
+      state.timelineSeekProgress = time
+      state.seek = seek
+      if (state.ended) {
+        state.ended = false
+        state.playing = true
+      }
+    },
+
+    endSeeking(state, action: PayloadAction<ReactPlayer>) {
+      const player = action.payload
+      const time = clamp(state.progress + state.accumulatedSeek, 0, state.duration - 1)
+      state.seek = null
+      state.accumulatedSeek = 0
+      state.isTimelineDragging = false
+      state.progress = time
+      state.thumbnailsOverlayProgress = time
+      player.seekTo(time)
+    },
+
     setPlayerInteracted(state, action: PayloadAction<SetStateAction<boolean>>) {
       const payload = action.payload
       const next = typeof payload === 'function' ? payload(state.interacted) : payload
@@ -295,6 +329,8 @@ const playerSlice = createSlice({
       state.timelineSeekProgress = 0
       state.showThumbnailsOverlay = false
       state.thumbnailsOverlayProgress = 0
+      state.seek = null
+      state.accumulatedSeek = 0
       state.interacted = false
       state.focused = false
       state.tooltipHovered = false
@@ -329,8 +365,10 @@ export const {
   startHovering,
   startDragging,
   timelineMove,
-  endDragging,
   endHovering,
+  endDragging,
+  seekTo,
+  endSeeking,
   setPlayerInteracted,
   setPlayerFocused,
   setPlayerTooltipHovered,
@@ -386,6 +424,8 @@ export const selectPlayerThumbnailsOverlayProgress = (state: AppStoreState) =>
   state.player.thumbnailsOverlayProgress
 export const selectPlayerShowThumbnailsOverlay = (state: AppStoreState) =>
   state.player.showThumbnailsOverlay
+export const selectPlayerSeek = (state: AppStoreState) => state.player.seek
+export const selectPlayerAccumulatedSeek = (state: AppStoreState) => state.player.accumulatedSeek
 
 export const selectPlayerInteracted = (state: AppStoreState) => state.player.interacted
 export const selectPlayerFocused = (state: AppStoreState) => state.player.focused
@@ -403,8 +443,9 @@ export const selectPlayerPlayingCombined = createSelector(
   selectPlayerPlaying,
   selectPlayerFastForwarding,
   selectPlayerIsTimelineDragging,
-  (playing, fastForwarding, isTimelineDragging) =>
-    (playing || fastForwarding) && !isTimelineDragging,
+  selectPlayerSeek,
+  (playing, fastForwarding, isTimelineDragging, seek) =>
+    (playing || fastForwarding) && !isTimelineDragging && seek === null,
 )
 export const selectPlayerTime = createSelector(
   selectPlayerProgress,

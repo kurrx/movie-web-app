@@ -1,5 +1,6 @@
 export type PlayerMenu = 'settings' | 'playlist' | null
 export type PlayerAction = 'play' | 'pause' | 'mute' | 'volumeUp' | 'volumeDown' | null
+export type PlayerSeek = 'forward' | 'backward' | null
 
 export interface PlayerStoreState {
   initialized: boolean
@@ -25,6 +26,8 @@ export interface PlayerStoreState {
   timelineSeekProgress: number
   thumbnailsOverlayProgress: number
   showThumbnailsOverlay: boolean
+  seek: PlayerSeek
+  accumulatedSeek: number
 
   interacted: boolean
   focused: boolean
