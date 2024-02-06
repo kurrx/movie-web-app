@@ -473,10 +473,32 @@ export const selectPlayerDesktopControlsVisible = createSelector(
   selectPlayerPlaying,
   selectPlayerMenu,
   selectPlayerFastForwarding,
-  (fetched, ended, tooltipHovered, interacted, focused, playing, menu, fastForwarding) => {
+  selectPlayerIsTimelineHovering,
+  selectPlayerIsTimelineDragging,
+  (
+    fetched,
+    ended,
+    tooltipHovered,
+    interacted,
+    focused,
+    playing,
+    menu,
+    fastForwarding,
+    isTimelineHovering,
+    isTimelineDragging,
+  ) => {
     if (!fetched) return false
     if (fastForwarding) return false
-    return ended || tooltipHovered || interacted || focused || !playing || menu !== null
+    return (
+      ended ||
+      tooltipHovered ||
+      interacted ||
+      focused ||
+      !playing ||
+      menu !== null ||
+      isTimelineHovering ||
+      isTimelineDragging
+    )
   },
 )
 export const selectPlayerDesktopMouseVisible = createSelector(
