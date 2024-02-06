@@ -1,6 +1,5 @@
 import { FocusEvent, PropsWithChildren, useCallback, useEffect, useRef } from 'react'
 
-import { selectDeviceIsTouch } from '@/features/device'
 import { useStore } from '@/hooks'
 
 import { useInteract } from '../../../hooks'
@@ -11,32 +10,21 @@ import {
   selectPlayerMenu,
   selectPlayerPlayingCombined,
   setPlayerFocused,
-  setPlayerInteracted,
 } from '../../../player.slice'
 
 export function Wrapper({ children }: PropsWithChildren) {
   const [dispatch, selector] = useStore()
   const interact = useInteract()
   const visible = selector(selectPlayerDesktopMouseVisible)
-  const isTouch = selector(selectDeviceIsTouch)
   const playing = selector(selectPlayerPlayingCombined)
   const fullscreen = selector(selectPlayerFullscreen)
   const menu = selector(selectPlayerMenu)
   const fastForwarding = selector(selectPlayerFastForwarding)
   const downRef = useRef(false)
 
-  const cancelInteract = useCallback(() => {
-    if (isTouch) return
-    dispatch(setPlayerInteracted(false))
-  }, [dispatch, isTouch])
-
-  const onPointerChange = useCallback(
-    (down: boolean) => {
-      downRef.current = down
-      interact()
-    },
-    [interact],
-  )
+  const onPointerChange = useCallback((down: boolean) => {
+    downRef.current = down
+  }, [])
   const onPointerDown = useCallback(() => onPointerChange(true), [onPointerChange])
   const onPointerUp = useCallback(() => onPointerChange(false), [onPointerChange])
 
@@ -67,11 +55,6 @@ export function Wrapper({ children }: PropsWithChildren) {
       data-visible={visible}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
-      onPointerMove={interact}
-      onPointerEnter={interact}
-      onPointerOver={interact}
-      onPointerLeave={cancelInteract}
-      onPointerOut={cancelInteract}
       onFocus={onFocus}
       onBlur={onBlur}
     >

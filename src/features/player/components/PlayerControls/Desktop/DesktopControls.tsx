@@ -1,5 +1,6 @@
 import { AutoPlaySwitch } from '../AutoPlaySwitch'
 import { Ending } from '../Ending'
+import { Gestures } from '../Gestures'
 import { PlaylistMenu } from '../PlaylistMenu'
 import { SettingsMenu } from '../SettingsMenu'
 import { Actions } from './Actions'
@@ -20,6 +21,7 @@ export function DesktopControls() {
       <Gradient position='bottom' />
       <Loader />
       <Actions />
+      <Gestures />
       <Ending />
       <Heading.Root>
         <Heading.Title />
