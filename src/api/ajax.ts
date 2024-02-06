@@ -1,4 +1,5 @@
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 
 import { Request } from '@/core'
 import {
@@ -37,15 +38,23 @@ import {
 } from './parser'
 import { bytesToStr } from './utils'
 
+const retryConfig = {
+  retries: 5,
+  retryDelay: () => 500,
+  retryCondition: () => true,
+}
+
 export const html = new Request({
   baseURL: `${PROXY_URL}/${PROVIDER_URL}`,
   responseType: 'document',
   responseEncoding: 'utf8',
+  timeout: 7000,
 })
   .useRequest(sendProxiedCookies)
   .useResponse(parseProxiedCookies)
   .useResponse(convertDataToDom)
   .construct()
+axiosRetry(html, retryConfig)
 
 export async function fetchSearch({ query, signal }: FetchSearchArgs) {
   // TODO: Add pagination support
@@ -142,6 +151,7 @@ export const ajax = new Request({
   .useRequest(sendProxiedCookies)
   .useResponse(parseProxiedCookies)
   .construct()
+axiosRetry(ajax, retryConfig)
 
 export async function fetchStreamDownloadSize(stream: Stream, id: string, signal?: AbortSignal) {
   const quality = stream.qualities.find((q) => q.id === id)!
