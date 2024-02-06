@@ -76,6 +76,10 @@ body {
   overflow: hidden;
 }
 
+.fullscreen body {
+  background-color: #000;
+}
+
 #app {
   flex: 1 1 auto;
   width: 100%;
@@ -87,7 +91,7 @@ body {
 #content {
   display: flex;
   flex: 1 1 auto;
-  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(var(--vh) * 100 - var(--navbar-height));
 }
 
 .svg-shadow {
