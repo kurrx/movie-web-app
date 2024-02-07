@@ -1,8 +1,10 @@
+import { AutoPlaySwitch } from '../AutoPlaySwitch'
 import { Ending } from '../Ending'
 import { Gestures } from '../Gestures'
 import { Loader } from '../Loader'
 import { SeekProgress } from '../SeekProgress'
 import { Actions } from './Actions'
+import { Controls } from './Controls'
 import { Overlay } from './Overlay'
 import { Wrapper } from './Wrapper'
 
@@ -15,6 +17,9 @@ export function MobileControls() {
       <SeekProgress />
       <Gestures />
       <Ending />
+      <Controls.Top>
+        <AutoPlaySwitch />
+      </Controls.Top>
     </Wrapper>
   )
 }
