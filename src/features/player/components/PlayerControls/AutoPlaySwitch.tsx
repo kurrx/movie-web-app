@@ -7,7 +7,7 @@ import { useStore } from '@/hooks'
 
 import { selectPlayerAutoPlay, setPlayerAutoPlay } from '../../player.slice'
 import { useProps } from '../PlayerProps'
-import { PlayerTooltip } from './Desktop'
+import { PlayerTooltip } from './PlayerTooltip'
 
 export function AutoPlaySwitch() {
   const [dispatch, selector] = useStore()

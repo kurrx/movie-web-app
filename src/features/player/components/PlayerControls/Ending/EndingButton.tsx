@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 import { cn } from '@/api'
 import { IconSwap } from '@/components'
 
-import { PlayerTooltip } from '../Desktop'
+import { PlayerTooltip } from '../PlayerTooltip'
 
 export interface EndingReplayProps extends PropsWithChildren {
   id: string

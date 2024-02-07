@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState
 
 import { cn } from '@/api'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components'
+import { selectDeviceIsMobile } from '@/features/device'
 import { useStore } from '@/hooks'
 
 import { selectPlayerMenu, setPlayerTooltipHovered } from '../../player.slice'
@@ -16,6 +17,7 @@ export interface PlayerTooltipProps extends PropsWithChildren {
 export function PlayerTooltip({ content, className, disabled, children }: PlayerTooltipProps) {
   const [dispatch, selector] = useStore()
   const { content: container } = useNodes()
+  const isMobile = selector(selectDeviceIsMobile)
   const menu = selector(selectPlayerMenu)
   const [open, setOpen] = useState(false)
   const combinedDisabled = useMemo(() => disabled || menu !== null, [disabled, menu])
@@ -37,7 +39,7 @@ export function PlayerTooltip({ content, className, disabled, children }: Player
   }, [dispatch, combinedDisabled])
 
   return (
-    <Tooltip disableHoverableContent open={open} onOpenChange={onOpenChange}>
+    <Tooltip disableHoverableContent open={open && !isMobile} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent
         container={container}
