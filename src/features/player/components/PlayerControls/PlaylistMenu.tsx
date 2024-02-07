@@ -14,6 +14,8 @@ import {
 export function PlaylistMenu() {
   const { playlist } = useProps()
 
+  if (playlist.items.length === 0) return null
+
   return (
     <MenuWrapper
       id='playlist'
