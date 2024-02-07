@@ -105,7 +105,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
     (item: WatchPlaylistPlayItem) => {
       if (item.isCurrent) return
       if (item.type === 'franchise') {
-        navigate(item.to)
+        navigate(item.to, { replace: false })
       } else {
         makeSwitchEpisode(item.season, item.number)
       }

@@ -1,3 +1,4 @@
+import { Ending } from '../Ending'
 import { Gestures } from '../Gestures'
 import { Loader } from '../Loader'
 import { SeekProgress } from '../SeekProgress'
@@ -13,6 +14,7 @@ export function MobileControls() {
       <Actions />
       <SeekProgress />
       <Gestures />
+      <Ending />
     </Wrapper>
   )
 }
