@@ -31,7 +31,7 @@
     max-width: initial;
     height: auto;
     position: sticky;
-    top: var(--navbar-height);
+    top: 0;
     z-index: 49;
   }
 }
@@ -89,6 +89,10 @@
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.player video {
+  position: absolute;
 }
 
 .player-abs {
