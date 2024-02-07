@@ -1,3 +1,5 @@
+import { Wrapper } from './Wrapper'
+
 export function MobileControls() {
-  return null
+  return <Wrapper></Wrapper>
 }
