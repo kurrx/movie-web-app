@@ -37,6 +37,14 @@ export const dialogContentVariants = cva(
           'sm:data-[state=closed]:slide-out-to-left-1/2',
           'sm:data-[state=open]:slide-in-from-left-1/2',
         ),
+        bottom: cn(
+          'left-[10px] right-[10px] sm:left-[50%] sm:right-[auto]',
+          'sm:translate-x-[-50%] bottom-[10px] sm:w-full sm:max-w-lg',
+          'max-h-[calc(var(--visual-vh)*100-20px)]',
+          'sm:max-h-[calc(var(--visual-vh)*100-var(--navbar-height)-30px)]',
+          'sm:data-[state=closed]:slide-out-to-left-1/2',
+          'sm:data-[state=open]:slide-in-from-left-1/2',
+        ),
       },
     },
     defaultVariants: {
@@ -50,14 +58,17 @@ type Ref = ElementRef<Component>
 type RefProps = ComponentPropsWithoutRef<Component>
 type Variants = VariantProps<typeof dialogContentVariants>
 
-export interface DialogContentProps extends RefProps, Variants {}
+export interface DialogContentProps extends RefProps, Variants {
+  container?: HTMLElement | null
+  closeHidden?: boolean
+}
 
 export const DialogContent = forwardRef<Ref, DialogContentProps>(
   function DialogContent(props, ref) {
-    const { location, className, children, ...restProps } = props
+    const { location, className, container, closeHidden, children, ...restProps } = props
 
     return (
-      <DialogPortal>
+      <DialogPortal container={container}>
         <DialogOverlay />
         <Content
           ref={ref}
@@ -73,7 +84,9 @@ export const DialogContent = forwardRef<Ref, DialogContentProps>(
               'focus:ring-2 focus:ring-ring focus:ring-offset-2',
               'disabled:pointer-events-none',
               'data-[state=open]:bg-accent data-[state=open]:text-muted-foreground',
+              'data-[hidden=true]:hidden',
             )}
+            data-hidden={closeHidden}
           >
             <Cross2Icon className={cn('h-4 w-4')} />
             <span className={cn('sr-only')}>Close</span>

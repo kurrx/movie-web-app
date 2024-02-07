@@ -1,7 +1,15 @@
 import { ReactNode, useMemo } from 'react'
 
 import { cn } from '@/api'
-import { AutoHeight, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components'
+import {
+  AutoHeight,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components'
 import { selectDeviceIsMobile } from '@/features/device'
 import { useAppSelector } from '@/hooks'
 
@@ -13,10 +21,39 @@ export interface MenuWrapperProps extends MenuProviderProps {
   tooltip: string
   badge?: string | null
   Icon?: ReactNode | ((open: boolean) => ReactNode)
+  MobileIcon?: ReactNode | ((open: boolean) => ReactNode)
 }
 
-function MobileWrapper({ children }: MenuWrapperProps) {
-  return null
+function MobileWrapper({ id, tooltip, MobileIcon, Icon, children }: MenuWrapperProps) {
+  const { content } = useNodes()
+  const { open, setOpen } = useMenu()
+  const ButtonIcon = useMemo(() => MobileIcon || Icon, [MobileIcon, Icon])
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <div>
+          <Button id={id} tooltip={tooltip} className='relative'>
+            {typeof ButtonIcon === 'function' ? ButtonIcon(open) : ButtonIcon}
+          </Button>
+        </div>
+      </DialogTrigger>
+      <DialogContent
+        closeHidden
+        container={content}
+        className='px-0 py-2 overflow-hidden rounded-lg'
+        location='bottom'
+        onFocus={(e) => {
+          const target = e.target as HTMLElement
+          target.blur()
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <AutoHeight>{children}</AutoHeight>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 function DesktopWrapper({ id, tooltip, badge, Icon, children }: MenuWrapperProps) {

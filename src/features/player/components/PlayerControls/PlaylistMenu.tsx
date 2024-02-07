@@ -1,5 +1,5 @@
 import { cn } from '@/api'
-import { PlaylistIcon } from '@/assets'
+import { PlaylistIcon, PlaylistOutlinedIcon } from '@/assets'
 import { WatchPlaylistItemSeason } from '@/types'
 
 import { useProps } from '../PlayerProps'
@@ -23,6 +23,7 @@ export function PlaylistMenu() {
           className={cn(playlist ? 'scale-[1]' : 'scale-[0.9]', 'transition-transform')}
         />
       )}
+      MobileIcon={<PlaylistOutlinedIcon className='!w-6 !h-6' />}
     >
       <MenuSection
         key='main'

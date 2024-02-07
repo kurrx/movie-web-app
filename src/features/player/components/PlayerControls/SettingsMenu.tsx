@@ -5,6 +5,7 @@ import {
   QualityIcon,
   SeekIcon,
   SettingsIcon,
+  SettingsOutlinedIcon,
   SpeedIcon,
   TranslatorIcon,
   UkraineIcon,
@@ -103,6 +104,7 @@ export function SettingsMenu() {
       Icon={(settings) => (
         <SettingsIcon className={cn(settings ? 'rotate-45' : 'rotate-0', 'transition-transform')} />
       )}
+      MobileIcon={<SettingsOutlinedIcon className='!w-6 !h-6' />}
     >
       <MenuSection key='main' main>
         <MenuSectionButton value={`${jumpStep}s`} icon={<SeekIcon />}>

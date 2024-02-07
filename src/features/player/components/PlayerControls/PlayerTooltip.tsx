@@ -24,11 +24,11 @@ export function PlayerTooltip({ content, className, disabled, children }: Player
 
   const onOpenChange = useCallback(
     (open: boolean) => {
-      if (combinedDisabled && open) return
+      if ((combinedDisabled && open) || isMobile) return
       setOpen(open)
       dispatch(setPlayerTooltipHovered(open))
     },
-    [dispatch, combinedDisabled],
+    [dispatch, combinedDisabled, isMobile],
   )
 
   useEffect(() => {
