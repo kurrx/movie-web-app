@@ -16,8 +16,8 @@ import {
   setPlayerVolume,
   setPlayerVolumeWithAction,
 } from '../../../player.slice'
+import { PlayerTooltip } from '../PlayerTooltip'
 import { Button } from './Buttons/Button'
-import { PlayerTooltip } from './PlayerTooltip'
 
 export function VolumeSlider() {
   const [dispatch, selector] = useStore()

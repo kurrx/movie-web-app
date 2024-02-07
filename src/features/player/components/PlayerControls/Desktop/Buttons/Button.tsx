@@ -3,7 +3,7 @@ import { Children, forwardRef, Fragment, PropsWithChildren, useMemo } from 'reac
 import { cn } from '@/api'
 import { IconSwap } from '@/components'
 
-import { PlayerTooltip } from '../PlayerTooltip'
+import { PlayerTooltip } from '../../PlayerTooltip'
 
 export interface ButtonProps extends PropsWithChildren {
   id: string

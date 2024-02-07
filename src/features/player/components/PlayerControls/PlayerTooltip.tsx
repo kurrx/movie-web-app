@@ -4,8 +4,8 @@ import { cn } from '@/api'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components'
 import { useStore } from '@/hooks'
 
-import { selectPlayerMenu, setPlayerTooltipHovered } from '../../../player.slice'
-import { useNodes } from '../../PlayerNodes'
+import { selectPlayerMenu, setPlayerTooltipHovered } from '../../player.slice'
+import { useNodes } from '../PlayerNodes'
 
 export interface PlayerTooltipProps extends PropsWithChildren {
   content?: ReactNode
