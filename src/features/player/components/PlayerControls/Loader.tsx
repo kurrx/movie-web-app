@@ -2,7 +2,7 @@ import { cn } from '@/api'
 import { LoaderIcon } from '@/assets'
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerLoading } from '../../../player.slice'
+import { selectPlayerLoading } from '../../player.slice'
 
 export function Loader() {
   const loading = useAppSelector(selectPlayerLoading)
@@ -16,7 +16,7 @@ export function Loader() {
       )}
       data-visible={loading}
     >
-      <LoaderIcon className='w-[75px] h-[75px]' />
+      <LoaderIcon className='sm:w-[75px] sm:h-[75px] w-[35px] h-[35px]' />
     </div>
   )
 }
