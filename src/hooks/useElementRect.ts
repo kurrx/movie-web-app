@@ -37,6 +37,12 @@ export function useElementRect(ref: RefObject<HTMLElement>, key?: string) {
     document.body.style.setProperty(`--${key}-height`, `${rect.height}px`)
     document.body.style.setProperty(`--${key}-x`, `${rect.x}px`)
     document.body.style.setProperty(`--${key}-y`, `${rect.y}px`)
+    return () => {
+      document.body.style.removeProperty(`--${key}-width`)
+      document.body.style.removeProperty(`--${key}-height`)
+      document.body.style.removeProperty(`--${key}-x`)
+      document.body.style.removeProperty(`--${key}-y`)
+    }
   }, [key, rect])
 
   return rect

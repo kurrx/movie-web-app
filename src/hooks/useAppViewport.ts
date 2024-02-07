@@ -40,6 +40,13 @@ export function useAppViewport() {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', visualResize)
       }
+      const sizes = getSizes(window.innerWidth, window.innerHeight)
+      for (const key of Object.keys(sizes)) {
+        document.body.style.removeProperty(`--${key}`)
+        if (!window.visualViewport) {
+          document.body.style.removeProperty(`--visual-${key}`)
+        }
+      }
     }
   }, [])
 }
