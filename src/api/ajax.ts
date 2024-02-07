@@ -41,7 +41,7 @@ export const html = new Request({
   baseURL: `${PROXY_URL}/${PROVIDER_URL}`,
   responseType: 'document',
   responseEncoding: 'utf8',
-  timeout: 7000,
+  timeout: 10_000,
 })
   .useRequest(sendProxiedCookies)
   .useResponse(parseProxiedCookies)
@@ -160,7 +160,7 @@ export const ajax = new Request({
   baseURL: `${PROXY_URL}/${PROVIDER_URL}`,
   responseType: 'json',
   responseEncoding: 'utf8',
-  timeout: 7000,
+  timeout: 10_000,
 })
   .useRequest(sendProxiedCookies)
   .useResponse(parseProxiedCookies)
