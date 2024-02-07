@@ -14,13 +14,19 @@ export function PlayerSwitchState() {
     <div
       id='player-switch-state'
       className={cn(
-        'player-abs player-full player-flex text-white',
+        'relative player-full player-flex text-white',
         'bg-black data-[visible=false]:hidden',
+        'after:content-[""] after:block after:w-full',
+        'after:pt-[56.25%]',
       )}
       data-visible={switchState.state !== SwitchState.IDLE}
     >
       <LoaderIcon
-        className={cn('sm:w-[75px] sm:h-[75px] w-[35px] h-[35px] data-[visible=false]:hidden')}
+        className={cn(
+          'absolute top-[50%] left-[50%] translate-x-[-50%]',
+          'translate-y-[-50%] sm:w-[75px] sm:h-[75px] w-[35px]',
+          'h-[35px] data-[visible=false]:hidden',
+        )}
         data-visible={switchState.state === SwitchState.LOADING}
       />
       <AlertErrorDialog
