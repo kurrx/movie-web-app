@@ -25,7 +25,8 @@ export function MenuSectionEpisode({ item }: MenuSectionEpisodeProps) {
         'w-full h-16 pl-5 pr-2 hover:bg-white/10',
         'flex items-center justify-between',
         'space-x-2 text-xs [&_svg]:w-5 [&_svg]:h-5',
-        'data-[active=true]:bg-white/10',
+        'dark:data-[active=true]:bg-white/10',
+        'data-[active=true]:bg-black/10',
       )}
       data-active={item.isCurrent}
       onClick={onClick}

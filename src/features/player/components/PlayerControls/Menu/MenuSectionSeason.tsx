@@ -27,7 +27,8 @@ export function MenuSectionSeason({ item }: MenuSectionSeasonProps) {
       className={cn(
         'w-full h-16 px-5 hover:bg-white/10',
         'flex items-center justify-between',
-        'space-x-2 text-xs data-[active=true]:bg-white/10',
+        'space-x-2 text-xs dark:data-[active=true]:bg-white/10',
+        'data-[active=true]:bg-black/10',
       )}
       data-active={item.isCurrent}
       onClick={onClick}

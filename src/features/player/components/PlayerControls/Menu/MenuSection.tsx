@@ -4,6 +4,8 @@ import { PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useRef }
 
 import { cn } from '@/api'
 import { ScrollArea } from '@/components'
+import { selectDeviceIsMobile } from '@/features/device'
+import { useAppSelector, useElementRect } from '@/hooks'
 
 import { useMenu } from './MenuProvider'
 
@@ -30,7 +32,11 @@ export type MenuSectionProps = (MainSectionProps | SectionProps) &
 export function MenuSection(props: MenuSectionProps) {
   const { main, name, isScrollable, children, className, topContent } = props
   const { open, section, setSection } = useMenu()
+  const isMobile = useAppSelector(selectDeviceIsMobile)
+  const ref = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const topContentRef = useRef<HTMLDivElement>(null)
+  const { height } = useElementRect(topContentRef)
   const isMain = useMemo(() => !!main || name === 'main', [main, name])
   const position = useMotionValue(isMain ? 'static' : 'absolute')
   const pointerEvents = useMotionValue(isMain ? 'auto' : 'none')
@@ -72,31 +78,49 @@ export function MenuSection(props: MenuSectionProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, section])
 
+  useEffect(() => {
+    if (!ref.current) return
+    ref.current.style.setProperty('--top-content-height', `${height}px`)
+  }, [height])
+
   return (
     <motion.div
+      ref={ref}
       style={{ x, opacity, position, pointerEvents }}
       className='left-0 right-0 top-0 w-full'
     >
-      {!isMain && (
-        <button
-          className={cn(
-            'w-full h-10 px-2 hover:bg-white/10',
-            'flex items-center justify-start',
-            'space-x-2 text-md border-b',
-          )}
-          onClick={onClick}
-        >
-          <ChevronLeftIcon className='h-6 w-6' />
-          <span className='font-bold'>{name}</span>
-        </button>
-      )}
-      {topContent}
-      {isScrollable ? (
+      <div ref={topContentRef}>
+        {!isMain && (
+          <button
+            className={cn(
+              'w-full h-10 px-2 hover:bg-white/10',
+              'flex items-center justify-start',
+              'space-x-2 text-md border-b',
+            )}
+            onClick={onClick}
+          >
+            <ChevronLeftIcon className='h-6 w-6' />
+            <span className='font-bold'>{name}</span>
+          </button>
+        )}
+        {topContent}
+      </div>
+      {isScrollable && !isMobile ? (
         <ScrollArea ref={scrollRef} className={cn('h-[22.5rem]', className)}>
           {children}
         </ScrollArea>
-      ) : (
+      ) : !isMobile ? (
         children
+      ) : (
+        <div
+          className={cn(
+            'max-h-[calc(var(--visual-vh)*100-var(--navbar-height)-var(--top-content-height)-36px)]',
+            'overflow-y-scroll',
+            className,
+          )}
+        >
+          {children}
+        </div>
       )}
     </motion.div>
   )

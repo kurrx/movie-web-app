@@ -40,8 +40,7 @@ export const dialogContentVariants = cva(
         bottom: cn(
           'left-[10px] right-[10px] sm:left-[50%] sm:right-[auto]',
           'sm:translate-x-[-50%] bottom-[10px] sm:w-full sm:max-w-lg',
-          'max-h-[calc(var(--visual-vh)*100-20px)]',
-          'sm:max-h-[calc(var(--visual-vh)*100-var(--navbar-height)-30px)]',
+          'max-h-[calc(var(--visual-vh)*100-var(--navbar-height)-20px)]',
           'sm:data-[state=closed]:slide-out-to-left-1/2',
           'sm:data-[state=open]:slide-in-from-left-1/2',
         ),
