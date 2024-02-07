@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { cn } from '@/api'
+import { useElementRect } from '@/hooks'
 import { WatchPlaylistItemEpisode } from '@/types'
 
 import { useProps } from '../../PlayerProps'
@@ -13,11 +14,18 @@ export interface MenuSectionEpisodeProps {
 export function MenuSectionEpisode({ item }: MenuSectionEpisodeProps) {
   const { onPlayItem } = useProps()
   const { setOpen } = useMenu()
+  const titleRef = useRef<HTMLSpanElement>(null)
+  const { width } = useElementRect(titleRef)
 
   const onClick = useCallback(() => {
     onPlayItem(item)
     setOpen(false)
   }, [onPlayItem, setOpen, item])
+
+  useEffect(() => {
+    if (!titleRef.current) return
+    titleRef.current.style.setProperty('--title-width', `${width}px`)
+  }, [width])
 
   return (
     <button
@@ -35,7 +43,9 @@ export function MenuSectionEpisode({ item }: MenuSectionEpisodeProps) {
         className='font-medium flex flex-col items-start justify-center text-left grow'
         title={item.title}
       >
-        <span className='truncate max-w-[14rem] grow min-w-0 flex-1'>{item.title}</span>
+        <span className='truncate max-w-[calc(var(--title-width)-20px)] grow min-w-0 flex-1'>
+          {item.title}
+        </span>
         {item.releaseDate && <span className='mt-1 text-muted-foreground'>{item.releaseDate}</span>}
       </span>
     </button>

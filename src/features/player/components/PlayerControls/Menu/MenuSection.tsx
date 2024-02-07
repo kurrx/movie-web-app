@@ -116,6 +116,7 @@ export function MenuSection(props: MenuSectionProps) {
           className={cn(
             'max-h-[calc(var(--visual-vh)*100-var(--navbar-height)-var(--top-content-height)-36px)]',
             'overflow-y-scroll',
+            isScrollable && 'h-[22.5rem]',
             className,
           )}
         >

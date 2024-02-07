@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { cn } from '@/api'
+import { useElementRect } from '@/hooks'
 import { WatchPlaylistItemFranchise } from '@/types'
 
 import { useProps } from '../../PlayerProps'
@@ -74,11 +75,18 @@ export interface MenuSectionFranchiseProps {
 export function MenuSectionFranchise({ item }: MenuSectionFranchiseProps) {
   const { onPlayItem } = useProps()
   const { setOpen } = useMenu()
+  const titleRef = useRef<HTMLSpanElement>(null)
+  const { width } = useElementRect(titleRef)
 
   const onClick = useCallback(() => {
     onPlayItem(item)
     setOpen(false)
   }, [onPlayItem, setOpen, item])
+
+  useEffect(() => {
+    if (!titleRef.current) return
+    titleRef.current.style.setProperty('--title-width', `${width}px`)
+  }, [width])
 
   return (
     <button
@@ -95,8 +103,13 @@ export function MenuSectionFranchise({ item }: MenuSectionFranchiseProps) {
         className='flex items-center justify-between flex-1'
         title={`${item.title}${typeof item.year === 'number' ? ` (${item.year})` : ''}`}
       >
-        <span className='font-medium flex flex-col items-start justify-center text-left grow'>
-          <span className='truncate max-w-[12rem] grow min-w-0 flex-1'>{item.title}</span>
+        <span
+          ref={titleRef}
+          className='font-medium flex flex-col items-start justify-center text-left grow'
+        >
+          <span className='truncate max-w-[calc(var(--title-width)-20px)] grow min-w-0 flex-1'>
+            {item.title}
+          </span>
           {typeof item.year === 'number' && (
             <span className='mt-1 text-muted-foreground'>{item.year}</span>
           )}

@@ -1,4 +1,4 @@
-import { Fragment, useCallback } from 'react'
+import { Fragment, useCallback, useEffect, useRef } from 'react'
 
 import { cn } from '@/api'
 import {
@@ -10,7 +10,7 @@ import {
   TranslatorIcon,
   UkraineIcon,
 } from '@/assets'
-import { useStore } from '@/hooks'
+import { useElementRect, useStore } from '@/hooks'
 import { ItemTranslator, StreamQuality } from '@/types'
 
 import {
@@ -47,11 +47,19 @@ function translatorToNode(translator: ItemTranslator) {
   return <span className='w-[6.25rem] inline-block truncate text-right'>{translator.name}</span>
 }
 
-function translatorToSelectNode(translator: ItemTranslator) {
+function Translator({ translator }: { translator: ItemTranslator }) {
+  const titleRef = useRef<HTMLSpanElement>(null)
+  const { width } = useElementRect(titleRef)
+
+  useEffect(() => {
+    if (!titleRef.current) return
+    titleRef.current.style.setProperty('--title-width', `${width}px`)
+  }, [width])
+
   return (
     <span className='flex items-center justify-between flex-1 pr-6' title={translator.name}>
-      <span className='max-w-[10rem] flex items-center justify-start text-left grow min-w-0'>
-        <span className='truncate'>{translator.name}</span>
+      <span ref={titleRef} className='flex items-center justify-start text-left grow min-w-0'>
+        <span className='truncate max-w-[calc(var(--title-width)-30px)]'>{translator.name}</span>
         {translator.isUkranian && <UkraineIcon className='ml-2 w-4 h-4' />}
       </span>
       {!!translator.rating && (
@@ -186,7 +194,7 @@ export function SettingsMenu() {
           >
             {translators.map((translator) => (
               <MenuSectionSelectValue key={translator.id} value={translator}>
-                {translatorToSelectNode(translator)}
+                <Translator translator={translator} />
               </MenuSectionSelectValue>
             ))}
           </MenuSectionSelect>
