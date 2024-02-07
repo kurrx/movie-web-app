@@ -47,9 +47,15 @@ export class Request {
       convertedError.message = `Request has been cancelled for some reason, please refresh the page.`
       convertedError.code = 'CANCELLED'
     } else if (axios.isAxiosError(err)) {
-      convertedError.name = err.name
-      convertedError.message = err.response?.data?.message || err.message
-      convertedError.code = err.response?.status ? `${err.response.status}` : err.code
+      if (err.code === 'ECONNABORTED') {
+        convertedError.name = 'Request Timeout'
+        convertedError.message = 'Request has been timed out, please try again later.'
+        convertedError.code = 'TIMEOUT'
+      } else {
+        convertedError.name = err.name
+        convertedError.message = err.response?.data?.message || err.message
+        convertedError.code = err.response?.status ? `${err.response.status}` : err.code
+      }
     } else if (err instanceof Error) {
       convertedError.name = err.name
       convertedError.message = err.message
