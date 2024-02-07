@@ -116,8 +116,6 @@ export function PlayerNative() {
         loop={false}
         stopOnUnmount={false}
         config={{
-          forceHLS: true,
-          forceSafariHLS: true,
           hlsVersion: '1.4.10',
         }}
         playing={playing}
