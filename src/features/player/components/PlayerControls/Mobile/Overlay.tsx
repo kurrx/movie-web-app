@@ -1,10 +1,10 @@
 import { cn } from '@/api'
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerDesktopControlsVisible } from '../../../player.slice'
+import { selectPlayerControlsVisible } from '../../../player.slice'
 
 export function Overlay() {
-  const controlsVisible = useAppSelector(selectPlayerDesktopControlsVisible)
+  const controlsVisible = useAppSelector(selectPlayerControlsVisible)
 
   return (
     <div

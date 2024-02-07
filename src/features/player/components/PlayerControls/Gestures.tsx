@@ -9,7 +9,7 @@ import { useFullscreen, useInteract, usePlaying } from '../../hooks'
 import {
   endSeeking,
   seekTo,
-  selectPlayerDesktopControlsVisible,
+  selectPlayerControlsVisible,
   selectPlayerFastForwarding,
   setPlayerFastForwarding,
   setPlayerInteracted,
@@ -22,7 +22,7 @@ export function Gestures() {
   const isTouch = selector(selectDeviceIsTouch)
   const isMobile = selector(selectDeviceIsMobile)
   const fastForwarding = selector(selectPlayerFastForwarding)
-  const controlsVisible = selector(selectPlayerDesktopControlsVisible)
+  const controlsVisible = selector(selectPlayerControlsVisible)
   const ref = useRef<HTMLDivElement>(null)
   const rect = useElementRect(ref)
   const fastForwardingTimeout = useRef<NodeJS.Timeout | null>(null)

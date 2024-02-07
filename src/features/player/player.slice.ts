@@ -511,7 +511,7 @@ export const selectPlayerLoading = createSelector(
   selectPlayerBuffering,
   (fetched, buffering) => !fetched || buffering,
 )
-export const selectPlayerDesktopControlsVisible = createSelector(
+export const selectPlayerControlsVisible = createSelector(
   selectPlayerFetched,
   selectPlayerEnded,
   selectPlayerTooltipHovered,
@@ -551,15 +551,15 @@ export const selectPlayerDesktopControlsVisible = createSelector(
     )
   },
 )
-export const selectPlayerDesktopMouseVisible = createSelector(
+export const selectPlayerMouseVisible = createSelector(
   selectPlayerFetched,
-  selectPlayerDesktopControlsVisible,
+  selectPlayerControlsVisible,
   selectPlayerFastForwarding,
   (fetched, controlsVisible, fastForwarding) => !fetched || fastForwarding || controlsVisible,
 )
-export const selectPlayerDesktopHeadingVisible = createSelector(
+export const selectPlayerHeadingVisible = createSelector(
   selectPlayerFullscreen,
-  selectPlayerDesktopControlsVisible,
+  selectPlayerControlsVisible,
   (fullscreen, controlsVisible) => fullscreen && controlsVisible,
 )
 

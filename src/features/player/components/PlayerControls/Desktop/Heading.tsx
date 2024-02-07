@@ -3,11 +3,11 @@ import { PropsWithChildren } from 'react'
 import { cn } from '@/api'
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerDesktopHeadingVisible } from '../../../player.slice'
+import { selectPlayerHeadingVisible } from '../../../player.slice'
 import { useProps } from '../../PlayerProps'
 
 function Root({ children }: PropsWithChildren) {
-  const visible = useAppSelector(selectPlayerDesktopHeadingVisible)
+  const visible = useAppSelector(selectPlayerHeadingVisible)
 
   return (
     <div

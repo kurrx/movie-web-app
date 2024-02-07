@@ -4,10 +4,10 @@ import { useStore } from '@/hooks'
 
 import { useInteract } from '../../../hooks'
 import {
-  selectPlayerDesktopMouseVisible,
   selectPlayerFastForwarding,
   selectPlayerFullscreen,
   selectPlayerMenu,
+  selectPlayerMouseVisible,
   selectPlayerPlayingCombined,
   setPlayerFocused,
 } from '../../../player.slice'
@@ -15,7 +15,7 @@ import {
 export function Wrapper({ children }: PropsWithChildren) {
   const [dispatch, selector] = useStore()
   const interact = useInteract()
-  const visible = selector(selectPlayerDesktopMouseVisible)
+  const visible = selector(selectPlayerMouseVisible)
   const playing = selector(selectPlayerPlayingCombined)
   const fullscreen = selector(selectPlayerFullscreen)
   const menu = selector(selectPlayerMenu)
