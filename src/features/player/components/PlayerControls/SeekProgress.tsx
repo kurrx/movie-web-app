@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react'
 
 import { cn } from '@/api'
 import { SeekBackwardIcon, SeekForwardIcon } from '@/assets'
+import { selectDeviceIsMobile } from '@/features/device'
 import { useAppSelector } from '@/hooks'
 
 import { selectPlayerDisplayAccumulatedSeek, selectPlayerSeek } from '../../player.slice'
@@ -13,6 +14,7 @@ type TrackerType = { cancel: (() => void) | null }
 const Tracker: TrackerType = { cancel: null }
 
 export function SeekProgress() {
+  const isMobile = useAppSelector(selectDeviceIsMobile)
   const seek = useAppSelector(selectPlayerSeek)
   const displayProgress = useAppSelector(selectPlayerDisplayAccumulatedSeek)
   const Icon = useMemo(() => (seek === 'forward' ? SeekForwardIcon : SeekBackwardIcon), [seek])
@@ -46,15 +48,15 @@ export function SeekProgress() {
       onStop()
     } else {
       if (seek === 'backward') {
-        containerLeft.set('30%')
+        containerLeft.set(!isMobile ? '30%' : '20%')
         textRight.set('100%')
         iconRotate.set('90deg')
       } else {
-        containerRight.set('30%')
+        containerRight.set(!isMobile ? '30%' : '20%')
         textLeft.set('100%')
         iconRotate.set('-90deg')
       }
-      const nextX = seek === 'backward' ? '-2rem' : '2rem'
+      const nextX = seek === 'backward' ? '-2em' : '2em'
       const rotateControls = animate(iconRotate, '0deg', transition)
       const textXControls = animate(textX, nextX, transition)
       const textOpacityControls = animate(textOpacity, 1, transition)
@@ -75,6 +77,7 @@ export function SeekProgress() {
       className={cn(
         'absolute top-[50%] translate-y-[-50%]',
         'text-white pointer-events-none select-none',
+        'sm:text-[1rem] text-[0.75rem]',
       )}
       style={{
         display: containerDisplay,
@@ -83,7 +86,7 @@ export function SeekProgress() {
       }}
     >
       <motion.div style={{ rotate: iconRotate }}>
-        <Icon className='w-10 h-10' />
+        <Icon className='sm:w-10 sm:h-10 w-7 h-7' />
       </motion.div>
       <motion.span
         className='absolute top-[50%]'
