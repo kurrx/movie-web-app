@@ -67,7 +67,7 @@ export function BottomInfo({ children }: PropsWithChildren) {
   return (
     <div
       id='player-mobile-bottom-info-controls'
-      className='flex items-center justify-between w-full px-3'
+      className='flex items-center justify-between w-full pl-7 pr-3'
     >
       {children}
     </div>
