@@ -25,6 +25,11 @@ export function useFullscreen() {
       } else {
         if (screenfull.isEnabled) {
           screenfull.exit().catch(noop)
+        } else if (typeof (video as any).webkitExitFullscreen === 'function') {
+          const promise = (video as any).webkitExitFullscreen()
+          if (typeof promise?.catch === 'function') {
+            promise.catch(noop)
+          }
         }
       }
     },
