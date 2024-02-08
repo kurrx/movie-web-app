@@ -23,7 +23,6 @@ export function MobileControls() {
       <Actions />
       <SeekProgress />
       <Gestures />
-      <Ending />
       <Controls.Top>
         <AutoPlaySwitch />
         <PlaylistMenu />
@@ -41,6 +40,7 @@ export function MobileControls() {
         </Controls.BottomInfo>
         <Timeline />
       </Controls.Bottom>
+      <Ending />
     </Wrapper>
   )
 }

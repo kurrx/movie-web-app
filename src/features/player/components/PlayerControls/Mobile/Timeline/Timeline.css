@@ -29,12 +29,10 @@
 }
 
 .mobile-timeline-load-progress {
-  z-index: 1;
   background-color: rgba(255, 255, 255, 0.4);
 }
 
 .mobile-timeline-play-progress {
-  z-index: 2;
   background-color: #f00;
 }
 
@@ -43,7 +41,6 @@
   position: absolute;
   top: 50%;
   left: -8px;
-  z-index: 43;
 }
 
 .mobile-timeline-scrubber-button {
