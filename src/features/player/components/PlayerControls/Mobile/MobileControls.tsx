@@ -6,8 +6,10 @@ import { PlaylistMenu } from '../PlaylistMenu'
 import { SeekProgress } from '../SeekProgress'
 import { SettingsMenu } from '../SettingsMenu'
 import { Actions } from './Actions'
+import { AdjacentButton } from './AdjacentButton'
 import { Controls } from './Controls'
 import { Overlay } from './Overlay'
+import { PlayButton } from './PlayButton'
 import { Wrapper } from './Wrapper'
 
 export function MobileControls() {
@@ -24,6 +26,11 @@ export function MobileControls() {
         <PlaylistMenu />
         <SettingsMenu />
       </Controls.Top>
+      <Controls.Center>
+        <AdjacentButton type='prev' />
+        <PlayButton />
+        <AdjacentButton type='next' />
+      </Controls.Center>
     </Wrapper>
   )
 }
