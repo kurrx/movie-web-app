@@ -53,7 +53,7 @@ export function Bottom({ children }: PropsWithChildren) {
       id='player-mobile-bottom-controls'
       className={cn(
         'absolute left-0 bottom-0 transition-opacity',
-        'data-[visible=false]:opacity-0',
+        'data-[visible=false]:opacity-0 w-full',
         'data-[visible=false]:pointer-events-none',
       )}
       data-visible={visible}
