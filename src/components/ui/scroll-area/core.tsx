@@ -9,15 +9,17 @@ type Component = typeof Root
 type Ref = ElementRef<Component>
 type RefProps = ComponentPropsWithoutRef<Component>
 
-export type ScrollAreaProps = RefProps
+export interface ScrollAreaProps extends RefProps {
+  hideBar?: boolean
+}
 
 export const ScrollArea = forwardRef<Ref, ScrollAreaProps>(function ScrollArea(props, ref) {
-  const { className, children, ...restProps } = props
+  const { className, hideBar, children, ...restProps } = props
 
   return (
     <Root ref={ref} className={cn('relative overflow-hidden', className)} {...restProps}>
       <Viewport className='h-full w-full rounded-[inherit]'>{children}</Viewport>
-      <ScrollAreaBar />
+      <ScrollAreaBar className={cn(hideBar && 'opacity-0 pointer-events-none')} />
       <Corner />
     </Root>
   )
