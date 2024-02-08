@@ -45,4 +45,33 @@ export function Center({ children }: PropsWithChildren) {
   )
 }
 
-export const Controls = { Top, Center }
+export function Bottom({ children }: PropsWithChildren) {
+  const visible = useAppSelector(selectPlayerControlsVisible)
+
+  return (
+    <div
+      id='player-mobile-bottom-controls'
+      className={cn(
+        'absolute left-0 bottom-0 transition-opacity',
+        'data-[visible=false]:opacity-0',
+        'data-[visible=false]:pointer-events-none',
+      )}
+      data-visible={visible}
+    >
+      {children}
+    </div>
+  )
+}
+
+export function BottomInfo({ children }: PropsWithChildren) {
+  return (
+    <div
+      id='player-mobile-bottom-info-controls'
+      className='flex items-center justify-between w-full px-3'
+    >
+      {children}
+    </div>
+  )
+}
+
+export const Controls = { Top, Center, Bottom, BottomInfo }
