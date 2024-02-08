@@ -11,6 +11,7 @@ import { Controls } from './Controls'
 import { FullscreenButton } from './FullscreenButton'
 import { Overlay } from './Overlay'
 import { PlayButton } from './PlayButton'
+import { Timeline } from './Timeline'
 import { Timer } from './Timer'
 import { Wrapper } from './Wrapper'
 
@@ -38,6 +39,7 @@ export function MobileControls() {
           <Timer />
           <FullscreenButton />
         </Controls.BottomInfo>
+        <Timeline />
       </Controls.Bottom>
     </Wrapper>
   )

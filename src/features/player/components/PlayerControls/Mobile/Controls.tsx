@@ -3,10 +3,19 @@ import { PropsWithChildren, useMemo } from 'react'
 import { cn } from '@/api'
 import { useAppSelector } from '@/hooks'
 
-import { selectPlayerControlsVisible, selectPlayerSeek } from '../../../player.slice'
+import {
+  selectPlayerControlsVisible,
+  selectPlayerIsTimelineDragging,
+  selectPlayerSeek,
+} from '../../../player.slice'
 
 export function Top({ children }: PropsWithChildren) {
-  const visible = useAppSelector(selectPlayerControlsVisible)
+  const controlsVisible = useAppSelector(selectPlayerControlsVisible)
+  const isTimelineDragging = useAppSelector(selectPlayerIsTimelineDragging)
+  const visible = useMemo(
+    () => controlsVisible && !isTimelineDragging,
+    [controlsVisible, isTimelineDragging],
+  )
 
   return (
     <div
@@ -27,7 +36,11 @@ export function Top({ children }: PropsWithChildren) {
 export function Center({ children }: PropsWithChildren) {
   const constrolsVisible = useAppSelector(selectPlayerControlsVisible)
   const seek = useAppSelector(selectPlayerSeek)
-  const visible = useMemo(() => constrolsVisible && seek === null, [constrolsVisible, seek])
+  const isTimelineDragging = useAppSelector(selectPlayerIsTimelineDragging)
+  const visible = useMemo(
+    () => constrolsVisible && seek === null && !isTimelineDragging,
+    [constrolsVisible, seek, isTimelineDragging],
+  )
 
   return (
     <div
@@ -64,10 +77,17 @@ export function Bottom({ children }: PropsWithChildren) {
 }
 
 export function BottomInfo({ children }: PropsWithChildren) {
+  const hidden = useAppSelector(selectPlayerIsTimelineDragging)
+
   return (
     <div
       id='player-mobile-bottom-info-controls'
-      className='flex items-center justify-between w-full pl-7 pr-3'
+      className={cn(
+        'flex items-center justify-between',
+        'w-full pl-7 pr-3 mb-[-0.8125rem]',
+        'data-[hidden=true]:hidden',
+      )}
+      data-hidden={hidden}
     >
       {children}
     </div>

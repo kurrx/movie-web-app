@@ -6,10 +6,10 @@ import { IconSwap } from '@/components'
 import { useAppSelector } from '@/hooks'
 
 import { usePlaying } from '../../../hooks'
-import { selectPlayerEnded, selectPlayerPlaying } from '../../../player.slice'
+import { selectPlayerEnded, selectPlayerPlayingCombined } from '../../../player.slice'
 
 export function PlayButton() {
-  const playing = useAppSelector(selectPlayerPlaying)
+  const playing = useAppSelector(selectPlayerPlayingCombined)
   const ended = useAppSelector(selectPlayerEnded)
   const id = useMemo(() => {
     if (ended) return 'Replay'
