@@ -5,7 +5,6 @@ import { Fragment, useEffect } from 'react'
 import { SwitchState } from '@/core'
 import { useAppDispatch } from '@/hooks'
 
-import { usePlayerFullscreen } from '../hooks'
 import { setPlayerInitialized } from '../player.slice'
 import { PlayerContainer } from './PlayerContainer'
 import { PlayerControls } from './PlayerControls'
@@ -25,8 +24,6 @@ export function Player(props: PlayerProps) {
       dispatch(setPlayerInitialized(false))
     }
   }, [dispatch])
-
-  usePlayerFullscreen()
 
   return (
     <PlayerPropsProvider {...props}>
