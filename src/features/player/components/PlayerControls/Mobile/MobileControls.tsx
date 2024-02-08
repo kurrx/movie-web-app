@@ -8,8 +8,10 @@ import { SettingsMenu } from '../SettingsMenu'
 import { Actions } from './Actions'
 import { AdjacentButton } from './AdjacentButton'
 import { Controls } from './Controls'
+import { FullscreenButton } from './FullscreenButton'
 import { Overlay } from './Overlay'
 import { PlayButton } from './PlayButton'
+import { Timer } from './Timer'
 import { Wrapper } from './Wrapper'
 
 export function MobileControls() {
@@ -31,6 +33,12 @@ export function MobileControls() {
         <PlayButton />
         <AdjacentButton type='next' />
       </Controls.Center>
+      <Controls.Bottom>
+        <Controls.BottomInfo>
+          <Timer />
+          <FullscreenButton />
+        </Controls.BottomInfo>
+      </Controls.Bottom>
     </Wrapper>
   )
 }
