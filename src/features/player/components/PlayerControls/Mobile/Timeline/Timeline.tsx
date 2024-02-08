@@ -105,11 +105,11 @@ export function Timeline() {
         onContextMenu={onContextMenu}
       >
         <div className='mobile-timeline-progress-lines'>
-          <motion.div className='mobile-timeline-play-progress' style={{ scaleX: timeScaleX }} />
           <motion.div
             className='mobile-timeline-load-progress'
             style={{ scaleX: loadedProgressScaleX }}
           />
+          <motion.div className='mobile-timeline-play-progress' style={{ scaleX: timeScaleX }} />
         </div>
         <motion.div
           className='mobile-timeline-scrubber-container'
