@@ -32,7 +32,7 @@ export function PlayButton() {
       className={cn(
         'text-white w-[3.5rem] h-[3.5rem]',
         'flex items-center justify-center',
-        'transition-colors hover:bg-white/10 active:bg-white/20',
+        'transition-colors active:bg-white/20',
         'rounded-full bg-black/40 mx-[2.75rem]',
       )}
       onClick={onClick}

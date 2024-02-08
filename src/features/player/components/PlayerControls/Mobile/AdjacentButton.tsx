@@ -23,9 +23,9 @@ export function AdjacentButton({ type }: AdjacentButtonProps) {
   return (
     <button
       className={cn(
-        'text-white w-[2.5rem] h-[2.5rem] active:bg-white/20',
+        'text-white w-[2.5rem] h-[2.5rem]',
         'flex items-center justify-center disabled:text-white/40',
-        'transition-colors hover:bg-white/10',
+        'transition-colors active:bg-white/20',
         'rounded-full bg-black/40 disabled:pointer-events-none',
       )}
       disabled={disabled}
