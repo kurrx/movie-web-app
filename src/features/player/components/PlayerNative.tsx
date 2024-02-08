@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { isIOS, isMobileOnly, isMobileSafari } from 'react-device-detect'
+import { isIOS, isIPad13, isMobileOnly, isMobileSafari } from 'react-device-detect'
 import { OnProgressProps } from 'react-player/base'
 import ReactPlayer from 'react-player/file'
 
@@ -92,7 +92,7 @@ export function PlayerNative() {
 
   const onEnded = useCallback(() => {
     dispatch(setPlayerEnded())
-    if (isIOS && (isMobileOnly || isMobileSafari)) {
+    if (isIOS && (isMobileOnly || isMobileSafari) && !isIPad13) {
       exitFullscreen()
     }
   }, [dispatch, exitFullscreen])
