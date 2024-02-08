@@ -49,8 +49,10 @@
     --ring: 211 96% 78%;
   }
 
-  .fullscreen {
-    font-size: 1.25rem;
+  @media (min-width: 768px) {
+    .fullscreen {
+      font-size: 1.25rem;
+    }
   }
 }
 
