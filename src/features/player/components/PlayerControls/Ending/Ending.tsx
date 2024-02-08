@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 import { cn } from '@/api'
+import { selectDeviceIsMobile } from '@/features/device'
 import { useStore } from '@/hooks'
 
 import { usePlaying } from '../../../hooks'
@@ -22,6 +23,7 @@ export function Ending() {
   const { playlistAdjacents, onPlayItem } = useProps()
   const ended = selector(selectPlayerEnded)
   const autoPlay = selector(selectPlayerAutoPlay)
+  const isMobile = selector(selectDeviceIsMobile)
   const prev = useMemo(() => playlistAdjacents.prev, [playlistAdjacents])
   const next = useMemo(() => playlistAdjacents.next, [playlistAdjacents])
   const canPlayPrev = useMemo(() => !!prev, [prev])
@@ -50,6 +52,8 @@ export function Ending() {
       </div>
     )
   }
+
+  if (isMobile) return null
 
   return (
     <div id='player-ending' className={classes.root}>

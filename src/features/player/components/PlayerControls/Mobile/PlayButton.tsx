@@ -38,7 +38,7 @@ export function PlayButton() {
       onClick={onClick}
     >
       <IconSwap id={id}>
-        <Icon className='w-[2.375rem] h-[2.375rem]' />
+        <Icon className={cn(id !== 'Replay' ? 'w-[2.375rem] h-[2.375rem]' : 'w-[2rem] h-[2rem]')} />
       </IconSwap>
     </button>
   )
