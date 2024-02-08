@@ -46,7 +46,10 @@ export function PlayerThumbnailsOverlay() {
         className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]'
         style={thumbnailsImage}
       />
-      <div id='seek-overlay-bg' className='absolute w-full h-full top-0 left-0 bg-black/50' />
+      <div
+        id='seek-overlay-bg'
+        className='absolute w-full h-full top-0 left-0 sm:bg-black/50 bg-black/0'
+      />
     </div>
   )
 }
