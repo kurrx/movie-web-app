@@ -173,15 +173,13 @@ export const ajax = new Request({
 
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
-    const { key, stream, qualityId, signal } = args
-    const id = `${key}-${qualityId}`
-    const size = await db.getStreamSize(id, async () => {
-      const quality = stream.qualities.find((q) => q.id === qualityId)!
-      const res = await axios.head(quality.downloadUrl, { signal })
+    const size = await db.getStreamSize(args, async () => {
+      const quality = args.stream.qualities.find((q) => q.id === args.qualityId)!
+      const res = await axios.head(quality.downloadUrl, { signal: args.signal })
       const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
       return size
     })
-    return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
+    return { id: args.qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
   } catch (err) {
     if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
     throw err
@@ -190,9 +188,8 @@ export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs,
 
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
-    const { key, stream, signal } = args
-    const thumbnails = await db.getStreamThumbnail(key, async () => {
-      const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+    const thumbnails = await db.getStreamThumbnail(args, async () => {
+      const { data } = await ajax.get<string>(args.stream.thumbnailsUrl, { signal: args.signal })
       return data
     })
     return thumbnails
@@ -204,10 +201,9 @@ export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retr
 
 export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0) {
   try {
-    const { key, stream, signal } = args
-    const thumbnailsPromise = fetchStreamThumbnails({ key, stream, signal })
-    const promises = stream.qualities.map((q) =>
-      fetchStreamDownloadSize({ key, stream, qualityId: q.id, signal }),
+    const thumbnailsPromise = fetchStreamThumbnails(args)
+    const promises = args.stream.qualities.map((q) =>
+      fetchStreamDownloadSize({ ...args, qualityId: q.id }),
     )
     const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
     return { thumbnails, sizes }

@@ -116,11 +116,14 @@ export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam
   async (id, { signal, getState }) => {
     const stream = getItemStream(getState().watch, id)
     const itemState = getState().watch.states[id]!
-    let key = `${id}-${itemState.translatorId}`
-    if (typeof itemState.season === 'number' && typeof itemState.episode === 'number') {
-      key += `-${itemState.season}-${itemState.episode}`
-    }
-    return await fetchStreamDetails({ key, stream, signal })
+    return await fetchStreamDetails({
+      id,
+      translatorId: itemState.translatorId,
+      season: itemState.season,
+      episode: itemState.episode,
+      stream,
+      signal,
+    })
   },
   {
     condition(id, { getState }) {

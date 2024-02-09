@@ -1,12 +1,17 @@
 import { StreamSuccessResponse } from './ajax.types'
 
-export interface StreamThumbnailsModel {
-  id: string
+export interface StreamDetailsModel {
+  id: number
+  translatorId: number
+  season?: number
+  episode?: number
+}
+
+export interface StreamThumbnailsModel extends StreamDetailsModel {
   content: string
 }
 
-export interface StreamSizeModel {
-  id: string
+export interface StreamSizeModel extends StreamDetailsModel {
   size: number
 }
 

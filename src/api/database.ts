@@ -3,6 +3,7 @@ import Dexie, { Table } from 'dexie'
 import {
   AjaxMovieModel,
   FetchMovieStreamArgs,
+  FetchStreamDetailsArgs,
   ItemModel,
   StreamSizeModel,
   StreamSuccessResponse,
@@ -19,10 +20,10 @@ class Database extends Dexie {
   constructor() {
     super('tv-db')
     this.version(1).stores({
-      items: 'id, updatedAt',
-      ajaxMovies: '[id+translatorId+favsId+isCamrip+isAds+isDirector], updatedAt',
-      streamThumbnails: 'id',
-      streamSizes: 'id, size',
+      items: 'id',
+      ajaxMovies: '[id+translatorId+favsId+isCamrip+isAds+isDirector]',
+      streamThumbnails: '[id+translatorId]',
+      streamSizes: '[id+translatorId]',
     })
   }
 
@@ -65,22 +66,40 @@ class Database extends Dexie {
     return entry.data
   }
 
-  async getStreamSize(id: string, fetch: () => Promise<number>) {
-    const entry = await this.streamSizes.get(id)
+  async getStreamSize(args: FetchStreamDetailsArgs, fetch: () => Promise<number>) {
+    const entry = await this.streamSizes
+      .where({ id: args.id, translatorId: args.translatorId })
+      .filter((entry) => entry.season === args.season && entry.episode === args.episode)
+      .first()
     if (!entry) {
       const size = await fetch()
-      this.streamSizes.put({ id, size })
+      this.streamSizes.put({
+        id: args.id,
+        translatorId: args.translatorId,
+        season: args.season,
+        episode: args.episode,
+        size,
+      })
       return size
     }
     return entry.size
   }
 
-  async getStreamThumbnail(id: string, fetch: () => Promise<string>) {
-    const entry = await this.streamThumbnails.get(id)
+  async getStreamThumbnail(args: FetchStreamDetailsArgs, fetch: () => Promise<string>) {
+    const entry = await this.streamThumbnails
+      .where({ id: args.id, translatorId: args.translatorId })
+      .filter((entry) => entry.season === args.season && entry.episode === args.episode)
+      .first()
     if (!entry) {
-      const thumbnails = await fetch()
-      this.streamThumbnails.put({ id, content: thumbnails })
-      return thumbnails
+      const content = await fetch()
+      this.streamThumbnails.put({
+        id: args.id,
+        translatorId: args.translatorId,
+        season: args.season,
+        episode: args.episode,
+        content,
+      })
+      return content
     }
     return entry.content
   }
