@@ -27,9 +27,13 @@ class Database extends Dexie {
     })
   }
 
+  private static isExpired(entry: { updatedAt: number }) {
+    return Date.now() - entry.updatedAt > 1000 * 60 * 60 * Database.CACHE_HRS
+  }
+
   async getItem(id: number, fetch: () => Promise<Document>) {
     const entry = await this.items.get(id)
-    if (!entry || Date.now() - entry.updatedAt > 1000 * 60 * 60 * Database.CACHE_HRS) {
+    if (!entry || Database.isExpired(entry)) {
       const document = await fetch()
       const html = document.documentElement.innerHTML
       this.items.put({ id, html, updatedAt: Date.now() })
@@ -49,7 +53,7 @@ class Database extends Dexie {
         isDirector: Number(args.isDirector),
       })
       .first()
-    if (!entry || Date.now() - entry.updatedAt > 1000 * 60 * 60 * Database.CACHE_HRS) {
+    if (!entry || Database.isExpired(entry)) {
       const data = await fetch()
       this.ajaxMovies.put({
         id: args.id,
