@@ -304,6 +304,7 @@ export interface FetchStreamDetailsArgs extends RequestArgs {
 
 export interface FetchStreamDownloadSizeArgs extends FetchStreamDetailsArgs {
   qualityId: string
+  downloadUrl: string
 }
 
 export type FetchStreamThumbnailArgs = FetchStreamDetailsArgs

@@ -174,8 +174,7 @@ export const ajax = new Request({
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
     const size = await db.getStreamSize(args, async () => {
-      const quality = args.stream.qualities.find((q) => q.id === args.qualityId)!
-      const res = await axios.head(quality.downloadUrl, { signal: args.signal })
+      const res = await axios.head(args.downloadUrl, { signal: args.signal })
       const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
       return size
     })
@@ -203,7 +202,7 @@ export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0
   try {
     const thumbnailsPromise = fetchStreamThumbnails(args)
     const promises = args.stream.qualities.map((q) =>
-      fetchStreamDownloadSize({ ...args, qualityId: q.id }),
+      fetchStreamDownloadSize({ ...args, qualityId: q.id, downloadUrl: q.downloadUrl }),
     )
     const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
     return { thumbnails, sizes }
