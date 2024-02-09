@@ -1,6 +1,10 @@
 import { StreamSuccessResponse } from './ajax.types'
 
-export interface StreamDetailsModel {
+export interface Model {
+  pk?: number
+}
+
+export interface StreamDetailsModel extends Model {
   id: number
   translatorId: number
   season?: number
@@ -21,13 +25,13 @@ export interface ItemModel {
   updatedAt: number
 }
 
-export interface AjaxMovieModel {
+export interface AjaxMovieModel extends Model {
   id: number
   translatorId: number
   favsId: string
-  isCamrip: number
-  isAds: number
-  isDirector: number
+  isCamrip: boolean
+  isAds: boolean
+  isDirector: boolean
   data: StreamSuccessResponse
   updatedAt: number
 }

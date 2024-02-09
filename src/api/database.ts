@@ -21,9 +21,9 @@ class Database extends Dexie {
     super('tv-db')
     this.version(1).stores({
       items: 'id',
-      ajaxMovies: '[id+translatorId+favsId+isCamrip+isAds+isDirector]',
-      streamThumbnails: '[id+translatorId]',
-      streamSizes: '[id+translatorId]',
+      ajaxMovies: '++pk, [id+translatorId]',
+      streamThumbnails: '++pk, [id+translatorId]',
+      streamSizes: '++pk, [id+translatorId]',
     })
   }
 
@@ -44,24 +44,23 @@ class Database extends Dexie {
 
   async getAjaxMovie(args: FetchMovieStreamArgs, fetch: () => Promise<StreamSuccessResponse>) {
     const entry = await this.ajaxMovies
-      .where({
-        id: args.id,
-        translatorId: args.translatorId,
-        favsId: args.favsId,
-        isCamrip: Number(args.isCamrip),
-        isAds: Number(args.isAds),
-        isDirector: Number(args.isDirector),
-      })
+      .where({ id: args.id, translatorId: args.translatorId })
+      .filter(
+        (entry) =>
+          entry.isAds === args.isAds &&
+          entry.isCamrip === args.isCamrip &&
+          entry.isDirector === args.isDirector,
+      )
       .first()
-    if (!entry || Database.isExpired(entry)) {
+    if (!entry || Database.isExpired(entry) || entry.favsId !== args.favsId) {
       const data = await fetch()
       this.ajaxMovies.put({
         id: args.id,
         translatorId: args.translatorId,
         favsId: args.favsId,
-        isCamrip: Number(args.isCamrip),
-        isAds: Number(args.isAds),
-        isDirector: Number(args.isDirector),
+        isCamrip: args.isCamrip,
+        isAds: args.isAds,
+        isDirector: args.isDirector,
         data,
         updatedAt: Date.now(),
       })
