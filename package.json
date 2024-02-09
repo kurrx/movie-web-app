@@ -52,6 +52,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",
+    "dexie": "^3.2.5",
     "framer-motion": "^11.0.3",
     "react": "^18.2.0",
     "react-animate-height": "^3.2.3",

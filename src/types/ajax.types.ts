@@ -295,6 +295,7 @@ export interface FetchTranslatorArgs extends FetchTranslatorBaseArgs {
 export type FetchTranslatorResponse = FetchMovieTranslatorResponse | FetchSeriesTranslatorResponse
 
 export interface FetchStreamDetailsArgs extends RequestArgs {
+  key: string
   stream: Stream
 }
 

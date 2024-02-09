@@ -27,6 +27,7 @@ import {
   StreamResponse,
 } from '@/types'
 
+import { db } from './database'
 import { PROVIDER_URL, PROXY_URL } from './env'
 import { convertDataToDom, parseProxiedCookies, sendProxiedCookies } from './interceptors'
 import {
@@ -169,10 +170,14 @@ export const ajax = new Request({
 
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
-    const { stream, qualityId, signal } = args
-    const quality = stream.qualities.find((q) => q.id === qualityId)!
-    const res = await axios.head(quality.downloadUrl, { signal })
-    const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
+    const { key, stream, qualityId, signal } = args
+    const id = `${key}-${qualityId}`
+    const size = await db.getStreamSize(id, async () => {
+      const quality = stream.qualities.find((q) => q.id === qualityId)!
+      const res = await axios.head(quality.downloadUrl, { signal })
+      const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
+      return size
+    })
     return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
   } catch (err) {
     if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
@@ -182,9 +187,12 @@ export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs,
 
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
-    const { stream, signal } = args
-    const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
-    return data
+    const { key, stream, signal } = args
+    const thumbnails = await db.getStreamThumbnail(key, async () => {
+      const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+      return data
+    })
+    return thumbnails
   } catch (err) {
     if (retry < 3) return await fetchStreamThumbnails(args, retry + 1)
     throw err
@@ -193,10 +201,10 @@ export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retr
 
 export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0) {
   try {
-    const { stream, signal } = args
-    const thumbnailsPromise = fetchStreamThumbnails({ stream, signal })
+    const { key, stream, signal } = args
+    const thumbnailsPromise = fetchStreamThumbnails({ key, stream, signal })
     const promises = stream.qualities.map((q) =>
-      fetchStreamDownloadSize({ stream, qualityId: q.id, signal }),
+      fetchStreamDownloadSize({ key, stream, qualityId: q.id, signal }),
     )
     const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
     return { thumbnails, sizes }
