@@ -293,3 +293,13 @@ export interface FetchTranslatorArgs extends FetchTranslatorBaseArgs {
 }
 
 export type FetchTranslatorResponse = FetchMovieTranslatorResponse | FetchSeriesTranslatorResponse
+
+export interface FetchStreamDetailsArgs extends RequestArgs {
+  stream: Stream
+}
+
+export interface FetchStreamDownloadSizeArgs extends FetchStreamDetailsArgs {
+  qualityId: string
+}
+
+export type FetchStreamThumbnailArgs = FetchStreamDetailsArgs

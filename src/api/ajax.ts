@@ -12,8 +12,10 @@ import {
   FetchSeriesStreamArgs,
   FetchSeriesTranslatorArgs,
   FetchSeriesTranslatorResponse,
+  FetchStreamDetailsArgs,
+  FetchStreamDownloadSizeArgs,
+  FetchStreamThumbnailArgs,
   FetchTranslatorArgs,
-  FetchTranslatorResponse,
   Item,
   ItemMovie,
   ItemMovieStream,
@@ -22,7 +24,6 @@ import {
   ItemSeriesSeasonStream,
   ItemSeriesStream,
   SeriesEpisodesStreamResponse,
-  Stream,
   StreamResponse,
 } from '@/types'
 
@@ -166,41 +167,41 @@ export const ajax = new Request({
   .useResponse(parseProxiedCookies)
   .construct()
 
-export async function fetchStreamDownloadSize(
-  stream: Stream,
-  id: string,
-  signal?: AbortSignal,
-  retry = 0,
-) {
+export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
-    const quality = stream.qualities.find((q) => q.id === id)!
+    const { stream, qualityId, signal } = args
+    const quality = stream.qualities.find((q) => q.id === qualityId)!
     const res = await axios.head(quality.downloadUrl, { signal })
     const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
-    return { id, downloadSize: size, downloadSizeStr: bytesToStr(size) }
+    return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
   } catch (err) {
-    if (retry < 3) return await fetchStreamDownloadSize(stream, id, signal, retry + 1)
+    if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
     throw err
   }
 }
 
-export async function fetchStreamThumbnails(stream: Stream, signal?: AbortSignal, retry = 0) {
+export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
+    const { stream, signal } = args
     const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
     return data
   } catch (err) {
-    if (retry < 3) return await fetchStreamThumbnails(stream, signal, retry + 1)
+    if (retry < 3) return await fetchStreamThumbnails(args, retry + 1)
     throw err
   }
 }
 
-export async function fetchStreamDetails(stream: Stream, signal?: AbortSignal, retry = 0) {
+export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0) {
   try {
-    const thumbnailsPromise = fetchStreamThumbnails(stream, signal)
-    const promises = stream.qualities.map((q) => fetchStreamDownloadSize(stream, q.id, signal))
+    const { stream, signal } = args
+    const thumbnailsPromise = fetchStreamThumbnails({ stream, signal })
+    const promises = stream.qualities.map((q) =>
+      fetchStreamDownloadSize({ stream, qualityId: q.id, signal }),
+    )
     const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
     return { thumbnails, sizes }
   } catch (err) {
-    if (retry < 3) return await fetchStreamDetails(stream, signal, retry + 1)
+    if (retry < 3) return await fetchStreamDetails(args, retry + 1)
     throw err
   }
 }
@@ -383,10 +384,7 @@ export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs, ret
   }
 }
 
-export async function fetchTranslator(
-  args: FetchTranslatorArgs,
-  retry = 0,
-): Promise<FetchTranslatorResponse> {
+export async function fetchTranslator(args: FetchTranslatorArgs, retry = 0) {
   try {
     const { item, translatorId, state, signal } = args
     if (item.itemType === 'series') {

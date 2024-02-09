@@ -115,7 +115,7 @@ export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam
   'watch/getStreamDetails',
   async (id, { signal, getState }) => {
     const stream = getItemStream(getState().watch, id)
-    return await fetchStreamDetails(stream, signal)
+    return await fetchStreamDetails({ stream, signal })
   },
   {
     condition(id, { getState }) {
