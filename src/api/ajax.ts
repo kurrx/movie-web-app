@@ -174,8 +174,11 @@ export const ajax = new Request({
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
     const { qualityId, downloadUrl, signal } = args
-    const res = await axios.head(downloadUrl, { signal })
-    const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
+    const size = await db.getSize(args, async () => {
+      const res = await axios.head(downloadUrl, { signal })
+      const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
+      return size
+    })
     return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
   } catch (err) {
     if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
