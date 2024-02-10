@@ -2,11 +2,16 @@ import Dexie, { Table } from 'dexie'
 
 import {
   FetchStreamDownloadSizeArgs,
+  FetchStreamThumbnailArgs,
   ItemModel,
   MovieSizeKey,
   MovieSizeModel,
+  MovieThumbnailsKey,
+  MovieThumbnailsModel,
   SeriesSizeKey,
   SeriesSizeModel,
+  SeriesThumbnailsKey,
+  SeriesThumbnailsModel,
 } from '@/types'
 
 class Database extends Dexie {
@@ -14,6 +19,8 @@ class Database extends Dexie {
   items!: Table<ItemModel, number>
   moviesSizes!: Table<MovieSizeModel, MovieSizeKey>
   seriesSizes!: Table<SeriesSizeModel, SeriesSizeKey>
+  moviesThumbnails!: Table<MovieThumbnailsModel, MovieThumbnailsKey>
+  seriesThumbnails!: Table<SeriesThumbnailsModel, SeriesThumbnailsKey>
 
   constructor() {
     super('tv-db')
@@ -21,6 +28,8 @@ class Database extends Dexie {
       items: 'id',
       moviesSizes: '[id+translatorId+qualityId]',
       seriesSizes: '[id+translatorId+qualityId+season+episode]',
+      moviesThumbnails: '[id+translatorId]',
+      seriesThumbnails: '[id+translatorId+season+episode]',
     })
   }
 
@@ -73,11 +82,11 @@ class Database extends Dexie {
         id,
         translatorId,
         qualityId,
+        season: season!,
+        episode: episode!,
         size,
         createdAt: date,
         updatedAt: date,
-        season: season!,
-        episode: episode!,
       })
       return size
     }
@@ -89,6 +98,51 @@ class Database extends Dexie {
       return await this.getSeriesSize(args, fetch)
     }
     return await this.getMovieSize(args, fetch)
+  }
+
+  private async getMovieThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
+    const { id, translatorId } = args
+    const entry = await this.moviesThumbnails.get({ id, translatorId })
+    if (!entry) {
+      const content = await fetch()
+      const date = new Date()
+      this.moviesThumbnails.add({
+        id,
+        translatorId,
+        content,
+        createdAt: date,
+        updatedAt: date,
+      })
+      return content
+    }
+    return entry.content
+  }
+
+  private async getSeriesThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
+    const { id, translatorId, season, episode } = args
+    const entry = await this.seriesThumbnails.get({ id, translatorId, season, episode })
+    if (!entry) {
+      const content = await fetch()
+      const date = new Date()
+      this.seriesThumbnails.add({
+        id,
+        translatorId,
+        season: season!,
+        episode: episode!,
+        content,
+        createdAt: date,
+        updatedAt: date,
+      })
+      return content
+    }
+    return entry.content
+  }
+
+  async getThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
+    if (typeof args.season === 'number' && typeof args.episode === 'number') {
+      return await this.getSeriesThumbnails(args, fetch)
+    }
+    return await this.getMovieThumbnails(args, fetch)
   }
 }
 

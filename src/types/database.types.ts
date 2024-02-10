@@ -18,16 +18,15 @@ interface SeriesModel {
   episode: number
 }
 
-interface SizeIDModel {
-  qualityId: string
-}
+type SizeIDModel = { qualityId: string }
+type SizeDataModel = { size: number }
+export type MovieSizeModel = Model & IDModel & SizeIDModel & SizeDataModel
+export type MovieSizeKey = IDModel & SizeIDModel
+export type SeriesSizeModel = MovieSizeModel & SeriesModel
+export type SeriesSizeKey = MovieSizeKey & SeriesModel
 
-interface SizeDataModel {
-  size: number
-}
-
-export interface MovieSizeModel extends Model, IDModel, SizeIDModel, SizeDataModel {}
-export interface MovieSizeKey extends IDModel, SizeIDModel {}
-
-export interface SeriesSizeModel extends MovieSizeModel, SeriesModel {}
-export interface SeriesSizeKey extends MovieSizeKey, SeriesModel {}
+type ThumbnailsDataModel = { content: string }
+export type MovieThumbnailsModel = Model & IDModel & ThumbnailsDataModel
+export type MovieThumbnailsKey = IDModel
+export type SeriesThumbnailsModel = MovieThumbnailsModel & SeriesModel
+export type SeriesThumbnailsKey = MovieThumbnailsKey & SeriesModel

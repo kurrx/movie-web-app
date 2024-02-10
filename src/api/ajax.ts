@@ -189,7 +189,10 @@ export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs,
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
     const { stream, signal } = args
-    const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+    const data = await db.getThumbnails(args, async () => {
+      const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+      return data
+    })
     return data
   } catch (err) {
     if (retry < 3) return await fetchStreamThumbnails(args, retry + 1)
