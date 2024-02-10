@@ -7,6 +7,7 @@ import {
   FetchStreamDownloadSizeArgs,
   FetchStreamThumbnailArgs,
   ItemModel,
+  ItemStateModel,
   MovieKey,
   MovieModel,
   MovieSizeKey,
@@ -23,11 +24,13 @@ import {
   SeriesThumbnailsModel,
   StreamSeason,
   StreamSuccessResponse,
+  WatchItemState,
 } from '@/types'
 
 class Database extends Dexie {
   private static readonly CACHE_HRS = 24
   items!: Table<ItemModel, number>
+  itemsStates!: Table<ItemStateModel, number>
   movies!: Table<MovieModel, MovieKey>
   series!: Table<SeriesModel, SeriesKey>
   seasons!: Table<SeasonsModel, SeasonsKey>
@@ -40,6 +43,7 @@ class Database extends Dexie {
     super('tv-db')
     this.version(1).stores({
       items: 'id',
+      itemsStates: 'id',
       movies: '[id+translatorId+isCamrip+isAds+isDirector]',
       series: '[id+translatorId+season+episode]',
       seasons: '[id+translatorId]',
@@ -68,6 +72,39 @@ class Database extends Dexie {
       return document
     }
     return new DOMParser().parseFromString(entry.html, 'text/html')
+  }
+
+  async getItemState(id: number, fetch: () => Promise<WatchItemState>) {
+    const entry = await this.itemsStates.get(id)
+    if (!entry) {
+      const state = await fetch()
+      const date = new Date()
+      if (!entry) {
+        this.itemsStates.add({ id, state, createdAt: date, updatedAt: date })
+      } else {
+        this.itemsStates.update(id, { state, updatedAt: date })
+      }
+      return state
+    }
+    return entry.state
+  }
+
+  async updateItemsStates(states: Record<number, WatchItemState | undefined>) {
+    const date = new Date()
+    for (const idStr of Object.keys(states)) {
+      const id = parseInt(idStr)
+      const state = states[id]
+      if (state) {
+        const entry = await this.itemsStates.get(id)
+        if (!entry) {
+          this.itemsStates.add({ id, state, createdAt: date, updatedAt: date })
+        } else {
+          this.itemsStates.update(id, { state, updatedAt: date })
+        }
+      } else {
+        await this.itemsStates.delete(id)
+      }
+    }
   }
 
   private async getMovieSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {

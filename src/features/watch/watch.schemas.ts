@@ -12,16 +12,16 @@ export const ItemState = z.object({
 })
 export const ItemStates = z.record(ID, ItemState.optional())
 
-export function getItemStates() {
+export function getItemStatesLS() {
   const item = localStorage.getItem('item-states')
-  if (!item) return {}
+  if (!item) return null
   try {
     return ItemStates.parse(JSON.parse(item))
   } catch (err) {
-    return {}
+    return null
   }
 }
 
-export function saveItemStates(states: z.infer<typeof ItemStates>) {
-  localStorage.setItem('item-states', JSON.stringify(states))
+export function deleteItemStatesLS() {
+  localStorage.removeItem('item-states')
 }

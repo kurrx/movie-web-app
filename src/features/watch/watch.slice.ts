@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { fetchItem, fetchSeriesStream, fetchStreamDetails, fetchTranslator } from '@/api'
+import { db, fetchItem, fetchSeriesStream, fetchStreamDetails, fetchTranslator } from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
   AppStoreState,
@@ -18,11 +18,14 @@ import {
   WatchStoreState,
 } from '@/types'
 
-import { getItemStates } from './watch.schemas'
+import { deleteItemStatesLS, getItemStatesLS } from './watch.schemas'
 
 type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
-type GetItemReturn = Awaited<ReturnType<typeof fetchItem>>
+type GetItemReturn = {
+  item: Awaited<ReturnType<typeof fetchItem>>
+  itemState: WatchItemState
+}
 type GetItemParam = ItemFullID
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
 type GetStreamParam = number
@@ -86,21 +89,38 @@ function getItemStream(state: WatchStoreState, id: number) {
 
 const initialState: WatchStoreState = {
   items: [],
-  states: getItemStates(),
+  states: {},
   switchStates: [],
 }
 
 export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
   async (fullId, { signal, getState }) => {
-    const itemState = getState().watch.states[fullId.id]
-    return await fetchItem({
+    let itemState = getState().watch.states[fullId.id]
+    const item = await fetchItem({
       fullId,
       translatorId: itemState?.translatorId,
       season: itemState?.season,
       episode: itemState?.episode,
       signal,
     })
+    if (!itemState) {
+      // Migration from old state storage
+      const states = getItemStatesLS()
+      if (states) {
+        await db.updateItemsStates(states)
+        deleteItemStatesLS()
+      }
+      itemState = await db.getItemState(fullId.id, async () => {
+        return {
+          translatorId: item.translators[0].id,
+          timestamp: 0,
+          quality: 'auto',
+          subtitle: 'null',
+        }
+      })
+    }
+    return { item, itemState }
   },
   {
     condition(arg, api) {
@@ -214,16 +234,8 @@ const watchSlice = createSlice({
       .addCase(getItem.fulfilled, (state, action) => {
         const item = state.items.find((i) => i.requestId === action.meta.requestId)
         if (item && item.state === FetchState.LOADING) {
-          const fetchedItem = action.payload
-          const currentState = state.states[action.meta.arg.id]
-          const nextState =
-            currentState ||
-            ({
-              translatorId: fetchedItem.translators[0].id,
-              timestamp: 0,
-              quality: 'auto',
-              subtitle: 'null',
-            } as WatchItemState)
+          const fetchedItem = action.payload.item
+          const nextState = action.payload.itemState
           let stream: Stream
           if (fetchedItem.itemType === 'series') {
             const seasons = fetchedItem.streams.find(
@@ -248,7 +260,7 @@ const watchSlice = createSlice({
             )!.stream!
           }
           checkState(stream!, nextState)
-          if (!currentState) {
+          if (!state.states[action.meta.arg.id]) {
             state.states[action.meta.arg.id] = nextState
           }
           item.requestId = null
