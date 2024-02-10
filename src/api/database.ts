@@ -1,9 +1,9 @@
 import Dexie, { Table } from 'dexie'
 
 import {
-  AjaxEpisodeModel,
   AjaxMovieModel,
-  AjaxSeriesModel,
+  AjaxSeriesEpisodesStreamModel,
+  AjaxSeriesStreamModel,
   FetchMovieStreamArgs,
   FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
@@ -19,8 +19,8 @@ class Database extends Dexie {
   private static readonly CACHE_HRS = 24
   items!: Table<ItemModel, number>
   ajaxMovies!: Table<AjaxMovieModel, number>
-  ajaxSeriesStreams!: Table<AjaxEpisodeModel, number>
-  ajaxSeriesEpisodesStreams!: Table<AjaxSeriesModel, number>
+  ajaxSeriesStreams!: Table<AjaxSeriesStreamModel, number>
+  ajaxSeriesEpisodesStreams!: Table<AjaxSeriesEpisodesStreamModel, number>
   streamThumbnails!: Table<StreamThumbnailsModel, string>
   streamSizes!: Table<StreamSizeModel, string>
 

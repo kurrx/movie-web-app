@@ -36,7 +36,7 @@ export interface AjaxMovieModel extends Model {
   updatedAt: number
 }
 
-export interface AjaxEpisodeModel extends Model {
+export interface AjaxSeriesStreamModel extends Model {
   id: number
   translatorId: number
   favsId: string
@@ -46,7 +46,7 @@ export interface AjaxEpisodeModel extends Model {
   updatedAt: number
 }
 
-export interface AjaxSeriesModel extends Model {
+export interface AjaxSeriesEpisodesStreamModel extends Model {
   id: number
   translatorId: number
   favsId: string
