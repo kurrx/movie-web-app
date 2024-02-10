@@ -174,11 +174,8 @@ export const ajax = new Request({
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
     const { qualityId, downloadUrl, signal } = args
-    const size = await db.getStreamSize(args, async () => {
-      const res = await axios.head(downloadUrl, { signal })
-      const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
-      return size
-    })
+    const res = await axios.head(downloadUrl, { signal })
+    const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
     return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
   } catch (err) {
     if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
@@ -189,11 +186,8 @@ export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs,
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
     const { stream, signal } = args
-    const thumbnails = await db.getStreamThumbnail(args, async () => {
-      const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
-      return data
-    })
-    return thumbnails
+    const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+    return data
   } catch (err) {
     if (retry < 3) return await fetchStreamThumbnails(args, retry + 1)
     throw err
@@ -218,25 +212,22 @@ export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0
 export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, isCamrip, isAds, isDirector, signal } = args
-    const data = await db.getAjaxMovie(args, async () => {
-      const params = new URLSearchParams({
-        id: String(id),
-        translator_id: String(translatorId),
-        favs: favsId,
-        is_camrip: String(Number(isCamrip)),
-        is_ads: String(Number(isAds)),
-        is_director: String(Number(isDirector)),
-        action: 'get_movie',
-      })
-      const { data } = await ajax.post<StreamResponse>(
-        `/ajax/get_cdn_series/?t=${Date.now()}`,
-        params,
-        { signal },
-      )
-      if (!data.success)
-        throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
-      return data
+    const params = new URLSearchParams({
+      id: String(id),
+      translator_id: String(translatorId),
+      favs: favsId,
+      is_camrip: String(Number(isCamrip)),
+      is_ads: String(Number(isAds)),
+      is_director: String(Number(isDirector)),
+      action: 'get_movie',
     })
+    const { data } = await ajax.post<StreamResponse>(
+      `/ajax/get_cdn_series/?t=${Date.now()}`,
+      params,
+      { signal },
+    )
+    if (!data.success)
+      throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
     return parseStream(data)
   } catch (err) {
     if (retry < 3) return await fetchMovieStream(args, retry + 1)
@@ -246,25 +237,22 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
 
 export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) {
   try {
-    const data = await db.getAjaxSeriesStream(args, async () => {
-      const { id, translatorId, favsId, season, episode, signal } = args
-      const params = new URLSearchParams({
-        id: String(id),
-        translator_id: String(translatorId),
-        favs: favsId,
-        season: String(season),
-        episode: String(episode),
-        action: 'get_stream',
-      })
-      const { data } = await ajax.post<StreamResponse>(
-        `/ajax/get_cdn_series/?t=${Date.now()}`,
-        params,
-        { signal },
-      )
-      if (!data.success)
-        throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
-      return data
+    const { id, translatorId, favsId, season, episode, signal } = args
+    const params = new URLSearchParams({
+      id: String(id),
+      translator_id: String(translatorId),
+      favs: favsId,
+      season: String(season),
+      episode: String(episode),
+      action: 'get_stream',
     })
+    const { data } = await ajax.post<StreamResponse>(
+      `/ajax/get_cdn_series/?t=${Date.now()}`,
+      params,
+      { signal },
+    )
+    if (!data.success)
+      throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
     return parseStream(data)
   } catch (err) {
     if (retry < 3) return await fetchSeriesStream(args, retry + 1)
@@ -275,24 +263,21 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) 
 export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, season, episode, signal } = args
-    const data = await db.getAjaxSeriesEpisodesStream(args, async () => {
-      const params = new URLSearchParams({
-        id: String(id),
-        translator_id: String(translatorId),
-        favs: favsId,
-        action: 'get_episodes',
-      })
-      if (typeof season === 'number') params.append('season', String(season))
-      if (typeof episode === 'number') params.append('episode', String(episode))
-      const { data } = await ajax.post<SeriesEpisodesStreamResponse>(
-        `/ajax/get_cdn_series/?t=${Date.now()}`,
-        params,
-        { signal },
-      )
-      if (!data.success)
-        throw new Error(data.message || 'Unable to get episodes list. Try again later.')
-      return data
+    const params = new URLSearchParams({
+      id: String(id),
+      translator_id: String(translatorId),
+      favs: favsId,
+      action: 'get_episodes',
     })
+    if (typeof season === 'number') params.append('season', String(season))
+    if (typeof episode === 'number') params.append('episode', String(episode))
+    const { data } = await ajax.post<SeriesEpisodesStreamResponse>(
+      `/ajax/get_cdn_series/?t=${Date.now()}`,
+      params,
+      { signal },
+    )
+    if (!data.success)
+      throw new Error(data.message || 'Unable to get episodes list. Try again later.')
     const seasons = parseStreamSeasons(data.seasons, data.episodes)
     const stream = parseStream(data)
     return {
