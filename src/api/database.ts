@@ -19,8 +19,8 @@ class Database extends Dexie {
   private static readonly CACHE_HRS = 24
   items!: Table<ItemModel, number>
   ajaxMovies!: Table<AjaxMovieModel, number>
-  ajaxEpisodes!: Table<AjaxEpisodeModel, number>
-  ajaxSeries!: Table<AjaxSeriesModel, number>
+  ajaxSeriesStreams!: Table<AjaxEpisodeModel, number>
+  ajaxSeriesEpisodesStreams!: Table<AjaxSeriesModel, number>
   streamThumbnails!: Table<StreamThumbnailsModel, string>
   streamSizes!: Table<StreamSizeModel, string>
 
@@ -29,8 +29,8 @@ class Database extends Dexie {
     this.version(1).stores({
       items: 'id',
       ajaxMovies: '++pk, [id+translatorId]',
-      ajaxEpisodes: '++pk, [id+translatorId]',
-      ajaxSeries: '++pk, [id+translatorId]',
+      ajaxSeriesStreams: '++pk, [id+translatorId]',
+      ajaxSeriesEpisodesStreams: '++pk, [id+translatorId]',
       streamThumbnails: '++pk, [id+translatorId]',
       streamSizes: '++pk, [id+translatorId]',
     })
@@ -78,14 +78,17 @@ class Database extends Dexie {
     return entry.data
   }
 
-  async getAjaxEpisode(args: FetchSeriesStreamArgs, fetch: () => Promise<StreamSuccessResponse>) {
-    const entry = await this.ajaxEpisodes
+  async getAjaxSeriesStream(
+    args: FetchSeriesStreamArgs,
+    fetch: () => Promise<StreamSuccessResponse>,
+  ) {
+    const entry = await this.ajaxSeriesStreams
       .where({ id: args.id, translatorId: args.translatorId })
       .filter((entry) => entry.season === args.season && entry.episode === args.episode)
       .first()
     if (!entry || Database.isExpired(entry) || entry.favsId !== args.favsId) {
       const data = await fetch()
-      this.ajaxEpisodes.put({
+      this.ajaxSeriesStreams.put({
         id: args.id,
         translatorId: args.translatorId,
         favsId: args.favsId,
@@ -99,17 +102,17 @@ class Database extends Dexie {
     return entry.data
   }
 
-  async getAjaxSeries(
+  async getAjaxSeriesEpisodesStream(
     args: FetchSeriesEpisodesStreamArgs,
     fetch: () => Promise<SeriesEpisodesStreamSuccessResponse>,
   ) {
-    const entry = await this.ajaxSeries
+    const entry = await this.ajaxSeriesEpisodesStreams
       .where({ id: args.id, translatorId: args.translatorId })
       .filter((entry) => entry.season === args.season && entry.episode === args.episode)
       .first()
     if (!entry || Database.isExpired(entry) || entry.favsId !== args.favsId) {
       const data = await fetch()
-      this.ajaxSeries.put({
+      this.ajaxSeriesEpisodesStreams.put({
         id: args.id,
         translatorId: args.translatorId,
         favsId: args.favsId,

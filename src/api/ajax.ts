@@ -246,7 +246,7 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
 
 export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) {
   try {
-    const data = await db.getAjaxEpisode(args, async () => {
+    const data = await db.getAjaxSeriesStream(args, async () => {
       const { id, translatorId, favsId, season, episode, signal } = args
       const params = new URLSearchParams({
         id: String(id),
@@ -275,7 +275,7 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) 
 export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, season, episode, signal } = args
-    const data = await db.getAjaxSeries(args, async () => {
+    const data = await db.getAjaxSeriesEpisodesStream(args, async () => {
       const params = new URLSearchParams({
         id: String(id),
         translator_id: String(translatorId),
