@@ -2,6 +2,7 @@ import Dexie, { Table } from 'dexie'
 
 import {
   FetchMovieStreamArgs,
+  FetchSeriesStreamArgs,
   FetchStreamDownloadSizeArgs,
   FetchStreamThumbnailArgs,
   ItemModel,
@@ -11,6 +12,8 @@ import {
   MovieSizeModel,
   MovieThumbnailsKey,
   MovieThumbnailsModel,
+  SeriesKey,
+  SeriesModel,
   SeriesSizeKey,
   SeriesSizeModel,
   SeriesThumbnailsKey,
@@ -22,6 +25,7 @@ class Database extends Dexie {
   private static readonly CACHE_HRS = 24
   items!: Table<ItemModel, number>
   movies!: Table<MovieModel, MovieKey>
+  series!: Table<SeriesModel, SeriesKey>
   moviesSizes!: Table<MovieSizeModel, MovieSizeKey>
   seriesSizes!: Table<SeriesSizeModel, SeriesSizeKey>
   moviesThumbnails!: Table<MovieThumbnailsModel, MovieThumbnailsKey>
@@ -32,6 +36,7 @@ class Database extends Dexie {
     this.version(1).stores({
       items: 'id',
       movies: '[id+translatorId+isCamrip+isAds+isDirector]',
+      series: '[id+translatorId+season+episode]',
       moviesSizes: '[id+translatorId+qualityId]',
       seriesSizes: '[id+translatorId+qualityId+season+episode]',
       moviesThumbnails: '[id+translatorId]',
@@ -168,6 +173,29 @@ class Database extends Dexie {
         })
       } else {
         this.movies.update(key, { favsId, data, updatedAt: date })
+      }
+      return data
+    }
+    return entry.data
+  }
+
+  async getSeries(args: FetchSeriesStreamArgs, fetch: () => Promise<StreamSuccessResponse>) {
+    const { id, translatorId, season, episode, favsId } = args
+    const key = { id, translatorId, season, episode }
+    const entry = await this.series.get(key)
+    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+      const data = await fetch()
+      const date = new Date()
+      if (!entry) {
+        this.series.add({
+          ...key,
+          favsId,
+          data,
+          createdAt: date,
+          updatedAt: date,
+        })
+      } else {
+        this.series.update(key, { favsId, data, updatedAt: date })
       }
       return data
     }

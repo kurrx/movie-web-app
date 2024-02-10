@@ -247,21 +247,24 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
 export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, season, episode, signal } = args
-    const params = new URLSearchParams({
-      id: String(id),
-      translator_id: String(translatorId),
-      favs: favsId,
-      season: String(season),
-      episode: String(episode),
-      action: 'get_stream',
+    const data = await db.getSeries(args, async () => {
+      const params = new URLSearchParams({
+        id: String(id),
+        translator_id: String(translatorId),
+        favs: favsId,
+        season: String(season),
+        episode: String(episode),
+        action: 'get_stream',
+      })
+      const { data } = await ajax.post<StreamResponse>(
+        `/ajax/get_cdn_series/?t=${Date.now()}`,
+        params,
+        { signal },
+      )
+      if (!data.success)
+        throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
+      return data
     })
-    const { data } = await ajax.post<StreamResponse>(
-      `/ajax/get_cdn_series/?t=${Date.now()}`,
-      params,
-      { signal },
-    )
-    if (!data.success)
-      throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
     return parseStream(data)
   } catch (err) {
     if (retry < 3) return await fetchSeriesStream(args, retry + 1)

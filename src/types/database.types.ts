@@ -15,31 +15,32 @@ interface IDModel {
   translatorId: number
 }
 
-interface SeriesModel {
-  season: number
-  episode: number
-}
-
-type SizeIDModel = { qualityId: string }
-type SizeDataModel = { size: number }
-export type MovieSizeModel = Model & IDModel & SizeIDModel & SizeDataModel
-export type MovieSizeKey = IDModel & SizeIDModel
-export type SeriesSizeModel = MovieSizeModel & SeriesModel
-export type SeriesSizeKey = MovieSizeKey & SeriesModel
-
-type ThumbnailsDataModel = { content: string }
-export type MovieThumbnailsModel = Model & IDModel & ThumbnailsDataModel
-export type MovieThumbnailsKey = IDModel
-export type SeriesThumbnailsModel = MovieThumbnailsModel & SeriesModel
-export type SeriesThumbnailsKey = MovieThumbnailsKey & SeriesModel
-
 type FavsModel = { favsId: string }
+type ItemDataModel = { data: StreamSuccessResponse }
 
 interface MovieIDModel {
   isCamrip: 0 | 1
   isAds: 0 | 1
   isDirector: 0 | 1
 }
-type MovieDataModel = { data: StreamSuccessResponse }
-export type MovieModel = Model & IDModel & FavsModel & MovieIDModel & MovieDataModel
+interface SeriesIDModel {
+  season: number
+  episode: number
+}
+export type MovieModel = Model & IDModel & FavsModel & ItemDataModel & MovieIDModel
 export type MovieKey = IDModel & MovieIDModel
+export type SeriesModel = Model & IDModel & FavsModel & ItemDataModel & SeriesIDModel
+export type SeriesKey = IDModel & SeriesIDModel
+
+type SizeIDModel = { qualityId: string }
+type SizeDataModel = { size: number }
+export type MovieSizeModel = Model & IDModel & SizeIDModel & SizeDataModel
+export type MovieSizeKey = IDModel & SizeIDModel
+export type SeriesSizeModel = MovieSizeModel & SeriesIDModel
+export type SeriesSizeKey = MovieSizeKey & SeriesIDModel
+
+type ThumbnailsDataModel = { content: string }
+export type MovieThumbnailsModel = Model & IDModel & ThumbnailsDataModel
+export type MovieThumbnailsKey = IDModel
+export type SeriesThumbnailsModel = MovieThumbnailsModel & SeriesIDModel
+export type SeriesThumbnailsKey = MovieThumbnailsKey & SeriesIDModel
