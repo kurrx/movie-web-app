@@ -1,4 +1,4 @@
-import { StreamSuccessResponse } from './ajax.types'
+import { StreamSeason, StreamSuccessResponse } from './ajax.types'
 
 interface Model {
   createdAt: Date
@@ -44,3 +44,7 @@ export type MovieThumbnailsModel = Model & IDModel & ThumbnailsDataModel
 export type MovieThumbnailsKey = IDModel
 export type SeriesThumbnailsModel = MovieThumbnailsModel & SeriesIDModel
 export type SeriesThumbnailsKey = MovieThumbnailsKey & SeriesIDModel
+
+type SeasonsDataModel = { seasons: StreamSeason[] }
+export type SeasonsModel = Model & IDModel & FavsModel & SeasonsDataModel
+export type SeasonsKey = IDModel

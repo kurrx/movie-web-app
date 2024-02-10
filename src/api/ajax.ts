@@ -275,30 +275,56 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) 
 export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, season, episode, signal } = args
-    const params = new URLSearchParams({
-      id: String(id),
-      translator_id: String(translatorId),
-      favs: favsId,
-      action: 'get_episodes',
+    const seasons = await db.getSeasons(args, async () => {
+      const params = new URLSearchParams({
+        id: String(id),
+        translator_id: String(translatorId),
+        favs: favsId,
+        action: 'get_episodes',
+      })
+      const { data } = await ajax.post<SeriesEpisodesStreamResponse>(
+        `/ajax/get_cdn_series/?t=${Date.now()}`,
+        params,
+        { signal },
+      )
+      if (!data.success)
+        throw new Error(data.message || 'Unable to get episodes list. Try again later.')
+      const seasons = parseStreamSeasons(data.seasons, data.episodes)
+      await db.addSeries(
+        {
+          id,
+          translatorId,
+          favsId,
+          season: seasons[0].number,
+          episode: seasons[0].episodes[0].number,
+        },
+        {
+          message: data.message,
+          success: true,
+          thumbnails: data.thumbnails,
+          url: data.url,
+          subtitle: data.subtitle,
+          subtitle_def: data.subtitle_def,
+          subtitle_lns: data.subtitle_lns,
+          quality: data.quality,
+        },
+      )
+      return seasons
     })
-    if (typeof season === 'number') params.append('season', String(season))
-    if (typeof episode === 'number') params.append('episode', String(episode))
-    const { data } = await ajax.post<SeriesEpisodesStreamResponse>(
-      `/ajax/get_cdn_series/?t=${Date.now()}`,
-      params,
-      { signal },
-    )
-    if (!data.success)
-      throw new Error(data.message || 'Unable to get episodes list. Try again later.')
-    const seasons = parseStreamSeasons(data.seasons, data.episodes)
-    const stream = parseStream(data)
+    const streamFor = {
+      season: season || seasons[0].number,
+      episode: episode || seasons[0].episodes[0].number,
+    }
+    const stream = await fetchSeriesStream({
+      id,
+      translatorId,
+      favsId,
+      ...streamFor,
+    })
     return {
       seasons,
       stream,
-      streamFor: {
-        season: season || seasons[0].number,
-        episode: episode || seasons[0].episodes[0].number,
-      },
+      streamFor,
     }
   } catch (err) {
     if (retry < 3) return await fetchSeriesEpisodesStream(args, retry + 1)

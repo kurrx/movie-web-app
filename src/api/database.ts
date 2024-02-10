@@ -2,6 +2,7 @@ import Dexie, { Table } from 'dexie'
 
 import {
   FetchMovieStreamArgs,
+  FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
   FetchStreamDownloadSizeArgs,
   FetchStreamThumbnailArgs,
@@ -12,12 +13,15 @@ import {
   MovieSizeModel,
   MovieThumbnailsKey,
   MovieThumbnailsModel,
+  SeasonsKey,
+  SeasonsModel,
   SeriesKey,
   SeriesModel,
   SeriesSizeKey,
   SeriesSizeModel,
   SeriesThumbnailsKey,
   SeriesThumbnailsModel,
+  StreamSeason,
   StreamSuccessResponse,
 } from '@/types'
 
@@ -26,6 +30,7 @@ class Database extends Dexie {
   items!: Table<ItemModel, number>
   movies!: Table<MovieModel, MovieKey>
   series!: Table<SeriesModel, SeriesKey>
+  seasons!: Table<SeasonsModel, SeasonsKey>
   moviesSizes!: Table<MovieSizeModel, MovieSizeKey>
   seriesSizes!: Table<SeriesSizeModel, SeriesSizeKey>
   moviesThumbnails!: Table<MovieThumbnailsModel, MovieThumbnailsKey>
@@ -37,6 +42,7 @@ class Database extends Dexie {
       items: 'id',
       movies: '[id+translatorId+isCamrip+isAds+isDirector]',
       series: '[id+translatorId+season+episode]',
+      seasons: '[id+translatorId]',
       moviesSizes: '[id+translatorId+qualityId]',
       seriesSizes: '[id+translatorId+qualityId+season+episode]',
       moviesThumbnails: '[id+translatorId]',
@@ -200,6 +206,47 @@ class Database extends Dexie {
       return data
     }
     return entry.data
+  }
+
+  async addSeries(args: FetchSeriesStreamArgs, data: StreamSuccessResponse) {
+    const { id, translatorId, season, episode, favsId } = args
+    const key = { id, translatorId, season, episode }
+    const entry = await this.series.get(key)
+    const date = new Date()
+    if (!entry) {
+      this.series.add({
+        ...key,
+        favsId,
+        data,
+        createdAt: date,
+        updatedAt: date,
+      })
+    } else {
+      this.series.update(key, { favsId, data, updatedAt: date })
+    }
+  }
+
+  async getSeasons(args: FetchSeriesEpisodesStreamArgs, fetch: () => Promise<StreamSeason[]>) {
+    const { id, translatorId, favsId } = args
+    const key = { id, translatorId }
+    const entry = await this.seasons.get(key)
+    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+      const seasons = await fetch()
+      const date = new Date()
+      if (!entry) {
+        this.seasons.add({
+          ...key,
+          favsId,
+          seasons,
+          createdAt: date,
+          updatedAt: date,
+        })
+      } else {
+        this.seasons.update(key, { favsId, seasons, updatedAt: date })
+      }
+      return seasons
+    }
+    return entry.seasons
   }
 }
 
