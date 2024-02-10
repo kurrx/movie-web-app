@@ -1,3 +1,5 @@
+import { StreamSuccessResponse } from './ajax.types'
+
 interface Model {
   createdAt: Date
   updatedAt: Date
@@ -30,3 +32,14 @@ export type MovieThumbnailsModel = Model & IDModel & ThumbnailsDataModel
 export type MovieThumbnailsKey = IDModel
 export type SeriesThumbnailsModel = MovieThumbnailsModel & SeriesModel
 export type SeriesThumbnailsKey = MovieThumbnailsKey & SeriesModel
+
+type FavsModel = { favsId: string }
+
+interface MovieIDModel {
+  isCamrip: 0 | 1
+  isAds: 0 | 1
+  isDirector: 0 | 1
+}
+type MovieDataModel = { data: StreamSuccessResponse }
+export type MovieModel = Model & IDModel & FavsModel & MovieIDModel & MovieDataModel
+export type MovieKey = IDModel & MovieIDModel

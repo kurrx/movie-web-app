@@ -218,22 +218,25 @@ export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0
 export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
   try {
     const { id, translatorId, favsId, isCamrip, isAds, isDirector, signal } = args
-    const params = new URLSearchParams({
-      id: String(id),
-      translator_id: String(translatorId),
-      favs: favsId,
-      is_camrip: String(Number(isCamrip)),
-      is_ads: String(Number(isAds)),
-      is_director: String(Number(isDirector)),
-      action: 'get_movie',
+    const data = await db.getMovie(args, async () => {
+      const params = new URLSearchParams({
+        id: String(id),
+        translator_id: String(translatorId),
+        favs: favsId,
+        is_camrip: String(Number(isCamrip)),
+        is_ads: String(Number(isAds)),
+        is_director: String(Number(isDirector)),
+        action: 'get_movie',
+      })
+      const { data } = await ajax.post<StreamResponse>(
+        `/ajax/get_cdn_series/?t=${Date.now()}`,
+        params,
+        { signal },
+      )
+      if (!data.success)
+        throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
+      return data
     })
-    const { data } = await ajax.post<StreamResponse>(
-      `/ajax/get_cdn_series/?t=${Date.now()}`,
-      params,
-      { signal },
-    )
-    if (!data.success)
-      throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
     return parseStream(data)
   } catch (err) {
     if (retry < 3) return await fetchMovieStream(args, retry + 1)

@@ -1,9 +1,12 @@
 import Dexie, { Table } from 'dexie'
 
 import {
+  FetchMovieStreamArgs,
   FetchStreamDownloadSizeArgs,
   FetchStreamThumbnailArgs,
   ItemModel,
+  MovieKey,
+  MovieModel,
   MovieSizeKey,
   MovieSizeModel,
   MovieThumbnailsKey,
@@ -12,11 +15,13 @@ import {
   SeriesSizeModel,
   SeriesThumbnailsKey,
   SeriesThumbnailsModel,
+  StreamSuccessResponse,
 } from '@/types'
 
 class Database extends Dexie {
   private static readonly CACHE_HRS = 24
   items!: Table<ItemModel, number>
+  movies!: Table<MovieModel, MovieKey>
   moviesSizes!: Table<MovieSizeModel, MovieSizeKey>
   seriesSizes!: Table<SeriesSizeModel, SeriesSizeKey>
   moviesThumbnails!: Table<MovieThumbnailsModel, MovieThumbnailsKey>
@@ -26,6 +31,7 @@ class Database extends Dexie {
     super('tv-db')
     this.version(1).stores({
       items: 'id',
+      movies: '[id+translatorId+isCamrip+isAds+isDirector]',
       moviesSizes: '[id+translatorId+qualityId]',
       seriesSizes: '[id+translatorId+qualityId+season+episode]',
       moviesThumbnails: '[id+translatorId]',
@@ -55,14 +61,13 @@ class Database extends Dexie {
 
   private async getMovieSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {
     const { id, translatorId, qualityId } = args
-    const entry = await this.moviesSizes.get({ id, translatorId, qualityId })
+    const key = { id, translatorId, qualityId }
+    const entry = await this.moviesSizes.get(key)
     if (!entry) {
       const size = await fetch()
       const date = new Date()
       this.moviesSizes.add({
-        id,
-        translatorId,
-        qualityId,
+        ...key,
         size,
         createdAt: date,
         updatedAt: date,
@@ -74,16 +79,13 @@ class Database extends Dexie {
 
   private async getSeriesSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {
     const { id, translatorId, qualityId, season, episode } = args
-    const entry = await this.seriesSizes.get({ id, translatorId, qualityId, season, episode })
+    const key = { id, translatorId, qualityId, season: season!, episode: episode! }
+    const entry = await this.seriesSizes.get(key)
     if (!entry) {
       const size = await fetch()
       const date = new Date()
       this.seriesSizes.add({
-        id,
-        translatorId,
-        qualityId,
-        season: season!,
-        episode: episode!,
+        ...key,
         size,
         createdAt: date,
         updatedAt: date,
@@ -102,13 +104,13 @@ class Database extends Dexie {
 
   private async getMovieThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
     const { id, translatorId } = args
-    const entry = await this.moviesThumbnails.get({ id, translatorId })
+    const key = { id, translatorId }
+    const entry = await this.moviesThumbnails.get(key)
     if (!entry) {
       const content = await fetch()
       const date = new Date()
       this.moviesThumbnails.add({
-        id,
-        translatorId,
+        ...key,
         content,
         createdAt: date,
         updatedAt: date,
@@ -120,15 +122,13 @@ class Database extends Dexie {
 
   private async getSeriesThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
     const { id, translatorId, season, episode } = args
-    const entry = await this.seriesThumbnails.get({ id, translatorId, season, episode })
+    const key = { id, translatorId, season: season!, episode: episode! }
+    const entry = await this.seriesThumbnails.get(key)
     if (!entry) {
       const content = await fetch()
       const date = new Date()
       this.seriesThumbnails.add({
-        id,
-        translatorId,
-        season: season!,
-        episode: episode!,
+        ...key,
         content,
         createdAt: date,
         updatedAt: date,
@@ -143,6 +143,35 @@ class Database extends Dexie {
       return await this.getSeriesThumbnails(args, fetch)
     }
     return await this.getMovieThumbnails(args, fetch)
+  }
+
+  async getMovie(args: FetchMovieStreamArgs, fetch: () => Promise<StreamSuccessResponse>) {
+    const { id, translatorId, favsId, isCamrip, isAds, isDirector } = args
+    const key = {
+      id,
+      translatorId,
+      isCamrip: Number(isCamrip) as 0 | 1,
+      isAds: Number(isAds) as 0 | 1,
+      isDirector: Number(isDirector) as 0 | 1,
+    }
+    const entry = await this.movies.get(key)
+    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+      const data = await fetch()
+      const date = new Date()
+      if (!entry) {
+        this.movies.add({
+          ...key,
+          favsId,
+          data,
+          createdAt: date,
+          updatedAt: date,
+        })
+      } else {
+        this.movies.update(key, { favsId, data, updatedAt: date })
+      }
+      return data
+    }
+    return entry.data
   }
 }
 
