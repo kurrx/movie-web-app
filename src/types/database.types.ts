@@ -16,6 +16,7 @@ export interface StreamThumbnailsModel extends StreamDetailsModel {
 }
 
 export interface StreamSizeModel extends StreamDetailsModel {
+  qualityId: string
   size: number
 }
 

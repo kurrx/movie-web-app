@@ -7,7 +7,8 @@ import {
   FetchMovieStreamArgs,
   FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
-  FetchStreamDetailsArgs,
+  FetchStreamDownloadSizeArgs,
+  FetchStreamThumbnailArgs,
   ItemModel,
   SeriesEpisodesStreamSuccessResponse,
   StreamSizeModel,
@@ -32,7 +33,7 @@ class Database extends Dexie {
       ajaxSeriesStreams: '++pk, [id+translatorId]',
       ajaxSeriesEpisodesStreams: '++pk, [id+translatorId]',
       streamThumbnails: '++pk, [id+translatorId]',
-      streamSizes: '++pk, [id+translatorId]',
+      streamSizes: '++pk, [id+translatorId+qualityId]',
     })
   }
 
@@ -126,9 +127,9 @@ class Database extends Dexie {
     return entry.data
   }
 
-  async getStreamSize(args: FetchStreamDetailsArgs, fetch: () => Promise<number>) {
+  async getStreamSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {
     const entry = await this.streamSizes
-      .where({ id: args.id, translatorId: args.translatorId })
+      .where({ id: args.id, translatorId: args.translatorId, qualityId: args.qualityId })
       .filter((entry) => entry.season === args.season && entry.episode === args.episode)
       .first()
     if (!entry) {
@@ -138,6 +139,7 @@ class Database extends Dexie {
         translatorId: args.translatorId,
         season: args.season,
         episode: args.episode,
+        qualityId: args.qualityId,
         size,
       })
       return size
@@ -145,7 +147,7 @@ class Database extends Dexie {
     return entry.size
   }
 
-  async getStreamThumbnail(args: FetchStreamDetailsArgs, fetch: () => Promise<string>) {
+  async getStreamThumbnail(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
     const entry = await this.streamThumbnails
       .where({ id: args.id, translatorId: args.translatorId })
       .filter((entry) => entry.season === args.season && entry.episode === args.episode)
