@@ -25,6 +25,7 @@ export interface PlayerProps {
   translators: ItemTranslator[]
   thumbnails: Thumbnails
   onTimeUpdate: (time: number) => void
+  onPreloadNext: () => void
   onSwitchRetry: () => void
   onPlayItem: (item: WatchPlaylistPlayItem) => void
   onTranslatorChange: (translatorId: number) => void

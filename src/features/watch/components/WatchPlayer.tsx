@@ -7,6 +7,7 @@ import { WatchPlaylistPlayItem } from '@/types'
 
 import {
   getStreamDetails,
+  preloadNextEpisode,
   selectWatchItemPlaylist,
   selectWatchItemPlaylistAdjacents,
   selectWatchItemQualities,
@@ -98,6 +99,13 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
     },
     [dispatch, id],
   )
+  const onPreloadNext = useCallback(() => {
+    if (!playlistAdjacents.next) return
+    if (playlistAdjacents.next.type === 'franchise') return
+    const season = playlistAdjacents.next.season
+    const episode = playlistAdjacents.next.number
+    dispatch(preloadNextEpisode({ id, season, episode }))
+  }, [dispatch, id, playlistAdjacents])
   const onSwitchRetry = useCallback(() => {
     makeSwitch()
   }, [makeSwitch])
@@ -146,6 +154,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
       translators={translators}
       thumbnails={thumbnails}
       onTimeUpdate={onTimeUpdate}
+      onPreloadNext={onPreloadNext}
       onSwitchRetry={onSwitchRetry}
       onPlayItem={onPlayItem}
       onTranslatorChange={onTranslatorChange}

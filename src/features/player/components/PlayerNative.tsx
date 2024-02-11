@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { isIOS, isIPad13, isMobileOnly, isMobileSafari } from 'react-device-detect'
 import { OnProgressProps } from 'react-player/base'
 import ReactPlayer from 'react-player/file'
@@ -29,13 +29,14 @@ import { useProps } from './PlayerProps'
 export function PlayerNative() {
   const [dispatch, selector] = useStore()
   const { setPlayer, player } = useNodes()
-  const { mediaUrl, startTime, onTimeUpdate } = useProps()
+  const { mediaUrl, startTime, onTimeUpdate, onPreloadNext } = useProps()
   const { exitFullscreen } = useFullscreen()
   const playing = selector(selectPlayerPlayingCombined)
   const volume = selector(selectPlayerVolume)
   const muted = selector(selectPlayerMuted)
   const playbackSpeed = selector(selectPlayerPlaybackSpeedCombined)
   const pip = selector(selectPlayerPip)
+  const thresholdPassed = useRef(false)
 
   const onReady = useCallback(() => {
     dispatch(setPlayerReady())
@@ -70,8 +71,12 @@ export function PlayerNative() {
       dispatch(setPlayerProgress(progress.playedSeconds))
       dispatch(setPlayerLoadedProgress(progress.loadedSeconds))
       onTimeUpdate(progress.playedSeconds)
+      if (progress.played >= 0.75 && !thresholdPassed.current) {
+        thresholdPassed.current = true
+        onPreloadNext()
+      }
     },
-    [dispatch, onTimeUpdate],
+    [dispatch, onTimeUpdate, onPreloadNext],
   )
 
   const onSeek = useCallback(
@@ -99,6 +104,7 @@ export function PlayerNative() {
 
   useEffect(() => {
     return () => {
+      thresholdPassed.current = false
       dispatch(resetPlayerState())
     }
   }, [dispatch])
