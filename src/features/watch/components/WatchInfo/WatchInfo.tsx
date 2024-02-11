@@ -18,8 +18,8 @@ export function WatchInfo({ id }: WatchInfoProps) {
     <Fragment>
       <Title>{title}</Title>
       <div className='container mt-4'>
-        <div className='flex items-center justify-between'>
-          <h1 className='font-bold text-xl'>{title}</h1>
+        <h1 className='font-bold text-xl'>{title}</h1>
+        <div className='flex items-center justify-start mt-4 space-x-2'>
           <WatchInfoDownload title={title} qualities={qualities} />
         </div>
       </div>
