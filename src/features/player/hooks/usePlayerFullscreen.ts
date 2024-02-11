@@ -38,6 +38,8 @@ export function usePlayerFullscreen() {
 
   useEffect(() => {
     if (!isMobile) return
+    if (!window.screen) return
+    if (!window.screen.orientation) return
     const onOrientationChange = () => {
       if (window.screen.orientation.type.includes('landscape')) {
         enterFullscreen()

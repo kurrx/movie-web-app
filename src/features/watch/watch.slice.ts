@@ -496,7 +496,7 @@ export const selectWatchItemTitle = createSelector(
       const currentEpisode = episodes.find((e) => e.number === episode)!
       const episodeDetail =
         item.episodesInfo?.[currentSeason.number - 1]?.[currentEpisode.number - 1]
-      return `${item.title} - S${currentSeason.number}:E${currentEpisode.number} «${episodeDetail.title || `Эпизод ${currentEpisode.number}`}»`
+      return `${item.title} - S${currentSeason.number}:E${currentEpisode.number} «${episodeDetail?.title || `Эпизод ${currentEpisode.number}`}»`
     }
     return item.title
   },
