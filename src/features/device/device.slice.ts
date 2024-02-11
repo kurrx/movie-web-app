@@ -4,7 +4,9 @@ import { mediaQuery } from '@/api'
 import { AppStoreState, DeviceStoreState } from '@/types'
 
 const initialState: DeviceStoreState = {
-  isMobile: mediaQuery('(max-width: 768px)'),
+  isMobile: mediaQuery(
+    '(max-width: 768px) and (orientation: portrait), (max-height: 768px) and (orientation: landscape)',
+  ),
   isTouch: mediaQuery('(pointer: coarse) and (hover: none)'),
 }
 
@@ -25,8 +27,7 @@ const deviceSlice = createSlice({
 
 export const { setDeviceIsMobile, setDeviceIsTouch } = deviceSlice.actions
 
-export const selectDeviceIsMobile = (state: AppStoreState) =>
-  state.device.isMobile || state.device.isTouch
+export const selectDeviceIsMobile = (state: AppStoreState) => state.device.isMobile
 export const selectDeviceIsTouch = (state: AppStoreState) => state.device.isTouch
 
 export const deviceReducer = deviceSlice.reducer

@@ -7,7 +7,9 @@ import { setDeviceIsMobile, setDeviceIsTouch } from '../device.slice'
 
 export function useAppDevice() {
   const dispatch = useAppDispatch()
-  const isMobile = useMediaQuery('(max-width: 768px)')
+  const isMobile = useMediaQuery(
+    '(max-width: 768px) and (orientation: portrait), (max-height: 768px) and (orientation: landscape)',
+  )
   const isTouch = useMediaQuery('(pointer: coarse) and (hover: none)')
 
   useEffect(() => {

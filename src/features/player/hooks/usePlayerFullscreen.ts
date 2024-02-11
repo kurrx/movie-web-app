@@ -38,18 +38,19 @@ export function usePlayerFullscreen() {
 
   useEffect(() => {
     if (!isMobile) return
-    if (!window.screen) return
-    if (!window.screen.orientation) return
+    const screenApi = window.screen || screen
+    if (!screenApi) return
+    if (!screenApi.orientation) return
     const onOrientationChange = () => {
-      if (window.screen.orientation.type.includes('landscape')) {
+      if (screenApi.orientation.type.includes('landscape')) {
         enterFullscreen()
       } else {
         exitFullscreen()
       }
     }
-    window.screen.orientation.addEventListener('change', onOrientationChange)
+    screenApi.orientation.addEventListener('change', onOrientationChange)
     return () => {
-      window.screen.orientation.removeEventListener('change', onOrientationChange)
+      screenApi.orientation.removeEventListener('change', onOrientationChange)
     }
   }, [isMobile, enterFullscreen, exitFullscreen])
 }
