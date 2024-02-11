@@ -22,7 +22,7 @@
   height: 100vh;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (pointer: coarse) and (hover: none) {
   .player-container,
   .player-container.theater,
   .player-container.fullscreen {
@@ -36,7 +36,7 @@
   }
 }
 
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 768px), (pointer: coarse) and (hover: none) and (orientation: landscape) {
   .player-container,
   .player-container.theater,
   .player-container.fullscreen {
@@ -58,7 +58,7 @@
   border-radius: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (pointer: coarse) and (hover: none) {
   .player-content,
   .theater .player-content,
   .fullscreen .player-content {
@@ -78,7 +78,7 @@
   width: 100% !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (pointer: coarse) and (hover: none) {
   .player-wrapper {
     height: auto;
     padding-top: calc(100% / (16 / 9));

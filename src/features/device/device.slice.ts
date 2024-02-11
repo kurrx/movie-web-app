@@ -25,7 +25,8 @@ const deviceSlice = createSlice({
 
 export const { setDeviceIsMobile, setDeviceIsTouch } = deviceSlice.actions
 
-export const selectDeviceIsMobile = (state: AppStoreState) => state.device.isMobile
+export const selectDeviceIsMobile = (state: AppStoreState) =>
+  state.device.isMobile || state.device.isTouch
 export const selectDeviceIsTouch = (state: AppStoreState) => state.device.isTouch
 
 export const deviceReducer = deviceSlice.reducer
