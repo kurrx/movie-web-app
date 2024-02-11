@@ -28,7 +28,7 @@ import {
 } from '@/types'
 
 class Database extends Dexie {
-  private static readonly CACHE_HRS = 24
+  private static readonly CACHE_HRS = 12
   items!: Table<ItemModel, number>
   itemsStates!: Table<ItemStateModel, number>
   movies!: Table<MovieModel, MovieKey>
@@ -191,7 +191,7 @@ class Database extends Dexie {
       isDirector: Number(isDirector) as 0 | 1,
     }
     const entry = await this.movies.get(key)
-    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+    if (!entry || entry.favsId !== favsId) {
       const data = await fetch()
       const date = new Date()
       if (!entry) {
@@ -214,7 +214,7 @@ class Database extends Dexie {
     const { id, translatorId, season, episode, favsId } = args
     const key = { id, translatorId, season, episode }
     const entry = await this.series.get(key)
-    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+    if (!entry || entry.favsId !== favsId) {
       const data = await fetch()
       const date = new Date()
       if (!entry) {
@@ -255,7 +255,7 @@ class Database extends Dexie {
     const { id, translatorId, favsId } = args
     const key = { id, translatorId }
     const entry = await this.seasons.get(key)
-    if (!entry || entry.favsId !== favsId || Database.isExpired(entry)) {
+    if (!entry || entry.favsId !== favsId) {
       const seasons = await fetch()
       const date = new Date()
       if (!entry) {
