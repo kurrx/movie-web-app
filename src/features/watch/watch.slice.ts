@@ -198,7 +198,7 @@ export const switchQuality = createAsyncThunk<SQualityReturn, SQualityParam, Thu
 )
 export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
   'watch/preloadNextEpisode',
-  async ({ id, season, episode }, { getState }) => {
+  async ({ id, season, episode }, { getState, signal }) => {
     const item = getState().watch.items.find((i) => i.id === id)!.item! as ItemSeries
     const state = getState().watch.states[id]!
     const nextEpisode = item.streams
@@ -208,12 +208,21 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
     if (nextEpisode) {
       const stream = nextEpisode.stream
       if (!stream) {
-        await fetchSeriesStream({
+        const stream = await fetchSeriesStream({
           id,
           favsId: item.favsId,
           translatorId: state.translatorId,
           season,
           episode,
+          signal,
+        })
+        await fetchStreamDetails({
+          id,
+          translatorId: state.translatorId,
+          season,
+          episode,
+          stream,
+          signal,
         })
       }
     }
