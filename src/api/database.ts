@@ -74,19 +74,9 @@ class Database extends Dexie {
     return new DOMParser().parseFromString(entry.html, 'text/html')
   }
 
-  async getItemState(id: number, fetch: () => Promise<WatchItemState>) {
+  async getItemState(id: number) {
     const entry = await this.itemsStates.get(id)
-    if (!entry) {
-      const state = await fetch()
-      const date = new Date()
-      if (!entry) {
-        this.itemsStates.add({ id, state, createdAt: date, updatedAt: date })
-      } else {
-        this.itemsStates.update(id, { state, updatedAt: date })
-      }
-      return state
-    }
-    return entry.state
+    return entry?.state
   }
 
   async updateItemsStates(states: Record<number, WatchItemState | undefined>) {
@@ -101,8 +91,6 @@ class Database extends Dexie {
         } else {
           this.itemsStates.update(id, { state, updatedAt: date })
         }
-      } else {
-        await this.itemsStates.delete(id)
       }
     }
   }

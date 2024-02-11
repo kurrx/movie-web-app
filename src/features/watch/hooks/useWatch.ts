@@ -9,6 +9,7 @@ export function useWatch() {
   const states = useAppSelector(selectWatchItemStates)
 
   useEffect(() => {
+    if (Object.keys(states).length === 0) return
     db.updateItemsStates(states)
   }, [states])
 }

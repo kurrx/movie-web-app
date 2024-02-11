@@ -97,6 +97,15 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
   async (fullId, { signal, getState }) => {
     let itemState = getState().watch.states[fullId.id]
+    if (!itemState) {
+      // Migration from old state storage
+      const states = getItemStatesLS()
+      if (states) {
+        await db.updateItemsStates(states)
+        deleteItemStatesLS()
+      }
+      itemState = await db.getItemState(fullId.id)
+    }
     const item = await fetchItem({
       fullId,
       translatorId: itemState?.translatorId,
@@ -105,20 +114,12 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
       signal,
     })
     if (!itemState) {
-      // Migration from old state storage
-      const states = getItemStatesLS()
-      if (states) {
-        await db.updateItemsStates(states)
-        deleteItemStatesLS()
+      itemState = {
+        translatorId: item.translators[0].id,
+        timestamp: 0,
+        quality: 'auto',
+        subtitle: 'null',
       }
-      itemState = await db.getItemState(fullId.id, async () => {
-        return {
-          translatorId: item.translators[0].id,
-          timestamp: 0,
-          quality: 'auto',
-          subtitle: 'null',
-        }
-      })
     }
     return { item, itemState }
   },
