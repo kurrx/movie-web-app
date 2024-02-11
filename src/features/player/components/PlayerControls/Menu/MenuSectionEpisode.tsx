@@ -40,6 +40,7 @@ export function MenuSectionEpisode({ item }: MenuSectionEpisodeProps) {
       onClick={onClick}
     >
       <span
+        ref={titleRef}
         className='font-medium flex flex-col items-start justify-center text-left grow'
         title={item.title}
       >
