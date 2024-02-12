@@ -24,7 +24,7 @@ export function WatchInfoDownload({ title, qualities }: WatchInfoDownloadProps) 
           Download
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-[12rem]'>
+      <DropdownMenuContent className='w-[12rem]' collisionPadding={16}>
         <DropdownMenuGroup>
           {qualities.map(({ id, altername, downloadUrl, downloadSizeStr }) => (
             <DropdownMenuItem key={id} asChild>
