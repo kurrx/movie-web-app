@@ -28,6 +28,10 @@ import {
 } from '@/types'
 
 class Database extends Dexie {
+  private static readonly VERSION = 2
+  private static readonly NAME = 'tv-db'
+  private static readonly MAX_ITEMS = 100
+  private static readonly MAX_STREAMS = 5000
   items!: Table<ItemModel, number>
   itemsStates!: Table<ItemStateModel, number>
   movies!: Table<MovieModel, MovieKey>
@@ -39,17 +43,17 @@ class Database extends Dexie {
   seriesThumbnails!: Table<SeriesThumbnailsModel, SeriesThumbnailsKey>
 
   constructor() {
-    super('tv-db')
-    this.version(1).stores({
-      items: 'id',
-      itemsStates: 'id',
-      movies: '[id+translatorId+isCamrip+isAds+isDirector]',
-      series: '[id+translatorId+season+episode]',
-      seasons: '[id+translatorId]',
-      moviesSizes: '[id+translatorId+qualityId]',
-      seriesSizes: '[id+translatorId+qualityId+season+episode]',
-      moviesThumbnails: '[id+translatorId]',
-      seriesThumbnails: '[id+translatorId+season+episode]',
+    super(Database.NAME)
+    this.version(Database.VERSION).stores({
+      items: 'id, createdAt, updatedAt',
+      itemsStates: 'id, createdAt, updatedAt',
+      movies: '[id+translatorId+isCamrip+isAds+isDirector], createdAt, updatedAt',
+      series: '[id+translatorId+season+episode], createdAt, updatedAt',
+      seasons: '[id+translatorId], createdAt, updatedAt',
+      moviesSizes: '[id+translatorId+qualityId], createdAt, updatedAt',
+      seriesSizes: '[id+translatorId+qualityId+season+episode], createdAt, updatedAt',
+      moviesThumbnails: '[id+translatorId], createdAt, updatedAt',
+      seriesThumbnails: '[id+translatorId+season+episode], createdAt, updatedAt',
     })
   }
 
@@ -61,7 +65,24 @@ class Database extends Dexie {
     return false
   }
 
+  private async clean<T extends { updatedAt: Date }, K>(
+    table: Table<T, K>,
+    checkExpired: boolean,
+    maxCount: number,
+    getKey: (entry: T) => K,
+  ) {
+    if (checkExpired) {
+      await table.filter((entry) => Database.isExpired(entry)).delete()
+    }
+    const count = await table.count()
+    if (count <= maxCount) return
+    const lastItem = await table.orderBy('updatedAt').first()
+    if (!lastItem) return
+    await table.delete(getKey(lastItem))
+  }
+
   async getItem(id: number, fetch: () => Promise<Document>) {
+    await this.clean(this.items, true, Database.MAX_ITEMS, (entry) => entry.id)
     const entry = await this.items.get(id)
     if (!entry || Database.isExpired(entry)) {
       const document = await fetch()
@@ -101,6 +122,11 @@ class Database extends Dexie {
   private async getMovieSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {
     const { id, translatorId, qualityId } = args
     const key = { id, translatorId, qualityId }
+    await this.clean(this.moviesSizes, false, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      qualityId: entry.qualityId,
+    }))
     const entry = await this.moviesSizes.get(key)
     if (!entry) {
       const size = await fetch()
@@ -119,6 +145,13 @@ class Database extends Dexie {
   private async getSeriesSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {
     const { id, translatorId, qualityId, season, episode } = args
     const key = { id, translatorId, qualityId, season: season!, episode: episode! }
+    await this.clean(this.seriesSizes, false, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      qualityId: entry.qualityId,
+      season: entry.season,
+      episode: entry.episode,
+    }))
     const entry = await this.seriesSizes.get(key)
     if (!entry) {
       const size = await fetch()
@@ -145,6 +178,10 @@ class Database extends Dexie {
     const { id, translatorId } = args
     const key = { id, translatorId }
     const entry = await this.moviesThumbnails.get(key)
+    await this.clean(this.moviesThumbnails, false, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+    }))
     if (!entry) {
       const content = await fetch()
       const date = new Date()
@@ -162,6 +199,12 @@ class Database extends Dexie {
   private async getSeriesThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
     const { id, translatorId, season, episode } = args
     const key = { id, translatorId, season: season!, episode: episode! }
+    await this.clean(this.seriesThumbnails, false, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      season: entry.season,
+      episode: entry.episode,
+    }))
     const entry = await this.seriesThumbnails.get(key)
     if (!entry) {
       const content = await fetch()
@@ -193,6 +236,13 @@ class Database extends Dexie {
       isAds: Number(isAds) as 0 | 1,
       isDirector: Number(isDirector) as 0 | 1,
     }
+    await this.clean(this.movies, true, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      isCamrip: entry.isCamrip,
+      isAds: entry.isAds,
+      isDirector: entry.isDirector,
+    }))
     const entry = await this.movies.get(key)
     if (!entry || entry.favsId !== favsId) {
       const data = await fetch()
@@ -216,6 +266,12 @@ class Database extends Dexie {
   async getSeries(args: FetchSeriesStreamArgs, fetch: () => Promise<StreamSuccessResponse>) {
     const { id, translatorId, season, episode, favsId } = args
     const key = { id, translatorId, season, episode }
+    await this.clean(this.series, true, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      season: entry.season,
+      episode: entry.episode,
+    }))
     const entry = await this.series.get(key)
     if (!entry || entry.favsId !== favsId) {
       const data = await fetch()
@@ -239,6 +295,12 @@ class Database extends Dexie {
   async addSeries(args: FetchSeriesStreamArgs, data: StreamSuccessResponse) {
     const { id, translatorId, season, episode, favsId } = args
     const key = { id, translatorId, season, episode }
+    await this.clean(this.series, true, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+      season: entry.season,
+      episode: entry.episode,
+    }))
     const entry = await this.series.get(key)
     const date = new Date()
     if (!entry) {
@@ -257,6 +319,10 @@ class Database extends Dexie {
   async getSeasons(args: FetchSeriesEpisodesStreamArgs, fetch: () => Promise<StreamSeason[]>) {
     const { id, translatorId, favsId } = args
     const key = { id, translatorId }
+    await this.clean(this.seasons, true, Database.MAX_STREAMS, (entry) => ({
+      id: entry.id,
+      translatorId: entry.translatorId,
+    }))
     const entry = await this.seasons.get(key)
     if (!entry || entry.favsId !== favsId) {
       const seasons = await fetch()
