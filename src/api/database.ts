@@ -8,6 +8,7 @@ import {
   FetchStreamThumbnailArgs,
   ItemModel,
   ItemStateModel,
+  Model,
   MovieKey,
   MovieModel,
   MovieSizeKey,
@@ -57,7 +58,7 @@ class Database extends Dexie {
     })
   }
 
-  private static isExpired(entry: { updatedAt: Date }) {
+  private static isExpired(entry: Model) {
     const now = new Date()
     if (now.getUTCFullYear() !== entry.updatedAt.getUTCFullYear()) return true
     if (now.getUTCMonth() !== entry.updatedAt.getUTCMonth()) return true
@@ -65,7 +66,7 @@ class Database extends Dexie {
     return false
   }
 
-  private async clean<T extends { updatedAt: Date }, K>(
+  private async clean<T extends Model, K>(
     table: Table<T, K>,
     checkExpired: boolean,
     maxCount: number,
@@ -82,9 +83,9 @@ class Database extends Dexie {
   }
 
   async getItem(id: number, fetch: () => Promise<Document>) {
-    await this.clean(this.items, true, Database.MAX_ITEMS, (entry) => entry.id)
+    await this.clean(this.items, false, Database.MAX_ITEMS, (entry) => entry.id)
     const entry = await this.items.get(id)
-    if (!entry || Database.isExpired(entry)) {
+    if (!entry) {
       const document = await fetch()
       const html = document.documentElement.innerHTML
       const date = new Date()
@@ -244,7 +245,7 @@ class Database extends Dexie {
       isDirector: entry.isDirector,
     }))
     const entry = await this.movies.get(key)
-    if (!entry || entry.favsId !== favsId) {
+    if (!entry || Database.isExpired(entry) || entry.favsId !== favsId) {
       const data = await fetch()
       const date = new Date()
       if (!entry) {
@@ -273,7 +274,7 @@ class Database extends Dexie {
       episode: entry.episode,
     }))
     const entry = await this.series.get(key)
-    if (!entry || entry.favsId !== favsId) {
+    if (!entry || Database.isExpired(entry) || entry.favsId !== favsId) {
       const data = await fetch()
       const date = new Date()
       if (!entry) {
@@ -324,7 +325,7 @@ class Database extends Dexie {
       translatorId: entry.translatorId,
     }))
     const entry = await this.seasons.get(key)
-    if (!entry || entry.favsId !== favsId) {
+    if (!entry || Database.isExpired(entry) || entry.favsId !== favsId) {
       const seasons = await fetch()
       const date = new Date()
       if (!entry) {
