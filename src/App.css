@@ -65,6 +65,16 @@
   }
 }
 
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 body {
   position: fixed;
   top: 0;
@@ -94,6 +104,7 @@ body {
   display: flex;
   flex: 1 1 auto;
   min-height: calc(var(--vh) * 100 - var(--navbar-height));
+  max-width: calc(var(--vw) * 100);
 }
 
 .svg-shadow {

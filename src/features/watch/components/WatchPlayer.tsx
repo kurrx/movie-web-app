@@ -8,6 +8,7 @@ import { WatchPlaylistPlayItem } from '@/types'
 import {
   getStreamDetails,
   preloadNextEpisode,
+  selectWatchItemFullTitle,
   selectWatchItemPlaylist,
   selectWatchItemPlaylistAdjacents,
   selectWatchItemQualities,
@@ -18,7 +19,6 @@ import {
   selectWatchItemSubtitles,
   selectWatchItemSwitchState,
   selectWatchItemThumbnails,
-  selectWatchItemTitle,
   selectWatchItemTranslator,
   selectWatchItemTranslators,
   setSubtitle,
@@ -41,7 +41,7 @@ export interface WatchPlayerProps {
 export function WatchPlayer({ id }: WatchPlayerProps) {
   const [dispatch, selector] = useStore()
   const navigate = useNavigate()
-  const title = selector((state) => selectWatchItemTitle(state, id))
+  const title = selector((state) => selectWatchItemFullTitle(state, id))
   const quality = selector((state) => selectWatchItemQuality(state, id))
   const qualities = selector((state) => selectWatchItemQualities(state, id))
   const mediaUrl = useMemo(() => quality.streamUrl, [quality])

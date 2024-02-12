@@ -36,7 +36,7 @@ export function WatchContent({ fullId }: WatchContentProps) {
       error={watchItem?.error}
       onReload={get}
     >
-      <div className='flex-1 flex flex-col'>
+      <div className='w-full max-w-full flex-1 flex flex-col'>
         <WatchPlayer id={fullId.id} />
         <WatchInfo id={fullId.id} />
       </div>
