@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { cn } from '@/api'
 import {
@@ -7,6 +7,7 @@ import {
   SettingsIcon,
   SettingsOutlinedIcon,
   SpeedIcon,
+  SubtitleIcon,
   TranslatorIcon,
   UkraineIcon,
 } from '@/assets'
@@ -71,10 +72,23 @@ function Translator({ translator }: { translator: ItemTranslator }) {
 
 export function SettingsMenu() {
   const [dispatch, selector] = useStore()
-  const { quality, qualities, onQualityChange, translator, translators, onTranslatorChange } =
-    useProps()
+  const {
+    quality,
+    qualities,
+    onQualityChange,
+    translator,
+    translators,
+    onTranslatorChange,
+    subtitle,
+    subtitles,
+    onSubtitleChange,
+  } = useProps()
   const jumpStep = selector(selectPlayerJumpStep)
   const playbackSpeed = selector(selectPlayerPlaybackSpeed)
+  const subtitleLabel = useMemo(
+    () => subtitles.find((s) => s.srcLang === subtitle)?.label,
+    [subtitles, subtitle],
+  )
 
   const onJumpStepChange = useCallback(
     (jumpStep: number) => {
@@ -123,6 +137,12 @@ export function SettingsMenu() {
           Playback Speed
         </MenuSectionButton>
 
+        {subtitles.length > 0 && (
+          <MenuSectionButton value={subtitleLabel || 'Off'} icon={<SubtitleIcon />}>
+            Subtitle
+          </MenuSectionButton>
+        )}
+
         {qualities.length > 1 && (
           <MenuSectionButton value={qualityToNode(quality)} icon={<QualityIcon />}>
             Quality
@@ -163,6 +183,22 @@ export function SettingsMenu() {
           ))}
         </MenuSectionSelect>
       </MenuSection>
+
+      {subtitles.length > 0 && (
+        <MenuSection key='subtitle' name='Subtitle' isScrollable={subtitles.length > 8}>
+          <MenuSectionSelect
+            selected={subtitle}
+            closeOnChange='section'
+            onSelectedChange={onSubtitleChange}
+          >
+            {[{ srcLang: null, label: 'Off' }, ...subtitles].map((s) => (
+              <MenuSectionSelectValue key={`${s.srcLang}`} value={s.srcLang}>
+                {s.label}
+              </MenuSectionSelectValue>
+            ))}
+          </MenuSectionSelect>
+        </MenuSection>
+      )}
 
       {qualities.length > 1 && (
         <MenuSection key='quality' name='Quality' isScrollable={qualities.length > 8}>

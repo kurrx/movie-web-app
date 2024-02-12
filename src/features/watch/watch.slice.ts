@@ -237,6 +237,10 @@ const watchSlice = createSlice({
     updateTime(state, action: PayloadAction<{ id: number; time: number }>) {
       state.states[action.payload.id]!.timestamp = action.payload.time
     },
+
+    setSubtitle(state, action: PayloadAction<{ id: number; subtitle: string | null }>) {
+      state.states[action.payload.id]!.subtitle = action.payload.subtitle
+    },
   },
 
   extraReducers(builder) {
@@ -421,7 +425,7 @@ const watchSlice = createSlice({
   },
 })
 
-export const { updateTime } = watchSlice.actions
+export const { updateTime, setSubtitle } = watchSlice.actions
 
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
@@ -479,16 +483,19 @@ export const selectWatchItemTranslator = createSelector(
   selectWatchItemStateTranslatorId,
   (translators, translatorId) => translators.find((t) => t.id === translatorId)!,
 )
-export const selectWatchItemTracks = createSelector(selectWatchItemStream, (stream) =>
-  stream.subtitles
-    .filter((s) => s.id !== null && s.title !== null && s.url !== null)
-    .map(({ id, title, url }) => ({
-      kind: 'subtitles',
-      src: url!,
-      srcLang: id!,
-      label: title!,
-      default: false,
-    })),
+export const selectWatchItemSubtitles = createSelector(
+  selectWatchItemStream,
+  selectWatchItemStateSubtitle,
+  (stream, subtitle) =>
+    stream.subtitles
+      .filter((s) => s.id !== null && s.title !== null && s.url !== null)
+      .map(({ id, title, url }) => ({
+        kind: 'subtitles',
+        src: url!,
+        srcLang: id!,
+        label: title!,
+        default: id === subtitle,
+      })),
 )
 export const selectWatchItemThumbnails = createSelector(
   selectWatchItemStream,

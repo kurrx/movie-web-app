@@ -12,14 +12,16 @@ import {
   selectWatchItemPlaylistAdjacents,
   selectWatchItemQualities,
   selectWatchItemQuality,
+  selectWatchItemStateSubtitle,
   selectWatchItemStateTimestamp,
   selectWatchItemStream,
+  selectWatchItemSubtitles,
   selectWatchItemSwitchState,
   selectWatchItemThumbnails,
   selectWatchItemTitle,
-  selectWatchItemTracks,
   selectWatchItemTranslator,
   selectWatchItemTranslators,
+  setSubtitle,
   switchEpisode,
   switchQuality,
   switchTranslator,
@@ -49,7 +51,8 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const playlistAdjacents = selector((state) => selectWatchItemPlaylistAdjacents(state, id))
   const translator = selector((state) => selectWatchItemTranslator(state, id))
   const translators = selector((state) => selectWatchItemTranslators(state, id))
-  const tracks = selector((state) => selectWatchItemTracks(state, id))
+  const subtitle = selector((state) => selectWatchItemStateSubtitle(state, id))
+  const subtitles = selector((state) => selectWatchItemSubtitles(state, id))
   const thumbnails = selector((state) => selectWatchItemThumbnails(state, id))
   const stream = selector((state) => selectWatchItemStream(state, id))
   const [switchAction, setSwitchAction] = useState<SwitchAction>(null)
@@ -128,6 +131,12 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
     },
     [makeSwitchTranslator],
   )
+  const onSubtitleChange = useCallback(
+    (subtitle: string | null) => {
+      dispatch(setSubtitle({ id, subtitle }))
+    },
+    [dispatch, id],
+  )
   const onQualityChange = useCallback(
     (quality: string) => {
       makeSwitchQuality(quality)
@@ -154,13 +163,15 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
       qualities={qualities}
       translator={translator}
       translators={translators}
-      tracks={tracks}
+      subtitle={subtitle}
+      subtitles={subtitles}
       thumbnails={thumbnails}
       onTimeUpdate={onTimeUpdate}
       onPreloadNext={onPreloadNext}
       onSwitchRetry={onSwitchRetry}
       onPlayItem={onPlayItem}
       onTranslatorChange={onTranslatorChange}
+      onSubtitleChange={onSubtitleChange}
       onQualityChange={onQualityChange}
     />
   )

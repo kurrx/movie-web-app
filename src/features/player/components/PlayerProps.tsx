@@ -24,13 +24,15 @@ export interface PlayerProps {
   qualities: StreamQuality[]
   translator: ItemTranslator
   translators: ItemTranslator[]
-  tracks: ItemTrack[]
+  subtitle: string | null
+  subtitles: ItemTrack[]
   thumbnails: Thumbnails
   onTimeUpdate: (time: number) => void
   onPreloadNext: () => void
   onSwitchRetry: () => void
   onPlayItem: (item: WatchPlaylistPlayItem) => void
   onTranslatorChange: (translatorId: number) => void
+  onSubtitleChange: (subtitle: string | null) => void
   onQualityChange: (quality: string) => void
 }
 

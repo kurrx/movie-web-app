@@ -5,7 +5,7 @@ import ReactPlayer from 'react-player/file'
 
 import { useStore, useStoreBoolean } from '@/hooks'
 
-import { useFullscreen } from '../hooks'
+import { useFullscreen, usePlayerSubtitles } from '../hooks'
 import {
   resetPlayerState,
   selectPlayerMuted,
@@ -29,7 +29,7 @@ import { useProps } from './PlayerProps'
 export function PlayerNative() {
   const [dispatch, selector] = useStore()
   const { setPlayer, player } = useNodes()
-  const { mediaUrl, startTime, tracks, onTimeUpdate, onPreloadNext } = useProps()
+  const { mediaUrl, startTime, subtitles, onTimeUpdate, onPreloadNext } = useProps()
   const { exitFullscreen } = useFullscreen()
   const playing = selector(selectPlayerPlayingCombined)
   const volume = selector(selectPlayerVolume)
@@ -109,6 +109,8 @@ export function PlayerNative() {
     }
   }, [dispatch])
 
+  usePlayerSubtitles()
+
   return (
     <div className='player-wrapper'>
       <ReactPlayer
@@ -128,7 +130,7 @@ export function PlayerNative() {
           forceHLS: true,
           forceSafariHLS: true,
           hlsVersion: '1.5.4',
-          tracks,
+          tracks: subtitles,
         }}
         playing={playing}
         volume={volume / 100}
