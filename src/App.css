@@ -49,7 +49,7 @@
     --ring: 211 96% 78%;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 932px) {
     .fullscreen {
       font-size: 1.25rem;
     }

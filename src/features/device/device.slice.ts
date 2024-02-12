@@ -4,9 +4,7 @@ import { mediaQuery } from '@/api'
 import { AppStoreState, DeviceStoreState } from '@/types'
 
 const initialState: DeviceStoreState = {
-  isMobile: mediaQuery(
-    '(max-width: 768px) and (orientation: portrait), (max-height: 768px) and (orientation: landscape)',
-  ),
+  isMobile: mediaQuery('(max-width: 932px)'),
   isTouch: mediaQuery('(pointer: coarse) and (hover: none)'),
 }
 
