@@ -501,7 +501,7 @@ export const selectWatchItemThumbnails = createSelector(
   selectWatchItemStream,
   (stream) => stream.thumbnails,
 )
-export const selectWatchItemTitle = createSelector(
+export const selectWatchItemEpisodeTitle = createSelector(
   selectWatchItem,
   selectWatchItemStateTranslatorId,
   selectWatchItemStateSeason,
@@ -514,7 +514,17 @@ export const selectWatchItemTitle = createSelector(
       const currentEpisode = episodes.find((e) => e.number === episode)!
       const episodeDetail =
         item.episodesInfo?.[currentSeason.number - 1]?.[currentEpisode.number - 1]
-      return `${item.title} - S${currentSeason.number}:E${currentEpisode.number} «${episodeDetail?.title || `Эпизод ${currentEpisode.number}`}»`
+      return `S${currentSeason.number}:E${currentEpisode.number} «${episodeDetail?.title || `Эпизод ${currentEpisode.number}`}»`
+    }
+    return null
+  },
+)
+export const selectWatchItemFullTitle = createSelector(
+  selectWatchItem,
+  selectWatchItemEpisodeTitle,
+  (item, episodeTitle) => {
+    if (episodeTitle) {
+      return `${item.title} - ${episodeTitle}`
     }
     return item.title
   },
