@@ -28,7 +28,6 @@ import {
 } from '@/types'
 
 class Database extends Dexie {
-  private static readonly CACHE_HRS = 12
   items!: Table<ItemModel, number>
   itemsStates!: Table<ItemStateModel, number>
   movies!: Table<MovieModel, MovieKey>
@@ -55,7 +54,11 @@ class Database extends Dexie {
   }
 
   private static isExpired(entry: { updatedAt: Date }) {
-    return Date.now() - entry.updatedAt.getTime() > 1000 * 60 * 60 * Database.CACHE_HRS
+    const now = new Date()
+    if (now.getUTCFullYear() !== entry.updatedAt.getUTCFullYear()) return true
+    if (now.getUTCMonth() !== entry.updatedAt.getUTCMonth()) return true
+    if (now.getUTCDate() !== entry.updatedAt.getUTCDate()) return true
+    return false
   }
 
   async getItem(id: number, fetch: () => Promise<Document>) {
