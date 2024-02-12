@@ -479,6 +479,17 @@ export const selectWatchItemTranslator = createSelector(
   selectWatchItemStateTranslatorId,
   (translators, translatorId) => translators.find((t) => t.id === translatorId)!,
 )
+export const selectWatchItemTracks = createSelector(selectWatchItemStream, (stream) =>
+  stream.subtitles
+    .filter((s) => s.id !== null && s.title !== null && s.url !== null)
+    .map(({ id, title, url }) => ({
+      kind: 'subtitles',
+      src: url!,
+      srcLang: id!,
+      label: title!,
+      default: false,
+    })),
+)
 export const selectWatchItemThumbnails = createSelector(
   selectWatchItemStream,
   (stream) => stream.thumbnails,

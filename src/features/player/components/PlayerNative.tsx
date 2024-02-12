@@ -29,7 +29,7 @@ import { useProps } from './PlayerProps'
 export function PlayerNative() {
   const [dispatch, selector] = useStore()
   const { setPlayer, player } = useNodes()
-  const { mediaUrl, startTime, onTimeUpdate, onPreloadNext } = useProps()
+  const { mediaUrl, startTime, tracks, onTimeUpdate, onPreloadNext } = useProps()
   const { exitFullscreen } = useFullscreen()
   const playing = selector(selectPlayerPlayingCombined)
   const volume = selector(selectPlayerVolume)
@@ -122,9 +122,13 @@ export function PlayerNative() {
         loop={false}
         stopOnUnmount={false}
         config={{
+          attributes: {
+            crossOrigin: 'anonymous',
+          },
           forceHLS: true,
           forceSafariHLS: true,
           hlsVersion: '1.5.4',
+          tracks,
         }}
         playing={playing}
         volume={volume / 100}

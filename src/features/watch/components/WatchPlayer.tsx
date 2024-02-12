@@ -17,6 +17,7 @@ import {
   selectWatchItemSwitchState,
   selectWatchItemThumbnails,
   selectWatchItemTitle,
+  selectWatchItemTracks,
   selectWatchItemTranslator,
   selectWatchItemTranslators,
   switchEpisode,
@@ -48,6 +49,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const playlistAdjacents = selector((state) => selectWatchItemPlaylistAdjacents(state, id))
   const translator = selector((state) => selectWatchItemTranslator(state, id))
   const translators = selector((state) => selectWatchItemTranslators(state, id))
+  const tracks = selector((state) => selectWatchItemTracks(state, id))
   const thumbnails = selector((state) => selectWatchItemThumbnails(state, id))
   const stream = selector((state) => selectWatchItemStream(state, id))
   const [switchAction, setSwitchAction] = useState<SwitchAction>(null)
@@ -152,6 +154,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
       qualities={qualities}
       translator={translator}
       translators={translators}
+      tracks={tracks}
       thumbnails={thumbnails}
       onTimeUpdate={onTimeUpdate}
       onPreloadNext={onPreloadNext}

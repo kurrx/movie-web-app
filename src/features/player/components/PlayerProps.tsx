@@ -3,6 +3,7 @@ import { createContext, PropsWithChildren } from 'react'
 import { SwitchState, Thumbnails } from '@/core'
 import {
   FetchableState,
+  ItemTrack,
   ItemTranslator,
   StreamQuality,
   WatchPlaylist,
@@ -23,6 +24,7 @@ export interface PlayerProps {
   qualities: StreamQuality[]
   translator: ItemTranslator
   translators: ItemTranslator[]
+  tracks: ItemTrack[]
   thumbnails: Thumbnails
   onTimeUpdate: (time: number) => void
   onPreloadNext: () => void

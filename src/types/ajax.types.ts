@@ -308,3 +308,11 @@ export interface FetchStreamDownloadSizeArgs extends FetchStreamDetailsArgs {
 }
 
 export type FetchStreamThumbnailArgs = FetchStreamDetailsArgs
+
+export interface ItemTrack {
+  kind: string
+  src: string
+  srcLang: string
+  label: string
+  default: boolean
+}
