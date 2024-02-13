@@ -15,7 +15,7 @@ export interface WatchInfoDescriptionProps extends PropsWithChildren {
 export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDescriptionProps) {
   const ref = useRef<HTMLParagraphElement>(null)
   const { height } = useElementRect(ref)
-  const expandable = useMemo(() => height > 60, [height])
+  const expandable = useMemo(() => height > 80, [height])
   const [expanded, setExpanded] = useState(false)
 
   const expand = useCallback(() => {
@@ -31,7 +31,7 @@ export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDe
   return (
     <section
       className={cn(
-        'bg-secondary py-3 px-4 rounded-xl max-h-[5.75rem]',
+        'bg-secondary py-3 px-4 rounded-xl max-h-[7rem]',
         'data-[clickable=true]:cursor-pointer overflow-y-hidden',
         'data-[clickable=true]:select-none relative',
         'data-[expanded=true]:max-h-[none]',
