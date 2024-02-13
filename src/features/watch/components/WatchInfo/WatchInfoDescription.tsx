@@ -7,6 +7,26 @@ import { cn } from '@/api'
 import { explore } from '@/features/router'
 import { useElementRect } from '@/hooks'
 
+interface LinkProps extends PropsWithChildren {
+  to: string
+  clickable: boolean
+}
+
+function Link({ to, children, clickable }: LinkProps) {
+  return (
+    <NavLink
+      className={cn(
+        'text-primary underline-offset-4 hover:underline',
+        'data-[clickable=false]:pointer-events-none font-medium',
+      )}
+      to={to}
+      data-clickable={clickable}
+    >
+      #{children}
+    </NavLink>
+  )
+}
+
 export interface WatchInfoDescriptionProps extends PropsWithChildren {
   typeId: string
   genreIds: string[]
@@ -44,18 +64,17 @@ export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDe
       <p ref={ref} className='text-sm'>
         {children}
         <div className='flex items-center justify-start flex-wrap gap-x-4 gap-y-2 mt-2'>
+          <Link to={`/explore/${typeId}`} clickable={!expandable || expanded}>
+            {explore[typeId].title}
+          </Link>
           {genreIds.map((genreId) => (
-            <NavLink
+            <Link
               key={genreId}
-              className={cn(
-                'text-primary underline-offset-4 hover:underline',
-                'data-[clickable=false]:pointer-events-none font-medium',
-              )}
               to={`/explore/${typeId}/${genreId}`}
-              data-clickable={!expandable || expanded}
+              clickable={!expandable || expanded}
             >
-              #{explore[typeId].genres[genreId]}
-            </NavLink>
+              {explore[typeId].genres[genreId]}
+            </Link>
           ))}
         </div>
         {expandable && expanded && (
