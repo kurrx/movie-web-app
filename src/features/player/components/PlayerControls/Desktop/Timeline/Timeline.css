@@ -82,7 +82,7 @@
 
 .timeline-play-progress {
   z-index: 3;
-  background-color: #f00;
+  background-color: var(--ui-primary);
 }
 
 .timeline-load-progress {
@@ -113,7 +113,7 @@
   border-radius: 6.5px;
   transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
   transform: scale(0);
-  background-color: #f00;
+  background-color: var(--ui-primary);
 }
 
 .fullscreen .timeline-scrubber-button {

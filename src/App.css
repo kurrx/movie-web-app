@@ -25,6 +25,8 @@
     --input: 240 5.9% 90%;
     --ring: 211 96% 78%;
     --radius: 0.5rem;
+
+    --ui-primary: #f00;
   }
 
   .dark {
@@ -47,6 +49,8 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 211 96% 78%;
+
+    --ui-primary: #f00;
   }
 
   @media (min-width: 932px) {

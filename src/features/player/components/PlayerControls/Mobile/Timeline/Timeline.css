@@ -33,7 +33,7 @@
 }
 
 .mobile-timeline-play-progress {
-  background-color: #f00;
+  background-color: var(--ui-primary);
 }
 
 .mobile-timeline-scrubber-container {
@@ -49,7 +49,7 @@
   border-radius: 50%;
   transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
   transform: scale(0.75);
-  background-color: #f00;
+  background-color: var(--ui-primary);
 }
 
 .mobile-timeline-container[data-dragging='true'] .mobile-timeline-scrubber-button {

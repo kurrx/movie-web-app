@@ -71,7 +71,7 @@ function DesktopWrapper({ id, tooltip, badge, Icon, children }: MenuWrapperProps
                 className={cn(
                   'absolute top-[0.625rem] right-[0.3125rem]',
                   'flex items-center justify-center',
-                  'h-[0.5625rem] w-[0.8125rem] rounded-[0.0625rem] bg-[#f00]',
+                  'h-[0.5625rem] w-[0.8125rem] rounded-[0.0625rem] bg-[var(--ui-primary)]',
                   'text-white text-[0.4375rem] font-bold leading-none',
                 )}
               >
