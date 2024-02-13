@@ -50,7 +50,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
           Watched
         </Button>
         <Button disabled className='rounded-full' variant='secondary'>
-          <ShareIcon className='mr-1 h-6 w-6' />
+          <ShareIcon className='mr-2 h-5 w-5' />
           Share
         </Button>
         <WatchInfoDownload title={title} qualities={qualities} />
