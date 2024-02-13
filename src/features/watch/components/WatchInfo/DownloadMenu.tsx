@@ -28,13 +28,7 @@ export function DownloadMenu({ title, qualities }: DownloadMenuProps) {
         <DropdownMenuGroup>
           {qualities.map(({ id, altername, downloadUrl, downloadSizeStr }) => (
             <DropdownMenuItem key={id} asChild>
-              <a
-                download={`[${id}] ${title}`}
-                href={downloadUrl}
-                target='_blank'
-                rel='noreferrer'
-                className='cursor-pointer'
-              >
+              <a download={`[${id}] ${title}`} href={downloadUrl} className='cursor-pointer'>
                 {id}
                 {altername && (
                   <sup className='text-muted-foreground text-[0.5rem] font-medium'>{altername}</sup>

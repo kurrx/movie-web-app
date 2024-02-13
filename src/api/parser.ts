@@ -18,7 +18,7 @@ import {
   StreamSuccessResponse,
 } from '@/types'
 
-import { PROVIDER_URL } from './env'
+import { PROVIDER_URL, PROXY_URL } from './env'
 import { base64ToString, product, stringToBase64, unite } from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
@@ -744,7 +744,7 @@ function parseStreamQualities(url: string) {
       id,
       altername,
       streamUrl,
-      downloadUrl,
+      downloadUrl: `${PROXY_URL}/${downloadUrl}`,
       downloadSize: 0,
       downloadSizeStr: '0B',
     })
