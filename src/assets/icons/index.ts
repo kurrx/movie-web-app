@@ -1,5 +1,6 @@
 /* eslint-disable simple-import-sort/exports */
 /// <reference types="vite-plugin-svgr/client" />
+export { default as BookMarkIcon } from './bookmark.svg?react'
 export { default as DownloadIcon } from './download.svg?react'
 export { default as EyeIcon } from './eye.svg?react'
 export { default as FastForwardIcon } from './fast-forward.svg?react'

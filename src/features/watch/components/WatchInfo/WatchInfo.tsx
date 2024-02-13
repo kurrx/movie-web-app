@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useState } from 'react'
 
 import { cn } from '@/api'
-import { EyeIcon, ShareIcon } from '@/assets'
+import { BookMarkIcon, EyeIcon, ShareIcon } from '@/assets'
 import { Button } from '@/components'
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
@@ -23,7 +23,12 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
   const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
+  const [saved, setSaved] = useState(false)
   const [watched, setWatched] = useState(false)
+
+  const toggleSaved = useCallback(() => {
+    setSaved((prev) => !prev)
+  }, [])
 
   const toggleWatched = useCallback(() => {
     setWatched((prev) => !prev)
@@ -39,6 +44,17 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
+        <Button disabled className='rounded-full' variant='secondary' onClick={toggleSaved}>
+          <BookMarkIcon
+            className={cn(
+              'mr-2 h-5 w-5 transition-colors',
+              'data-[active=true]:text-[var(--ui-primary)]',
+              'data-[active=true]:fill-[var(--ui-primary)]',
+            )}
+            data-active={saved}
+          />
+          {saved ? 'Saved' : 'Save'}
+        </Button>
         <Button disabled className='rounded-full' variant='secondary' onClick={toggleWatched}>
           <EyeIcon
             className={cn(
