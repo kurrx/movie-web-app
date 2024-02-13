@@ -1,6 +1,13 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { db, fetchItem, fetchSeriesStream, fetchStreamDetails, fetchTranslator } from '@/api'
+import {
+  db,
+  fetchItem,
+  fetchSeriesStream,
+  fetchStreamDetails,
+  fetchTranslator,
+  transliterate,
+} from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
   AppStoreState,
@@ -535,10 +542,8 @@ export const selectWatchItemFilename = createSelector(
   selectWatchItemStateEpisode,
   (item, season, episode) => {
     let filename = item.originalTitle || item.title
-    filename = filename.replaceAll(' ', '_')
+    filename = transliterate(filename.replaceAll(' ', '_'))
     if (item.itemType === 'series') {
-      console.log(season)
-
       filename += `_s${season}e${episode}`
     }
     return filename
