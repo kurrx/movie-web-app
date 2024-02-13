@@ -30,9 +30,12 @@ function Link({ to, children, clickable }: LinkProps) {
 export interface WatchInfoDescriptionProps extends PropsWithChildren {
   typeId: string
   genreIds: string[]
+  year?: number | null
+  country?: string | null
 }
 
-export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDescriptionProps) {
+export function WatchInfoDescription(props: WatchInfoDescriptionProps) {
+  const { children, typeId, genreIds, year, country } = props
   const ref = useRef<HTMLParagraphElement>(null)
   const { height } = useElementRect(ref)
   const expandable = useMemo(() => height > 80, [height])
@@ -76,6 +79,16 @@ export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDe
               {explore[typeId].genres[genreId]}
             </Link>
           ))}
+          {year && (
+            <Link to={`/explore/year/${year}`} clickable={!expandable || expanded}>
+              {year}
+            </Link>
+          )}
+          {country && (
+            <Link to={`/explore/country/${country}`} clickable={!expandable || expanded}>
+              {country}
+            </Link>
+          )}
         </span>
         {expandable && expanded && (
           <Fragment>

@@ -106,6 +106,7 @@ export interface BaseItem extends ItemFullID {
   description: string | null
   slogan: string | null
   releaseDate: string | null
+  year: number | null
   country: string | null
   quality: string | null
   ageRating: string | null

@@ -65,7 +65,12 @@ export function WatchInfo({ id }: WatchInfoProps) {
       </div>
       <div className='container mb-16'>
         {item.description && (
-          <WatchInfoDescription typeId={item.typeId} genreIds={item.genreIds}>
+          <WatchInfoDescription
+            typeId={item.typeId}
+            genreIds={item.genreIds}
+            year={item.year}
+            country={item.country}
+          >
             {item.description}
           </WatchInfoDescription>
         )}

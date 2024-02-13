@@ -18,6 +18,7 @@ import {
   StreamSuccessResponse,
 } from '@/types'
 
+import { PROVIDER_URL } from './env'
 import { base64ToString, product, stringToBase64, unite } from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
@@ -522,6 +523,24 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
   // Release Date
   const releaseDate = parseItemTableText(parser, parent, 'Дата выхода')
 
+  // Year
+  const td = findItemTableElementWithText(parser, parent, 'Дата выхода')
+  let year: number | null = null
+  if (td) {
+    parser.setParent(td)
+    const link = parser.switchToChild('a')
+    if (link) {
+      const link = parser.attr('href')
+      if (link) {
+        const yearStr = link.replaceAll(`${PROVIDER_URL}/year/`, '').slice(0, -1)
+        if (yearStr) {
+          year = parseInt(yearStr)
+          if (isNaN(year)) year = null
+        }
+      }
+    }
+  }
+
   // Country
   const country = parseItemTableText(parser, parent, 'Страна')
 
@@ -558,7 +577,7 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
     parser.setParent(genre.parentElement)
     const url = parser.attr('href')
     if (!url) continue
-    const genreId = url.replaceAll('https://rezka.ag/', '').slice(0, -1).split('/')[1]
+    const genreId = url.replaceAll(`${PROVIDER_URL}/`, '').slice(0, -1).split('/')[1]
     if (!genreId) continue
     genreIds.push(genreId)
   }
@@ -656,6 +675,7 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
     description,
     slogan,
     releaseDate,
+    year,
     country,
     quality,
     ageRating,
