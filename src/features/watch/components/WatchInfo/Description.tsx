@@ -6,11 +6,11 @@ import { NavLink } from 'react-router-dom'
 import { cn } from '@/api'
 import { useElementRect } from '@/hooks'
 
-export interface WatchInfoDescriptionProps extends PropsWithChildren {
+export interface DescriptionProps extends PropsWithChildren {
   links: { to: string; title: string }[]
 }
 
-export function WatchInfoDescription(props: WatchInfoDescriptionProps) {
+export function Description(props: DescriptionProps) {
   const { children, links } = props
   const ref = useRef<HTMLParagraphElement>(null)
   const { height } = useElementRect(ref)

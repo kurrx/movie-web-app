@@ -11,10 +11,10 @@ import {
   selectWatchItemFullTitle,
   selectWatchItemQualities,
 } from '../../watch.slice'
+import { ActionButton } from './ActionButton'
+import { Description } from './Description'
+import { DownloadMenu } from './DownloadMenu'
 import { Table } from './Table'
-import { WatchInfoButton } from './WatchInfoButton'
-import { WatchInfoDescription } from './WatchInfoDescription'
-import { WatchInfoDownload } from './WatchInfoDownload'
 
 export interface WatchInfoProps {
   id: number
@@ -90,24 +90,22 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
-        <WatchInfoButton disabled Icon={HeartIcon} active={favorite} onClick={toggleFavorite}>
+        <ActionButton disabled Icon={HeartIcon} active={favorite} onClick={toggleFavorite}>
           {favorite ? 'Remove' : 'Favorite'}
-        </WatchInfoButton>
-        <WatchInfoButton disabled Icon={BookMarkIcon} active={saved} onClick={toggleSaved}>
+        </ActionButton>
+        <ActionButton disabled Icon={BookMarkIcon} active={saved} onClick={toggleSaved}>
           {saved ? 'Saved' : 'Save'}
-        </WatchInfoButton>
-        <WatchInfoButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
+        </ActionButton>
+        <ActionButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
           Watched
-        </WatchInfoButton>
-        <WatchInfoButton disabled Icon={ShareIcon}>
+        </ActionButton>
+        <ActionButton disabled Icon={ShareIcon}>
           Share
-        </WatchInfoButton>
-        <WatchInfoDownload title={title} qualities={qualities} />
+        </ActionButton>
+        <DownloadMenu title={title} qualities={qualities} />
       </div>
       <div className='container mb-16'>
-        {item.description && (
-          <WatchInfoDescription links={links}>{item.description}</WatchInfoDescription>
-        )}
+        {item.description && <Description links={links}>{item.description}</Description>}
         <section className='mt-8'>
           <h3 className='font-bold text-lg'>
             More about this {item.itemType === 'series' ? 'show' : 'movie'}
@@ -138,10 +136,10 @@ export function WatchInfo({ id }: WatchInfoProps) {
                   {releaseDate.startStr}
                   <Table.Link to={releaseDate.year.to}>{releaseDate.year.title}</Table.Link>
                   {releaseDate.endStr && (
-                    <span>
+                    <Fragment>
                       <br />
-                      {releaseDate.endStr}
-                    </span>
+                      <span>{releaseDate.endStr}</span>
+                    </Fragment>
                   )}
                 </Table.Col>
               </Table.Row>

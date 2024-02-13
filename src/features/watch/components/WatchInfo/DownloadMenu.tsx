@@ -10,12 +10,12 @@ import {
 } from '@/components'
 import { StreamQuality } from '@/types'
 
-export interface WatchInfoDownloadProps {
+export interface DownloadMenuProps {
   title: string
   qualities: StreamQuality[]
 }
 
-export function WatchInfoDownload({ title, qualities }: WatchInfoDownloadProps) {
+export function DownloadMenu({ title, qualities }: DownloadMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
