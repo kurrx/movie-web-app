@@ -1,8 +1,6 @@
 import { Fragment, useCallback, useState } from 'react'
 
-import { cn } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon } from '@/assets'
-import { Button } from '@/components'
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
 
@@ -12,6 +10,7 @@ import {
   selectWatchItemFullTitle,
   selectWatchItemQualities,
 } from '../../watch.slice'
+import { WatchInfoButton } from './WatchInfoButton'
 import { WatchInfoDescription } from './WatchInfoDescription'
 import { WatchInfoDownload } from './WatchInfoDownload'
 
@@ -50,42 +49,18 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
-        <Button disabled className='rounded-full' variant='secondary' onClick={toggleFavorite}>
-          <HeartIcon
-            className={cn(
-              'mr-2 h-5 w-5 fill-[transparent] transition-colors',
-              'data-[active=true]:text-[var(--ui-primary)]',
-              'data-[active=true]:fill-[var(--ui-primary)]',
-            )}
-            data-active={favorite}
-          />
+        <WatchInfoButton disabled Icon={HeartIcon} active={favorite} onClick={toggleFavorite}>
           {favorite ? 'Remove' : 'Favorite'}
-        </Button>
-        <Button disabled className='rounded-full' variant='secondary' onClick={toggleSaved}>
-          <BookMarkIcon
-            className={cn(
-              'mr-2 h-5 w-5 fill-[transparent] transition-colors',
-              'data-[active=true]:text-[var(--ui-primary)]',
-              'data-[active=true]:fill-[var(--ui-primary)]',
-            )}
-            data-active={saved}
-          />
+        </WatchInfoButton>
+        <WatchInfoButton disabled Icon={BookMarkIcon} active={saved} onClick={toggleSaved}>
           {saved ? 'Saved' : 'Save'}
-        </Button>
-        <Button disabled className='rounded-full' variant='secondary' onClick={toggleWatched}>
-          <EyeIcon
-            className={cn(
-              'mr-2 h-5 w-5 transition-colors',
-              'data-[active=true]:text-[var(--ui-primary)]',
-            )}
-            data-active={watched}
-          />
+        </WatchInfoButton>
+        <WatchInfoButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
           Watched
-        </Button>
-        <Button disabled className='rounded-full' variant='secondary'>
-          <ShareIcon className='mr-2 h-5 w-5' />
+        </WatchInfoButton>
+        <WatchInfoButton disabled Icon={ShareIcon}>
           Share
-        </Button>
+        </WatchInfoButton>
         <WatchInfoDownload title={title} qualities={qualities} />
       </div>
       <div className='container mb-16'>
