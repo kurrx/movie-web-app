@@ -191,7 +191,7 @@ function parseItemCollections(parser: Parser, parent: Element, text: string): It
     parser.setParent(link)
 
     // URL
-    const url = parser.attr('href')
+    const url = parser.attr('href')?.replaceAll(`${PROVIDER_URL}`, '').slice(0, -1)
     if (!url) continue
 
     // Title
@@ -242,7 +242,7 @@ function parseItemPersons(parser: Parser, parent: Element, type: string): ItemPe
       if (!name) continue
 
       // URL
-      const url = parser.attr('href')
+      const url = parser.attr('href')?.replaceAll(`${PROVIDER_URL}`, '').slice(0, -1)
       if (!url) continue
 
       results.push({ id, name, photoUrl, job, url })
