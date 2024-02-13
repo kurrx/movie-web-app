@@ -64,7 +64,11 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <WatchInfoDownload title={title} qualities={qualities} />
       </div>
       <div className='container mb-16'>
-        {item.description && <WatchInfoDescription>{item.description}</WatchInfoDescription>}
+        {item.description && (
+          <WatchInfoDescription typeId={item.typeId} genreIds={item.genreIds}>
+            {item.description}
+          </WatchInfoDescription>
+        )}
       </div>
     </Fragment>
   )

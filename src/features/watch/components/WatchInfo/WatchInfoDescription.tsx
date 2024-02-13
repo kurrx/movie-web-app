@@ -1,14 +1,21 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Fragment, PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 import { cn } from '@/api'
+import { explore } from '@/features/router'
 import { useElementRect } from '@/hooks'
 
-export function WatchInfoDescription({ children }: PropsWithChildren) {
+export interface WatchInfoDescriptionProps extends PropsWithChildren {
+  typeId: string
+  genreIds: string[]
+}
+
+export function WatchInfoDescription({ children, typeId, genreIds }: WatchInfoDescriptionProps) {
   const ref = useRef<HTMLParagraphElement>(null)
   const { height } = useElementRect(ref)
-  const expandable = useMemo(() => height > 40, [height])
+  const expandable = useMemo(() => height > 60, [height])
   const [expanded, setExpanded] = useState(false)
 
   const expand = useCallback(() => {
@@ -36,9 +43,23 @@ export function WatchInfoDescription({ children }: PropsWithChildren) {
       <h3 className='font-bold text-md mb-2'>Description</h3>
       <p ref={ref} className='text-sm'>
         {children}
+        <div className='flex items-center justify-start flex-wrap gap-x-4 gap-y-2 mt-2'>
+          {genreIds.map((genreId) => (
+            <NavLink
+              key={genreId}
+              className={cn(
+                'text-primary underline-offset-4 hover:underline',
+                'data-[clickable=false]:pointer-events-none font-medium',
+              )}
+              to={`/explore/${typeId}/${genreId}`}
+              data-clickable={!expandable || expanded}
+            >
+              #{explore[typeId].genres[genreId]}
+            </NavLink>
+          ))}
+        </div>
         {expandable && expanded && (
           <Fragment>
-            <br />
             <br />
             <button className='font-bold text-sm' onClick={collapse}>
               Show less
