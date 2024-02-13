@@ -1,5 +1,7 @@
 import { Fragment } from 'react'
 
+import { ShareIcon } from '@/assets'
+import { Button } from '@/components'
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
 
@@ -31,6 +33,10 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
+        <Button disabled className='rounded-full' variant='secondary'>
+          <ShareIcon className='mr-1 h-6 w-6' />
+          Share
+        </Button>
         <WatchInfoDownload title={title} qualities={qualities} />
       </div>
       <div className='container mb-16'>
