@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useState } from 'react'
 
 import { cn } from '@/api'
-import { BookMarkIcon, EyeIcon, ShareIcon } from '@/assets'
+import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon } from '@/assets'
 import { Button } from '@/components'
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
@@ -23,8 +23,13 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
   const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
+  const [favorite, setFavorite] = useState(false)
   const [saved, setSaved] = useState(false)
   const [watched, setWatched] = useState(false)
+
+  const toggleFavorite = useCallback(() => {
+    setFavorite((prev) => !prev)
+  }, [])
 
   const toggleSaved = useCallback(() => {
     setSaved((prev) => !prev)
@@ -44,6 +49,17 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
+        <Button disabled className='rounded-full' variant='secondary' onClick={toggleFavorite}>
+          <HeartIcon
+            className={cn(
+              'mr-2 h-5 w-5 transition-colors',
+              'data-[active=true]:text-[var(--ui-primary)]',
+              'data-[active=true]:fill-[var(--ui-primary)]',
+            )}
+            data-active={favorite}
+          />
+          {favorite ? 'Remove' : 'Favorite'}
+        </Button>
         <Button disabled className='rounded-full' variant='secondary' onClick={toggleSaved}>
           <BookMarkIcon
             className={cn(
