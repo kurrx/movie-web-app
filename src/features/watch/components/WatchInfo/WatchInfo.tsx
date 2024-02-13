@@ -52,7 +52,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <Button disabled className='rounded-full' variant='secondary' onClick={toggleFavorite}>
           <HeartIcon
             className={cn(
-              'mr-2 h-5 w-5 transition-colors',
+              'mr-2 h-5 w-5 fill-[transparent] transition-colors',
               'data-[active=true]:text-[var(--ui-primary)]',
               'data-[active=true]:fill-[var(--ui-primary)]',
             )}
@@ -63,7 +63,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <Button disabled className='rounded-full' variant='secondary' onClick={toggleSaved}>
           <BookMarkIcon
             className={cn(
-              'mr-2 h-5 w-5 transition-colors',
+              'mr-2 h-5 w-5 fill-[transparent] transition-colors',
               'data-[active=true]:text-[var(--ui-primary)]',
               'data-[active=true]:fill-[var(--ui-primary)]',
             )}
