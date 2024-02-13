@@ -1,6 +1,7 @@
-import { Fragment } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 
-import { ShareIcon } from '@/assets'
+import { cn } from '@/api'
+import { EyeIcon, ShareIcon } from '@/assets'
 import { Button } from '@/components'
 import { Title } from '@/features/router'
 import { useAppSelector } from '@/hooks'
@@ -22,6 +23,11 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
   const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
+  const [watched, setWatched] = useState(false)
+
+  const toggleWatched = useCallback(() => {
+    setWatched((prev) => !prev)
+  }, [])
 
   return (
     <Fragment>
@@ -33,6 +39,16 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </div>
       <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
+        <Button disabled className='rounded-full' variant='secondary' onClick={toggleWatched}>
+          <EyeIcon
+            className={cn(
+              'mr-1 h-6 w-6 transition-colors',
+              'data-[active=true]:text-[var(--ui-primary)]',
+            )}
+            data-active={watched}
+          />
+          Watched
+        </Button>
         <Button disabled className='rounded-full' variant='secondary'>
           <ShareIcon className='mr-1 h-6 w-6' />
           Share
