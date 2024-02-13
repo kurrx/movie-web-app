@@ -12,6 +12,7 @@ import {
   selectWatchItemFullTitle,
   selectWatchItemQualities,
 } from '../../watch.slice'
+import { WatchInfoDescription } from './WatchInfoDescription'
 import { WatchInfoDownload } from './WatchInfoDownload'
 
 export interface WatchInfoProps {
@@ -88,7 +89,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <WatchInfoDownload title={title} qualities={qualities} />
       </div>
       <div className='container mb-16'>
-        {item.description && <p className='text-sm'>{item.description}</p>}
+        {item.description && <WatchInfoDescription>{item.description}</WatchInfoDescription>}
       </div>
     </Fragment>
   )
