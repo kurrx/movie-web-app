@@ -4,38 +4,14 @@ import { Fragment, PropsWithChildren, useCallback, useMemo, useRef, useState } f
 import { NavLink } from 'react-router-dom'
 
 import { cn } from '@/api'
-import { explore } from '@/features/router'
 import { useElementRect } from '@/hooks'
 
-interface LinkProps extends PropsWithChildren {
-  to: string
-  clickable: boolean
-}
-
-function Link({ to, children, clickable }: LinkProps) {
-  return (
-    <NavLink
-      className={cn(
-        'text-primary underline-offset-4 hover:underline',
-        'data-[clickable=false]:pointer-events-none font-medium',
-      )}
-      to={to}
-      data-clickable={clickable}
-    >
-      #{children}
-    </NavLink>
-  )
-}
-
 export interface WatchInfoDescriptionProps extends PropsWithChildren {
-  typeId: string
-  genreIds: string[]
-  year?: number | null
-  country?: string | null
+  links: { to: string; title: string }[]
 }
 
 export function WatchInfoDescription(props: WatchInfoDescriptionProps) {
-  const { children, typeId, genreIds, year, country } = props
+  const { children, links } = props
   const ref = useRef<HTMLParagraphElement>(null)
   const { height } = useElementRect(ref)
   const expandable = useMemo(() => height > 80, [height])
@@ -66,29 +42,20 @@ export function WatchInfoDescription(props: WatchInfoDescriptionProps) {
       <h3 className='font-bold text-md mb-2'>Description</h3>
       <p ref={ref} className='text-sm'>
         {children}
-        <span className='flex items-center justify-start flex-wrap gap-x-4 gap-y-2 mt-2'>
-          <Link to={`/explore/${typeId}`} clickable={!expandable || expanded}>
-            {explore[typeId].title}
-          </Link>
-          {genreIds.map((genreId) => (
-            <Link
-              key={genreId}
-              to={`/explore/${typeId}/${genreId}`}
-              clickable={!expandable || expanded}
+        <span className='flex items-center justify-start flex-wrap gap-x-2 gap-y-2 mt-2'>
+          {links.map(({ to, title }, index) => (
+            <NavLink
+              key={index}
+              className={cn(
+                'text-primary underline-offset-4 hover:underline',
+                'data-[clickable=false]:pointer-events-none font-medium',
+              )}
+              to={to}
+              data-clickable={!expandable || expanded}
             >
-              {explore[typeId].genres[genreId]}
-            </Link>
+              #{title}
+            </NavLink>
           ))}
-          {year && (
-            <Link to={`/explore/year/${year}`} clickable={!expandable || expanded}>
-              {year}
-            </Link>
-          )}
-          {country && (
-            <Link to={`/explore/country/${country}`} clickable={!expandable || expanded}>
-              {country}
-            </Link>
-          )}
         </span>
         {expandable && expanded && (
           <Fragment>
