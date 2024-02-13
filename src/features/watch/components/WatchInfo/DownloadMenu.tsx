@@ -11,11 +11,11 @@ import {
 import { StreamQuality } from '@/types'
 
 export interface DownloadMenuProps {
-  title: string
+  filename: string
   qualities: StreamQuality[]
 }
 
-export function DownloadMenu({ title, qualities }: DownloadMenuProps) {
+export function DownloadMenu({ filename, qualities }: DownloadMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,7 +28,10 @@ export function DownloadMenu({ title, qualities }: DownloadMenuProps) {
         <DropdownMenuGroup>
           {qualities.map(({ id, altername, downloadUrl, downloadSizeStr }) => (
             <DropdownMenuItem key={id} asChild>
-              <a download={`[${id}] ${title}`} href={downloadUrl} className='cursor-pointer'>
+              <a
+                href={`${downloadUrl}?proxy-filename=${encodeURIComponent(`${id}_${filename.replaceAll(' ', '_')}.mp4`)}`}
+                className='cursor-pointer'
+              >
                 {id}
                 {altername && (
                   <sup className='text-muted-foreground text-[0.5rem] font-medium'>{altername}</sup>

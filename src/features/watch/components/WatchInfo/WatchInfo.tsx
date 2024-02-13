@@ -8,6 +8,7 @@ import { useAppSelector } from '@/hooks'
 import {
   selectWatchItem,
   selectWatchItemEpisodeTitle,
+  selectWatchItemFilename,
   selectWatchItemFullTitle,
   selectWatchItemQualities,
 } from '../../watch.slice'
@@ -23,6 +24,7 @@ export interface WatchInfoProps {
 export function WatchInfo({ id }: WatchInfoProps) {
   const item = useAppSelector((state) => selectWatchItem(state, id))
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
+  const filename = useAppSelector((state) => selectWatchItemFilename(state, id))
   const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
   const [favorite, setFavorite] = useState(false)
@@ -102,7 +104,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <ActionButton disabled Icon={ShareIcon}>
           Share
         </ActionButton>
-        <DownloadMenu title={title} qualities={qualities} />
+        <DownloadMenu filename={filename} qualities={qualities} />
       </div>
       <div className='container mb-16'>
         {item.description && <Description links={links}>{item.description}</Description>}

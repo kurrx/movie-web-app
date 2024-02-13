@@ -529,6 +529,21 @@ export const selectWatchItemFullTitle = createSelector(
     return item.title
   },
 )
+export const selectWatchItemFilename = createSelector(
+  selectWatchItem,
+  selectWatchItemStateSeason,
+  selectWatchItemStateEpisode,
+  (item, season, episode) => {
+    let filename = item.originalTitle || item.title
+    filename = filename.replaceAll(' ', '_')
+    if (item.itemType === 'series') {
+      console.log(season)
+
+      filename += `_s${season}e${episode}`
+    }
+    return filename
+  },
+)
 export const selectWatchItemPlaylist = createSelector(
   selectWatchItem,
   selectWatchItemStateTranslatorId,
