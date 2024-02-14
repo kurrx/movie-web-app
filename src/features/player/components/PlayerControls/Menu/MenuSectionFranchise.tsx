@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { cn } from '@/api'
+import { LeafIcon } from '@/assets'
 import { useElementRect } from '@/hooks'
 import { WatchPlaylistItemFranchise } from '@/types'
 
@@ -30,27 +31,9 @@ function Badge({ rating }: { rating: number | null }) {
         )}
         style={{ backgroundImage: 'linear-gradient(160deg,#eacc7f 16%,#ad9c72 64%)' }}
       >
-        <span
-          style={{
-            backgroundImage: 'url("/images/leaf-left.png")',
-            backgroundPosition: 'center center',
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            width: '0.5em',
-            height: '1em',
-          }}
-        />
+        <LeafIcon className='w-[0.375rem] h-[0.75rem]' />
         <span>{fixed}</span>
-        <span
-          style={{
-            backgroundImage: 'url("/images/leaf-right.png")',
-            backgroundPosition: 'center center',
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            width: '0.5em',
-            height: '1em',
-          }}
-        />
+        <LeafIcon className='w-[0.375rem] h-[0.75rem]' style={{ transform: 'scaleX(-1)' }} />
       </span>
     )
 
