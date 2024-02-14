@@ -25,23 +25,27 @@ export function NavbarExploreDesktop({ children, navigation }: NavbarExploreProp
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-40' align='start'>
           <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <NavLink to='/explore/collections'>All Collections</NavLink>
+            </DropdownMenuItem>
             {Object.entries(navigation).map(([typeId, type]) => (
               <DropdownMenuSub key={typeId}>
                 <DropdownMenuSubTrigger>{type.title}</DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
-                    <NavLink to={`/explore/${typeId}`}>
-                      <DropdownMenuItem>All</DropdownMenuItem>
-                    </NavLink>
+                    <DropdownMenuItem asChild>
+                      <NavLink to={`/explore/${typeId}`}>All</NavLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>Best</DropdownMenuItem>
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger>Genres</DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                           <ScrollArea className='h-40'>
                             {Object.entries(type.genres).map(([genreId, genre]) => (
-                              <NavLink key={genreId} to={`/explore/${typeId}/${genreId}`}>
-                                <DropdownMenuItem>{genre}</DropdownMenuItem>
-                              </NavLink>
+                              <DropdownMenuItem key={genreId} asChild>
+                                <NavLink to={`/explore/${typeId}/${genreId}`}>{genre}</NavLink>
+                              </DropdownMenuItem>
                             ))}
                           </ScrollArea>
                         </DropdownMenuSubContent>
@@ -53,9 +57,11 @@ export function NavbarExploreDesktop({ children, navigation }: NavbarExploreProp
                         <DropdownMenuSubContent>
                           <ScrollArea className={type.collections.length > 5 ? 'h-40' : ''}>
                             {type.collections.map((collection) => (
-                              <NavLink key={collection.url} to={`/explore${collection.url}`}>
-                                <DropdownMenuItem>{collection.title}</DropdownMenuItem>
-                              </NavLink>
+                              <DropdownMenuItem key={collection.url} asChild>
+                                <NavLink to={`/explore${collection.url}`}>
+                                  {collection.title}
+                                </NavLink>
+                              </DropdownMenuItem>
                             ))}
                           </ScrollArea>
                         </DropdownMenuSubContent>
