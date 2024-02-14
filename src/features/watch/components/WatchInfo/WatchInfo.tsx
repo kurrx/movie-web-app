@@ -15,6 +15,8 @@ import {
 import { ActionButton } from './ActionButton'
 import { Description } from './Description'
 import { DownloadMenu } from './DownloadMenu'
+import { IMDbButton } from './IMDbButton'
+import { KinopoiskButton } from './KinopoiskButton'
 import { Table } from './Table'
 
 export interface WatchInfoProps {
@@ -101,6 +103,8 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <ActionButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
           Watched
         </ActionButton>
+        {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
+        {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
         <ActionButton disabled Icon={ShareIcon}>
           Share
         </ActionButton>
