@@ -2,6 +2,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon, StarIcon } from '@/assets'
+import { selectDeviceIsMobile } from '@/features/device'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
 import { useAppSelector } from '@/hooks'
@@ -18,6 +19,7 @@ import { Description } from './Description'
 import { DownloadMenu } from './DownloadMenu'
 import { IMDbButton } from './IMDbButton'
 import { KinopoiskButton } from './KinopoiskButton'
+import { Person } from './Person'
 import { Table } from './Table'
 
 export interface WatchInfoProps {
@@ -25,6 +27,7 @@ export interface WatchInfoProps {
 }
 
 export function WatchInfo({ id }: WatchInfoProps) {
+  const isMobile = useAppSelector(selectDeviceIsMobile)
   const item = useAppSelector((state) => selectWatchItem(state, id))
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
   const filename = useAppSelector((state) => selectWatchItemFilename(state, id))
@@ -74,6 +77,9 @@ export function WatchInfo({ id }: WatchInfoProps) {
     }
     return { startStr, endStr, year: { to: year.to, title } }
   }, [item, year])
+  const persons = useMemo(() => {
+    return [...item.actors, ...item.directors]
+  }, [item])
 
   const toggleFavorite = useCallback(() => {
     setFavorite((prev) => !prev)
@@ -90,13 +96,13 @@ export function WatchInfo({ id }: WatchInfoProps) {
   return (
     <Fragment>
       <Title>{title}</Title>
-      <div className='container mt-4'>
+      <section className='container mt-4'>
         <h1 className='font-bold text-xl'>{item.title}</h1>
         {episodeTitle && (
           <h2 className='font-medium text-md text-muted-foreground'>{episodeTitle}</h2>
         )}
-      </div>
-      <div className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
+      </section>
+      <section className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
         <ActionButton disabled Icon={HeartIcon} active={favorite} onClick={toggleFavorite}>
           {favorite ? 'Remove' : 'Favorite'}
         </ActionButton>
@@ -115,107 +121,128 @@ export function WatchInfo({ id }: WatchInfoProps) {
           Share
         </ActionButton>
         <DownloadMenu filename={filename} qualities={qualities} />
-      </div>
-      <div className='container mb-16'>
-        {item.description && <Description links={links}>{item.description}</Description>}
-        <section className='mt-8 flex items-baseline justify-between flex-wrap gap-x-8'>
-          {item.directors.length > 0 && (
-            <div className={cn('flex-1', item.actors.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
-              <h3 className='font-bold text-lg'>Directors</h3>
-            </div>
-          )}
-          {item.actors.length > 0 && (
-            <div className={cn('flex-1', item.directors.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
-              <h3 className='font-bold text-lg'>Cast</h3>
-            </div>
-          )}
+      </section>
+      {item.description && (
+        <section className='container'>
+          <Description links={links}>{item.description}</Description>
         </section>
-        <section className='mt-8 flex items-baseline justify-between gap-x-8'>
-          {item.bestOf.length > 0 && (
-            <div className={cn('flex-1', item.collections.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
-              <h3 className='font-bold text-lg'>Best of</h3>
-            </div>
-          )}
-          {item.collections.length > 0 && (
-            <div className={cn('flex-1', item.bestOf.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
-              <h3 className='font-bold text-lg'>From collections</h3>
-            </div>
-          )}
-        </section>
+      )}
+      {persons.length > 0 && isMobile && (
         <section className='mt-8'>
-          <h3 className='font-bold text-lg'>
-            More about this {item.itemType === 'series' ? 'show' : 'movie'}
-          </h3>
-          <Table.Root>
-            {item.originalTitle && (
-              <Table.Row>
-                <Table.TitleCol>Original Title</Table.TitleCol>
-                <Table.Col>{item.originalTitle}</Table.Col>
-              </Table.Row>
+          <div className='container'>
+            <h3 className='font-bold text-lg'>Cast</h3>
+          </div>
+          <div
+            className={cn(
+              'mt-4 w-full overflow-x-scroll grid gap-2',
+              'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
             )}
-            {item.lastInfo && (
-              <Table.Row>
-                <Table.TitleCol>Status</Table.TitleCol>
-                <Table.Col>{item.lastInfo}</Table.Col>
-              </Table.Row>
-            )}
-            {item.slogan && (
-              <Table.Row>
-                <Table.TitleCol>Slogan</Table.TitleCol>
-                <Table.Col>{item.slogan}</Table.Col>
-              </Table.Row>
-            )}
-            {releaseDate && (
-              <Table.Row>
-                <Table.TitleCol>Release Date</Table.TitleCol>
-                <Table.Col>
-                  {releaseDate.startStr}
-                  <Table.Link to={releaseDate.year.to}>{releaseDate.year.title}</Table.Link>
-                  {releaseDate.endStr && (
-                    <Fragment>
-                      <br />
-                      <span>{releaseDate.endStr}</span>
-                    </Fragment>
-                  )}
-                </Table.Col>
-              </Table.Row>
-            )}
-            {country && (
-              <Table.Row>
-                <Table.TitleCol>Country Origin</Table.TitleCol>
-                <Table.Col>
-                  <Table.Link to={country.to}>{country.title}</Table.Link>
-                </Table.Col>
-              </Table.Row>
-            )}
+          >
+            {persons.map((p) => (
+              <Person key={p.id} person={p} />
+            ))}
+          </div>
+        </section>
+      )}
+      <section className='container mt-8 mb-16'>
+        <h3 className='font-bold text-lg'>
+          More about this {item.itemType === 'series' ? 'show' : 'movie'}
+        </h3>
+        <Table.Root>
+          {item.originalTitle && (
             <Table.Row>
-              <Table.TitleCol>Category</Table.TitleCol>
+              <Table.TitleCol>Original Title</Table.TitleCol>
+              <Table.Col>{item.originalTitle}</Table.Col>
+            </Table.Row>
+          )}
+          {item.lastInfo && (
+            <Table.Row>
+              <Table.TitleCol>Status</Table.TitleCol>
+              <Table.Col>{item.lastInfo}</Table.Col>
+            </Table.Row>
+          )}
+          {item.slogan && (
+            <Table.Row>
+              <Table.TitleCol>Slogan</Table.TitleCol>
+              <Table.Col>{item.slogan}</Table.Col>
+            </Table.Row>
+          )}
+          {releaseDate && (
+            <Table.Row>
+              <Table.TitleCol>Release Date</Table.TitleCol>
               <Table.Col>
-                <Table.Link to={category.to}>{category.title}</Table.Link>
+                {releaseDate.startStr}
+                <Table.Link to={releaseDate.year.to}>{releaseDate.year.title}</Table.Link>
+                {releaseDate.endStr && (
+                  <Fragment>
+                    <br />
+                    <span>{releaseDate.endStr}</span>
+                  </Fragment>
+                )}
               </Table.Col>
             </Table.Row>
-            {genres.length > 0 && (
-              <Table.Row>
-                <Table.TitleCol>Genres</Table.TitleCol>
-                <Table.Col>
-                  {genres.map(({ to, title }, index) => (
-                    <Fragment key={to}>
-                      <Table.Link to={to}>{title}</Table.Link>
-                      {index !== genres.length - 1 && ', '}
-                    </Fragment>
-                  ))}
-                </Table.Col>
-              </Table.Row>
-            )}
-            {item.ageRating && (
-              <Table.Row>
-                <Table.TitleCol>Age Rating</Table.TitleCol>
-                <Table.Col>{item.ageRating}</Table.Col>
-              </Table.Row>
-            )}
-          </Table.Root>
-        </section>
-      </div>
+          )}
+          {country && (
+            <Table.Row>
+              <Table.TitleCol>Country Origin</Table.TitleCol>
+              <Table.Col>
+                <Table.Link to={country.to}>{country.title}</Table.Link>
+              </Table.Col>
+            </Table.Row>
+          )}
+          <Table.Row>
+            <Table.TitleCol>Category</Table.TitleCol>
+            <Table.Col>
+              <Table.Link to={category.to}>{category.title}</Table.Link>
+            </Table.Col>
+          </Table.Row>
+          {genres.length > 0 && (
+            <Table.Row>
+              <Table.TitleCol>Genres</Table.TitleCol>
+              <Table.Col>
+                {genres.map(({ to, title }, index) => (
+                  <Fragment key={to}>
+                    <Table.Link to={to}>{title}</Table.Link>
+                    {index !== genres.length - 1 && ', '}
+                  </Fragment>
+                ))}
+              </Table.Col>
+            </Table.Row>
+          )}
+          {item.directors.length > 0 && !isMobile && (
+            <Table.Row>
+              <Table.TitleCol>Directors</Table.TitleCol>
+              <Table.Col>
+                {item.directors.map(({ id, name, url }, index) => (
+                  <Fragment key={id}>
+                    <Table.Link to={`/explore${url}`}>{name}</Table.Link>
+                    {index !== item.directors.length - 1 && ', '}
+                  </Fragment>
+                ))}
+              </Table.Col>
+            </Table.Row>
+          )}
+          {item.actors.length > 0 && !isMobile && (
+            <Table.Row>
+              <Table.TitleCol>Actors</Table.TitleCol>
+              <Table.Col>
+                {item.actors.map(({ id, name, url }, index) => (
+                  <Fragment key={id}>
+                    <Table.Link to={`/explore${url}`}>{name}</Table.Link>
+                    {index !== item.actors.length - 1 && ', '}
+                  </Fragment>
+                ))}
+              </Table.Col>
+            </Table.Row>
+          )}
+          {item.ageRating && (
+            <Table.Row>
+              <Table.TitleCol>Age Rating</Table.TitleCol>
+              <Table.Col>{item.ageRating}</Table.Col>
+            </Table.Row>
+          )}
+        </Table.Root>
+      </section>
     </Fragment>
   )
 }

@@ -28,7 +28,7 @@ export function Description(props: DescriptionProps) {
   }, [expandable, expanded])
 
   return (
-    <section
+    <div
       className={cn(
         'bg-secondary py-3 px-4 rounded-xl max-h-[7rem]',
         'data-[clickable=true]:cursor-pointer overflow-y-hidden',
@@ -86,6 +86,6 @@ export function Description(props: DescriptionProps) {
       >
         ...more
       </button>
-    </section>
+    </div>
   )
 }
