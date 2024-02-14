@@ -15,6 +15,7 @@ import {
   selectWatchItemQualities,
 } from '../../watch.slice'
 import { ActionButton } from './ActionButton'
+import { Collection } from './Collection'
 import { Description } from './Description'
 import { DownloadMenu } from './DownloadMenu'
 import { IMDbButton } from './IMDbButton'
@@ -77,9 +78,8 @@ export function WatchInfo({ id }: WatchInfoProps) {
     }
     return { startStr, endStr, year: { to: year.to, title } }
   }, [item, year])
-  const persons = useMemo(() => {
-    return [...item.actors, ...item.directors]
-  }, [item])
+  const persons = useMemo(() => [...item.actors, ...item.directors], [item])
+  const collections = useMemo(() => [...item.bestOf, ...item.collections], [item])
 
   const toggleFavorite = useCallback(() => {
     setFavorite((prev) => !prev)
@@ -144,10 +144,25 @@ export function WatchInfo({ id }: WatchInfoProps) {
           </div>
         </section>
       )}
+      {collections.length > 0 && isMobile && (
+        <section className='mt-8'>
+          <div className='container'>
+            <h3 className='font-bold text-lg'>Collections</h3>
+          </div>
+          <div
+            className={cn(
+              'mt-4 w-full overflow-x-scroll grid gap-4',
+              'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
+            )}
+          >
+            {collections.map((c) => (
+              <Collection key={c.url} collection={c} />
+            ))}
+          </div>
+        </section>
+      )}
       <section className='container mt-8 mb-16'>
-        <h3 className='font-bold text-lg'>
-          More about this {item.itemType === 'series' ? 'show' : 'movie'}
-        </h3>
+        <h3 className='font-bold text-lg'>About {item.itemType === 'series' ? 'show' : 'movie'}</h3>
         <Table.Root>
           {item.originalTitle && (
             <Table.Row>
@@ -230,6 +245,33 @@ export function WatchInfo({ id }: WatchInfoProps) {
                   <Fragment key={id}>
                     <Table.Link to={`/explore${url}`}>{name}</Table.Link>
                     {index !== item.actors.length - 1 && ', '}
+                  </Fragment>
+                ))}
+              </Table.Col>
+            </Table.Row>
+          )}
+          {item.bestOf.length > 0 && !isMobile && (
+            <Table.Row>
+              <Table.TitleCol>Best of</Table.TitleCol>
+              <Table.Col>
+                {item.bestOf.map(({ url, title, place }, index) => (
+                  <Fragment key={index}>
+                    <Table.Link to={`/explore${url}`}>{title}</Table.Link>
+                    {place && ` (${place} место)`}
+                    <br />
+                  </Fragment>
+                ))}
+              </Table.Col>
+            </Table.Row>
+          )}
+          {item.collections.length > 0 && !isMobile && (
+            <Table.Row>
+              <Table.TitleCol>Collections</Table.TitleCol>
+              <Table.Col>
+                {item.collections.map(({ url, title }, index) => (
+                  <Fragment key={index}>
+                    <Table.Link to={`/explore${url}`}>{title}</Table.Link>
+                    <br />
                   </Fragment>
                 ))}
               </Table.Col>

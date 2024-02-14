@@ -24,7 +24,7 @@ export function Person({ person }: { person: ItemPerson }) {
       />
       <span className='grow min-w-0'>
         <p className='truncate font-bold text-sm'>{person.name}</p>
-        <p className='truncate text-xs'>{person.job}</p>
+        <p className='truncate text-xs text-muted-foreground'>{person.job}</p>
       </span>
     </NavLink>
   )
