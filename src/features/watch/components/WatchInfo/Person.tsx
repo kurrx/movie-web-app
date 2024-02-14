@@ -19,7 +19,9 @@ export function Person({ person }: { person: ItemPerson }) {
         )}
         onLoad={() => setImageLoaded(true)}
       />
-      <Skeleton className={cn('h-16 w-10 shrink-0 mr-4', !imageLoaded ? 'block' : 'hidden')} />
+      <Skeleton
+        className={cn('h-16 w-10 shrink-0 mr-4 !rounded-none', !imageLoaded ? 'block' : 'hidden')}
+      />
       <span className='grow min-w-0'>
         <p className='truncate font-bold text-sm'>{person.name}</p>
         <p className='truncate text-xs'>{person.job}</p>
