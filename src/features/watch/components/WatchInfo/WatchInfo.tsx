@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 
-import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon } from '@/assets'
+import { cn } from '@/api'
+import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon, StarIcon } from '@/assets'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
 import { useAppSelector } from '@/hooks'
@@ -32,6 +33,8 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const [favorite, setFavorite] = useState(false)
   const [saved, setSaved] = useState(false)
   const [watched, setWatched] = useState(false)
+  const [rated] = useState(false)
+  const [rating] = useState<number | null>(null)
   const category = useMemo(() => ({ to: `/explore/${item.typeId}`, title: item.type }), [item])
   const genres = useMemo(
     () =>
@@ -103,6 +106,9 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <ActionButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
           Watched
         </ActionButton>
+        <ActionButton disabled Icon={StarIcon} active={rated && rating !== null}>
+          {!rated || rating === null ? 'Rate' : rating}
+        </ActionButton>
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
         <ActionButton disabled Icon={ShareIcon}>
@@ -112,6 +118,30 @@ export function WatchInfo({ id }: WatchInfoProps) {
       </div>
       <div className='container mb-16'>
         {item.description && <Description links={links}>{item.description}</Description>}
+        <section className='mt-8 flex items-baseline justify-between flex-wrap gap-x-8'>
+          {item.directors.length > 0 && (
+            <div className={cn('flex-1', item.actors.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
+              <h3 className='font-bold text-lg'>Directors</h3>
+            </div>
+          )}
+          {item.actors.length > 0 && (
+            <div className={cn('flex-1', item.directors.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
+              <h3 className='font-bold text-lg'>Cast</h3>
+            </div>
+          )}
+        </section>
+        <section className='mt-8 flex items-baseline justify-between gap-x-8'>
+          {item.bestOf.length > 0 && (
+            <div className={cn('flex-1', item.collections.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
+              <h3 className='font-bold text-lg'>Best of</h3>
+            </div>
+          )}
+          {item.collections.length > 0 && (
+            <div className={cn('flex-1', item.bestOf.length > 0 ? 'w-[50%]' : 'w-[100%]')}>
+              <h3 className='font-bold text-lg'>From collections</h3>
+            </div>
+          )}
+        </section>
         <section className='mt-8'>
           <h3 className='font-bold text-lg'>
             More about this {item.itemType === 'series' ? 'show' : 'movie'}
