@@ -5,6 +5,7 @@ import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
 import { exploreSearch, selectExploreResult } from '../explore.slice'
+import { ExplorePagination } from './ExplorePagination'
 
 export function ExploreContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -28,7 +29,9 @@ export function ExploreContent({ url }: { url: string }) {
       error={exploreItem?.error}
       onReload={get}
     >
-      <div className='w-full max-w-full flex-1 flex flex-col'></div>
+      <div className='w-full max-w-full flex-1 flex flex-col'>
+        <ExplorePagination url={url} />
+      </div>
     </FallbackView>
   )
 }

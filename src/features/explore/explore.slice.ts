@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
 import { fetchExplore } from '@/api'
@@ -78,5 +78,6 @@ export const { setExploreOpen } = exploreSlice.actions
 export const selectExploreOpen = (state: AppStoreState) => state.explore.open
 export const selectExploreResult = (state: AppStoreState, url: string) =>
   state.explore.queries.find((q) => q.url === url)
+export const selectExploreResponse = createSelector(selectExploreResult, (item) => item!.response!)
 
 export const exploreReducer = exploreSlice.reducer
