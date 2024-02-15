@@ -61,6 +61,17 @@ export function parseUrlToIds(url: string): ItemFullID | null {
   }
 }
 
+export function parseComponentsToIds(typeId?: string, genreId?: string, slug?: string) {
+  if (!typeId || !genreId || !slug) return null
+  const type = explore[typeId].title
+  if (!type) return null
+  const genre = explore[typeId].genres[genreId]
+  if (!genre) return null
+  const id = parseSlugToId(slug)
+  if (!id) return null
+  return { typeId, type, genreId, genre, slug, id }
+}
+
 export function parseSearchDocument(document: Document): SearchItem[] {
   const parser = new Parser(document)
   parser.setDefaultError(NOT_AVAILABLE_ERROR)

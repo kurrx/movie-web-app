@@ -1,24 +1,15 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { parseSlugToId } from '@/api'
-import { explore, WatchContent } from '@/features'
+import { parseComponentsToIds } from '@/api'
+import { WatchContent } from '@/features'
 import { ItemID } from '@/types'
 
 import { ErrorView } from './ErrorView'
 
 export function WatchView() {
   const { typeId, genreId, slug } = useParams<Partial<ItemID>>()
-  const fullId = useMemo(() => {
-    if (!typeId || !genreId || !slug) return null
-    const type = explore[typeId].title
-    if (!type) return null
-    const genre = explore[typeId].genres[genreId]
-    if (!genre) return null
-    const id = parseSlugToId(slug)
-    if (!id) return null
-    return { typeId, type, genreId, genre, slug, id }
-  }, [typeId, genreId, slug])
+  const fullId = useMemo(() => parseComponentsToIds(typeId, genreId, slug), [typeId, genreId, slug])
   const key = useMemo(() => `${typeId}-${genreId}-${slug}`, [typeId, genreId, slug])
 
   if (!fullId) {
