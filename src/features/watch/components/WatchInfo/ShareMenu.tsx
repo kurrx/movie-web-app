@@ -37,8 +37,8 @@ export function ShareMenu({ time, itemTitle, itemLink, title, link }: ShareMenuP
     [clicked, isSuccess],
   )
   const finalTitle = useMemo(
-    () => (includeTime ? title : itemTitle),
-    [includeTime, itemTitle, title],
+    () => (includeTime ? `${title}\n\nTime: ${time}` : itemTitle),
+    [includeTime, itemTitle, title, time],
   )
   const finalLink = useMemo(() => (includeTime ? link : itemLink), [includeTime, itemLink, link])
 
