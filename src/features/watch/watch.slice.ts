@@ -6,6 +6,7 @@ import {
   fetchSeriesStream,
   fetchStreamDetails,
   fetchTranslator,
+  refererFromId,
   transliterate,
 } from '@/api'
 import { FetchState, SwitchState } from '@/core'
@@ -129,6 +130,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
       season: itemState?.season,
       episode: itemState?.episode,
       signal,
+      referer: refererFromId(fullId),
     })
     if (!itemState) {
       itemState = {
@@ -152,6 +154,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
 export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam, Thunk>(
   'watch/getStreamDetails',
   async (id, { signal, getState }) => {
+    const item = getState().watch.items.find((i) => i.id === id)!.item!
     const stream = getItemStream(getState().watch, id)
     const itemState = getState().watch.states[id]!
     return await fetchStreamDetails({
@@ -161,6 +164,7 @@ export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam
       episode: itemState.episode,
       stream,
       signal,
+      referer: refererFromId(item),
     })
   },
   {
@@ -195,6 +199,7 @@ export const switchEpisode = createAsyncThunk<SEpisodeReturn, SEpisodeParam, Thu
       season,
       episode,
       signal,
+      referer: refererFromId(item),
     })
   },
   switchOptions,
@@ -204,7 +209,13 @@ export const switchTranslator = createAsyncThunk<STranslatorReturn, STranslatorP
   async ({ id, translatorId }, { signal, getState }) => {
     const item = getState().watch.items.find((i) => i.id === id)!.item!
     const state = getState().watch.states[id]!
-    return await fetchTranslator({ item, translatorId, state, signal })
+    return await fetchTranslator({
+      item,
+      translatorId,
+      state,
+      signal,
+      referer: refererFromId(item),
+    })
   },
   switchOptions,
 )
@@ -232,6 +243,7 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
           season,
           episode,
           signal,
+          referer: refererFromId(item),
         })
         await fetchStreamDetails({
           id,
@@ -240,6 +252,7 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
           episode,
           stream,
           signal,
+          referer: refererFromId(item),
         })
       }
     }

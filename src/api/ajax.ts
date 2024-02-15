@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import { Request } from '@/core'
 import {
   FetchItemArgs,
@@ -29,7 +27,12 @@ import {
 
 import { db } from './database'
 import { PROVIDER_URL, PROXY_URL } from './env'
-import { convertDataToDom, parseProxiedCookies, sendProxiedCookies } from './interceptors'
+import {
+  convertDataToDom,
+  parseProxiedCookies,
+  sendProxiedCookies,
+  sendProxiedUserAgent,
+} from './interceptors'
 import {
   parseItemDocument,
   parseItemDocumentEpisodes,
@@ -44,8 +47,13 @@ export const html = new Request({
   responseType: 'document',
   responseEncoding: 'utf8',
   timeout: 10_000,
+  headers: {
+    'x-proxy-origin': PROVIDER_URL,
+    'x-proxy-referer': PROVIDER_URL + '/',
+  },
 })
   .useRequest(sendProxiedCookies)
+  .useRequest(sendProxiedUserAgent)
   .useResponse(parseProxiedCookies)
   .useResponse(convertDataToDom)
   .construct()
@@ -65,7 +73,7 @@ export async function fetchSearch(args: FetchSearchArgs, retry = 0) {
 
 export async function fetchItemMovie(args: FetchItemMovieArgs, retry = 0): Promise<ItemMovie> {
   try {
-    const { baseItem, translator, signal } = args
+    const { baseItem, translator, signal, referer } = args
     const stream = await fetchMovieStream({
       id: baseItem.id,
       translatorId: translator.id,
@@ -74,6 +82,7 @@ export async function fetchItemMovie(args: FetchItemMovieArgs, retry = 0): Promi
       isAds: translator.isAds,
       isDirector: translator.isDirector,
       signal,
+      referer,
     })
     const streams: ItemMovieStream[] = baseItem.translators.map((t) => ({
       translatorId: t.id,
@@ -93,7 +102,7 @@ export async function fetchItemMovie(args: FetchItemMovieArgs, retry = 0): Promi
 
 export async function fetchItemSeries(args: FetchItemSeriesArgs, retry = 0): Promise<ItemSeries> {
   try {
-    const { baseItem, translator, document, signal, season, episode } = args
+    const { baseItem, translator, document, signal, season, episode, referer } = args
     const episodesInfo = parseItemDocumentEpisodes(document)
     const { stream, seasons, streamFor } = await fetchSeriesEpisodesStream({
       id: baseItem.id,
@@ -102,6 +111,7 @@ export async function fetchItemSeries(args: FetchItemSeriesArgs, retry = 0): Pro
       season,
       episode,
       signal,
+      referer,
     })
     const streams: ItemSeriesStream[] = baseItem.translators.map((t) => {
       const translatorId = t.id
@@ -134,7 +144,7 @@ export async function fetchItemSeries(args: FetchItemSeriesArgs, retry = 0): Pro
 
 export async function fetchItem(args: FetchItemArgs, retry = 0): Promise<Item> {
   try {
-    const { signal, fullId, translatorId, season, episode } = args
+    const { signal, fullId, translatorId, season, episode, referer } = args
     const data = await db.getItem(fullId.id, async () => {
       const uri = `/${fullId.typeId}/${fullId.genreId}/${fullId.slug}.html`
       const { data } = await html.get<Document>(uri, { signal })
@@ -144,7 +154,7 @@ export async function fetchItem(args: FetchItemArgs, retry = 0): Promise<Item> {
     const translator =
       baseItem.translators.find((t) => t.id === translatorId) || baseItem.translators[0]
     if (baseItem.ogType === 'video.movie') {
-      return await fetchItemMovie({ baseItem, translator, signal })
+      return await fetchItemMovie({ baseItem, translator, signal, referer })
     } else {
       return await fetchItemSeries({
         baseItem,
@@ -153,6 +163,7 @@ export async function fetchItem(args: FetchItemArgs, retry = 0): Promise<Item> {
         signal,
         season,
         episode,
+        referer,
       })
     }
   } catch (err) {
@@ -166,16 +177,31 @@ export const ajax = new Request({
   responseType: 'json',
   responseEncoding: 'utf8',
   timeout: 10_000,
+  headers: {
+    'x-proxy-origin': PROVIDER_URL,
+  },
 })
   .useRequest(sendProxiedCookies)
+  .useRequest(sendProxiedUserAgent)
   .useResponse(parseProxiedCookies)
+  .construct()
+
+export const cdn = new Request({
+  baseURL: PROXY_URL,
+  timeout: 10_000,
+  headers: {
+    'x-proxy-origin': PROVIDER_URL,
+    'x-proxy-referer': PROVIDER_URL + '/',
+  },
+})
+  .useRequest(sendProxiedUserAgent)
   .construct()
 
 export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   try {
     const { qualityId, downloadUrl, signal } = args
     const size = await db.getSize(args, async () => {
-      const res = await axios.head(downloadUrl, { signal })
+      const res = await cdn.head(downloadUrl, { signal })
       const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
       return size
     })
@@ -188,9 +214,12 @@ export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs,
 
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {
   try {
-    const { stream, signal } = args
+    const { stream, signal, referer } = args
     const data = await db.getThumbnails(args, async () => {
-      const { data } = await ajax.get<string>(stream.thumbnailsUrl, { signal })
+      const { data } = await ajax.get<string>(stream.thumbnailsUrl, {
+        signal,
+        headers: { 'x-proxy-referer': referer },
+      })
       return data
     })
     return data
@@ -202,10 +231,10 @@ export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retr
 
 export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0) {
   try {
-    const { stream } = args
+    const { stream, referer } = args
     const thumbnailsPromise = fetchStreamThumbnails(args)
     const promises = stream.qualities.map((q) =>
-      fetchStreamDownloadSize({ ...args, qualityId: q.id, downloadUrl: q.downloadUrl }),
+      fetchStreamDownloadSize({ ...args, qualityId: q.id, downloadUrl: q.downloadUrl, referer }),
     )
     const [sizes, thumbnails] = await Promise.all([Promise.all(promises), thumbnailsPromise])
     return { thumbnails, sizes }
@@ -217,7 +246,7 @@ export async function fetchStreamDetails(args: FetchStreamDetailsArgs, retry = 0
 
 export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
   try {
-    const { id, translatorId, favsId, isCamrip, isAds, isDirector, signal } = args
+    const { id, translatorId, favsId, isCamrip, isAds, isDirector, signal, referer } = args
     const data = await db.getMovie(args, async () => {
       const params = new URLSearchParams({
         id: String(id),
@@ -231,7 +260,7 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
       const { data } = await ajax.post<StreamResponse>(
         `/ajax/get_cdn_series/?t=${Date.now()}`,
         params,
-        { signal },
+        { signal, headers: { 'x-proxy-referer': referer } },
       )
       if (!data.success)
         throw new Error(data.message || 'Unable to get movie stream details. Try again later.')
@@ -246,7 +275,7 @@ export async function fetchMovieStream(args: FetchMovieStreamArgs, retry = 0) {
 
 export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) {
   try {
-    const { id, translatorId, favsId, season, episode, signal } = args
+    const { id, translatorId, favsId, season, episode, signal, referer } = args
     const data = await db.getSeries(args, async () => {
       const params = new URLSearchParams({
         id: String(id),
@@ -259,7 +288,7 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) 
       const { data } = await ajax.post<StreamResponse>(
         `/ajax/get_cdn_series/?t=${Date.now()}`,
         params,
-        { signal },
+        { signal, headers: { 'x-proxy-referer': referer } },
       )
       if (!data.success)
         throw new Error(data.message || 'Unable to get episode stream details. Try again later.')
@@ -274,7 +303,7 @@ export async function fetchSeriesStream(args: FetchSeriesStreamArgs, retry = 0) 
 
 export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamArgs, retry = 0) {
   try {
-    const { id, translatorId, favsId, season, episode, signal } = args
+    const { id, translatorId, favsId, season, episode, signal, referer } = args
     const seasons = await db.getSeasons(args, async () => {
       const params = new URLSearchParams({
         id: String(id),
@@ -285,7 +314,7 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
       const { data } = await ajax.post<SeriesEpisodesStreamResponse>(
         `/ajax/get_cdn_series/?t=${Date.now()}`,
         params,
-        { signal },
+        { signal, headers: { 'x-proxy-referer': referer } },
       )
       if (!data.success)
         throw new Error(data.message || 'Unable to get episodes list. Try again later.')
@@ -330,6 +359,7 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
       translatorId,
       favsId,
       signal,
+      referer,
       ...streamFor,
     })
     return {
@@ -345,7 +375,7 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
 
 export async function fetchMovieTranslator(args: FetchMovieTranslatorArgs, retry = 0) {
   try {
-    const { item, translatorId, signal } = args
+    const { item, translatorId, signal, referer } = args
     const foundStream = item.streams.find((s) => s.translatorId === translatorId)!.stream
     if (foundStream) return { type: 'movie' as const }
     const translator = item.translators.find((t) => t.id === translatorId)!
@@ -357,6 +387,7 @@ export async function fetchMovieTranslator(args: FetchMovieTranslatorArgs, retry
       isAds: translator.isAds,
       isDirector: translator.isDirector,
       signal,
+      referer,
     })
     return { type: 'movie' as const, stream }
   } catch (err) {
@@ -367,7 +398,7 @@ export async function fetchMovieTranslator(args: FetchMovieTranslatorArgs, retry
 
 export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs, retry = 0) {
   try {
-    const { item, translatorId, state, signal } = args
+    const { item, translatorId, state, signal, referer } = args
     const stateTo = { season: state.season!, episode: state.episode! }
     let initial: FetchSeriesTranslatorResponse['initial']
     let seasons = item.streams.find((s) => s.translatorId === translatorId)!.seasons!
@@ -378,6 +409,7 @@ export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs, ret
         translatorId,
         favsId: item.favsId,
         signal,
+        referer,
       })
       const { seasons: newSeasons, stream, streamFor } = res
       seasons = newSeasons.map((s) => ({
@@ -421,6 +453,7 @@ export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs, ret
         season: stateTo.season,
         episode: stateTo.episode,
         signal,
+        referer,
       })
       next = { stream, streamFor: stateTo }
     }
@@ -438,11 +471,11 @@ export async function fetchSeriesTranslator(args: FetchSeriesTranslatorArgs, ret
 
 export async function fetchTranslator(args: FetchTranslatorArgs, retry = 0) {
   try {
-    const { item, translatorId, state, signal } = args
+    const { item, translatorId, state, signal, referer } = args
     if (item.itemType === 'series') {
-      return await fetchSeriesTranslator({ item, translatorId, signal, state })
+      return await fetchSeriesTranslator({ item, translatorId, signal, state, referer })
     } else {
-      return await fetchMovieTranslator({ item, translatorId, signal })
+      return await fetchMovieTranslator({ item, translatorId, signal, referer })
     }
   } catch (err) {
     if (retry < 3) return await fetchTranslator(args, retry + 1)

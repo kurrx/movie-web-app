@@ -1,6 +1,10 @@
 import clsx, { ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
+import { ItemFullID } from '@/types'
+
+import { PROVIDER_URL } from './env'
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
 
@@ -183,4 +187,8 @@ export function transliterate(str: string) {
     .replace(/\u044C/g, "'")
     .replace(/\u0431/g, 'b')
     .replace(/\u044E/g, 'yu')
+}
+
+export function refererFromId(fullId: ItemFullID) {
+  return `${PROVIDER_URL}/${fullId.typeId}/${fullId.genreId}/${fullId.slug}.html`
 }

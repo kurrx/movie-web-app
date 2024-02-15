@@ -9,4 +9,5 @@ export type OnRejected = ((error: any) => any) | null
 
 export interface RequestArgs {
   signal?: AbortSignal
+  referer?: string
 }
