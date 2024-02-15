@@ -27,6 +27,8 @@ export const dialogContentVariants = cva(
           'left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]',
           'max-w-lg data-[state=closed]:slide-out-to-left-1/2',
           'w-full data-[state=open]:slide-in-from-left-1/2',
+          'data-[state=closed]:slide-out-to-top-1/2',
+          'data-[state=open]:slide-in-from-top-1/2',
         ),
         top: cn(
           'left-[10px] right-[10px] sm:left-[50%] sm:right-[auto]',
