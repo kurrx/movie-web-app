@@ -14,7 +14,7 @@ export interface PaginationLinkProps extends RefProps, ButtonSizeProps {}
 
 export const PaginationLink = forwardRef<Ref, PaginationLinkProps>(
   function PaginationLink(props, ref) {
-    const { className, size, to, ...restProps } = props
+    const { className, size = 'icon', to, ...restProps } = props
     const location = useLocation()
     const isActive = useMemo(() => location.pathname + location.search === to, [location, to])
 

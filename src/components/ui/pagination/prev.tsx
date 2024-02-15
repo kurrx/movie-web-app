@@ -1,5 +1,5 @@
-import { ChevronLeftIcon } from '@radix-ui/react-icons'
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { ChevronLeftIcon, DoubleArrowLeftIcon } from '@radix-ui/react-icons'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef, useMemo } from 'react'
 
 import { cn } from '@/api'
 
@@ -9,22 +9,24 @@ type Component = typeof PaginationLink
 type Ref = ElementRef<Component>
 type RefProps = ComponentPropsWithoutRef<Component>
 
-export type PaginationPrevProps = RefProps
+export interface PaginationPrevProps extends RefProps {
+  first?: boolean
+}
 
 export const PaginationPrev = forwardRef<Ref, PaginationPrevProps>(
   function PaginationPrev(props, ref) {
-    const { className, ...restProps } = props
+    const { className, first, ...restProps } = props
+    const Icon = useMemo(() => (first ? DoubleArrowLeftIcon : ChevronLeftIcon), [first])
 
     return (
       <PaginationLink
         ref={ref}
         aria-label='Go to previous page'
-        size='default'
-        className={cn('gap-1 pl-2.5', className)}
+        size='icon'
+        className={cn('', className)}
         {...restProps}
       >
-        <ChevronLeftIcon className='h-4 w-4' />
-        <span>Previous</span>
+        <Icon className='h-4 w-4' />
       </PaginationLink>
     )
   },

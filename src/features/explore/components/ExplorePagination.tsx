@@ -1,9 +1,6 @@
-import { Fragment } from 'react'
-
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -31,43 +28,31 @@ export function ExplorePagination({ url }: { url: string }) {
     <div className='container mt-8'>
       <Pagination>
         <PaginationContent>
+          {pagination.firstPage && (
+            <PaginationItem>
+              <PaginationPrev first to={urlToRoute(pagination.firstPage.link)} />
+            </PaginationItem>
+          )}
           {pagination.prev && (
             <PaginationItem>
               <PaginationPrev to={urlToRoute(pagination.prev)} />
             </PaginationItem>
           )}
-          {pagination.firstPage && (
-            <Fragment>
-              <PaginationItem>
-                <PaginationLink to={urlToRoute(pagination.firstPage.link)}>
-                  {pagination.firstPage.page}
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            </Fragment>
-          )}
           {pagination.pages.map((p) => (
             <PaginationItem key={p.page}>
-              <PaginationLink to={urlToRoute(p.link || url)}>{p.page}</PaginationLink>
+              <PaginationLink to={urlToRoute(p.link || url)} className='text-xs'>
+                {p.page}
+              </PaginationLink>
             </PaginationItem>
           ))}
-          {pagination.lastPage && (
-            <Fragment>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink to={urlToRoute(pagination.lastPage.link)}>
-                  {pagination.lastPage.page}
-                </PaginationLink>
-              </PaginationItem>
-            </Fragment>
-          )}
           {pagination.next && (
             <PaginationItem>
               <PaginationNext to={urlToRoute(pagination.next)} />
+            </PaginationItem>
+          )}
+          {pagination.lastPage && (
+            <PaginationItem>
+              <PaginationNext last to={urlToRoute(pagination.lastPage.link)} />
             </PaginationItem>
           )}
         </PaginationContent>
