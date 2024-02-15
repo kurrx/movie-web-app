@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 
-import { cn } from '@/api'
+import { cn, convertSeconds } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
@@ -87,6 +87,9 @@ export function WatchInfo({ id }: WatchInfoProps) {
   }, [item, year])
   const persons = useMemo(() => [...item.actors, ...item.directors], [item])
   const collections = useMemo(() => [...item.bestOf, ...item.collections], [item])
+  const itemLink = useMemo(() => {
+    return `${window.location.origin}/watch/${item.typeId}/${item.genreId}/${item.slug}`
+  }, [item])
   const shareLink = useMemo(() => {
     const root = `${window.location.origin}/share`
     const itemPath = `${item.typeId}/${item.genreId}/${item.slug}`
@@ -133,7 +136,13 @@ export function WatchInfo({ id }: WatchInfoProps) {
         </ActionButton>
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
-        <ShareMenu link={shareLink} title={title} />
+        <ShareMenu
+          time={convertSeconds(timestamp)}
+          itemTitle={item.title}
+          itemLink={itemLink}
+          title={title}
+          link={shareLink}
+        />
         <DownloadMenu filename={filename} qualities={qualities} />
       </section>
       {item.description && (

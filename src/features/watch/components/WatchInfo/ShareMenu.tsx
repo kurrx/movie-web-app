@@ -5,6 +5,7 @@ import { noop } from '@/api'
 import { ShareIcon } from '@/assets'
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogClose,
   DialogContent,
@@ -18,19 +19,33 @@ import {
 } from '@/components'
 
 export interface ShareMenuProps {
+  time: string
+  itemTitle: string
+  itemLink: string
   title: string
   link: string
 }
 
-export function ShareMenu({ title, link }: ShareMenuProps) {
+export function ShareMenu({ time, itemTitle, itemLink, title, link }: ShareMenuProps) {
   const ref = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [clicked, setClicked] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [includeTime, setIncludeTime] = useState(false)
   const Icon = useMemo(
     () => (clicked ? (isSuccess ? CheckIcon : Cross2Icon) : CopyIcon),
     [clicked, isSuccess],
   )
+  const finalTitle = useMemo(
+    () => (includeTime ? title : itemTitle),
+    [includeTime, itemTitle, title],
+  )
+  const finalLink = useMemo(() => (includeTime ? link : itemLink), [includeTime, itemLink, link])
+
+  const onIncludeTimeChange = useCallback((value: boolean | 'indeterminate') => {
+    if (typeof value !== 'boolean') return
+    setIncludeTime(value)
+  }, [])
 
   const onCopy = useCallback(() => {
     if (timeoutRef.current) {
@@ -49,8 +64,8 @@ export function ShareMenu({ title, link }: ShareMenuProps) {
 
   const onShare = useCallback(() => {
     if (!navigator.share) return
-    navigator.share({ text: `${title}\n\n${link}` }).catch(noop)
-  }, [title, link])
+    navigator.share({ text: `${finalTitle}\n\n${finalLink}` }).catch(noop)
+  }, [finalTitle, finalLink])
 
   return (
     <Dialog>
@@ -63,14 +78,20 @@ export function ShareMenu({ title, link }: ShareMenuProps) {
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
-          <DialogDescription>Send your experience to your friends.</DialogDescription>
+          <DialogDescription>
+            You are going to share: <b>{finalTitle}</b>
+          </DialogDescription>
         </DialogHeader>
+        <div className='flex items-center space-x-2'>
+          <Checkbox id='terms' checked={includeTime} onCheckedChange={onIncludeTimeChange} />
+          <Label htmlFor='terms'>Include time: {time}</Label>
+        </div>
         <div className='flex items-center space-x-2'>
           <div className='grid flex-1 gap-2'>
             <Label htmlFor='link' className='sr-only'>
               Link
             </Label>
-            <Input ref={ref} readOnly id='link' defaultValue={link} />
+            <Input ref={ref} readOnly id='link' value={finalLink} />
           </div>
           <Button type='submit' size='sm' className='px-3' onClick={onCopy}>
             <span className='sr-only'>Copy</span>
