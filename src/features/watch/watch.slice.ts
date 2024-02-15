@@ -33,7 +33,7 @@ type GetItemReturn = {
   item: Awaited<ReturnType<typeof fetchItem>>
   itemState: WatchItemState
 }
-type GetItemParam = ItemFullID
+type GetItemParam = { fullId: ItemFullID; nextState?: WatchItemState | null }
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
 type GetStreamParam = number
 type SwitchParam = { id: number }
@@ -102,7 +102,7 @@ const initialState: WatchStoreState = {
 
 export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
-  async (fullId, { signal, getState }) => {
+  async ({ fullId, nextState }, { signal, getState }) => {
     let itemState = getState().watch.states[fullId.id]
     if (!itemState) {
       // Migration from old state storage
@@ -112,6 +112,16 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         deleteItemStatesLS()
       }
       itemState = await db.getItemState(fullId.id)
+      if (nextState) {
+        if (itemState) {
+          itemState.translatorId = nextState.translatorId
+          itemState.timestamp = nextState.timestamp
+          itemState.season = nextState.season
+          itemState.episode = nextState.episode
+        } else {
+          itemState = nextState
+        }
+      }
     }
     const item = await fetchItem({
       fullId,
@@ -133,7 +143,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   {
     condition(arg, api) {
       const items = api.getState().watch.items
-      const findItem = items.find((i) => i.id === arg.id)
+      const findItem = items.find((i) => i.id === arg.fullId.id)
       if (!findItem) return true
       return findItem.state !== FetchState.SUCCESS
     },
@@ -253,17 +263,17 @@ const watchSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(getItem.pending, (state, action) => {
-        const item = state.items.find((i) => i.id === action.meta.arg.id)
+        const item = state.items.find((i) => i.id === action.meta.arg.fullId.id)
         if (!item) {
           state.items.push({
-            id: action.meta.arg.id,
+            id: action.meta.arg.fullId.id,
             state: FetchState.LOADING,
             error: null,
             requestId: action.meta.requestId,
             item: null,
           })
           state.switchStates.push({
-            id: action.meta.arg.id,
+            id: action.meta.arg.fullId.id,
             state: SwitchState.IDLE,
             error: null,
             requestId: null,
@@ -304,9 +314,7 @@ const watchSlice = createSlice({
             )!.stream!
           }
           checkState(stream!, nextState)
-          if (!state.states[action.meta.arg.id]) {
-            state.states[action.meta.arg.id] = nextState
-          }
+          state.states[action.meta.arg.fullId.id] = nextState
           item.requestId = null
           item.state = FetchState.SUCCESS
           item.item = fetchedItem

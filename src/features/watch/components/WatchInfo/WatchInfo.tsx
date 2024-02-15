@@ -91,14 +91,12 @@ export function WatchInfo({ id }: WatchInfoProps) {
     return `${window.location.origin}/watch/${item.typeId}/${item.genreId}/${item.slug}`
   }, [item])
   const shareLink = useMemo(() => {
-    const root = `${window.location.origin}/share`
-    const itemPath = `${item.typeId}/${item.genreId}/${item.slug}`
     let query = `tr=${translatorId}&t=${timestamp.toFixed(0)}`
     if (typeof season === 'number' && typeof episode === 'number') {
       query += `&s=${season}&e=${episode}`
     }
-    return `${root}/${itemPath}?${query}`
-  }, [item, translatorId, season, episode, timestamp])
+    return `${itemLink}?${query}`
+  }, [itemLink, translatorId, season, episode, timestamp])
 
   const toggleFavorite = useCallback(() => {
     setFavorite((prev) => !prev)
