@@ -16,34 +16,14 @@ import {
   Input,
   Label,
 } from '@/components'
-import { useAppSelector } from '@/hooks'
 
-import {
-  selectWatchItem,
-  selectWatchItemFullTitle,
-  selectWatchItemStateEpisode,
-  selectWatchItemStateSeason,
-  selectWatchItemStateTimestamp,
-  selectWatchItemStateTranslatorId,
-} from '../../watch.slice'
+export interface ShareMenuProps {
+  title: string
+  link: string
+}
 
-export function ShareMenu({ id }: { id: number }) {
+export function ShareMenu({ title, link }: ShareMenuProps) {
   const ref = useRef<HTMLInputElement>(null)
-  const item = useAppSelector((state) => selectWatchItem(state, id))
-  const translatorId = useAppSelector((state) => selectWatchItemStateTranslatorId(state, id))
-  const season = useAppSelector((state) => selectWatchItemStateSeason(state, id))
-  const episode = useAppSelector((state) => selectWatchItemStateEpisode(state, id))
-  const timestamp = useAppSelector((state) => selectWatchItemStateTimestamp(state, id))
-  const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
-  const link = useMemo(() => {
-    const root = `${window.location.origin}/share`
-    const itemPath = `${item.typeId}/${item.genreId}/${item.slug}`
-    let query = `tr=${translatorId}&t=${timestamp.toFixed(0)}`
-    if (typeof season === 'number' && typeof episode === 'number') {
-      query += `&s=${season}&e=${episode}`
-    }
-    return `${root}/${itemPath}?${query}`
-  }, [item, translatorId, season, episode, timestamp])
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [clicked, setClicked] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)

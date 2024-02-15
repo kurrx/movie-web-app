@@ -12,6 +12,10 @@ import {
   selectWatchItemFilename,
   selectWatchItemFullTitle,
   selectWatchItemQualities,
+  selectWatchItemStateEpisode,
+  selectWatchItemStateSeason,
+  selectWatchItemStateTimestamp,
+  selectWatchItemStateTranslatorId,
 } from '../../watch.slice'
 import { ActionButton } from './ActionButton'
 import { Collection } from './Collection'
@@ -33,6 +37,10 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const filename = useAppSelector((state) => selectWatchItemFilename(state, id))
   const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
   const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
+  const translatorId = useAppSelector((state) => selectWatchItemStateTranslatorId(state, id))
+  const season = useAppSelector((state) => selectWatchItemStateSeason(state, id))
+  const episode = useAppSelector((state) => selectWatchItemStateEpisode(state, id))
+  const timestamp = useAppSelector((state) => selectWatchItemStateTimestamp(state, id))
   const [favorite, setFavorite] = useState(false)
   const [saved, setSaved] = useState(false)
   const [watched, setWatched] = useState(false)
@@ -79,6 +87,15 @@ export function WatchInfo({ id }: WatchInfoProps) {
   }, [item, year])
   const persons = useMemo(() => [...item.actors, ...item.directors], [item])
   const collections = useMemo(() => [...item.bestOf, ...item.collections], [item])
+  const shareLink = useMemo(() => {
+    const root = `${window.location.origin}/share`
+    const itemPath = `${item.typeId}/${item.genreId}/${item.slug}`
+    let query = `tr=${translatorId}&t=${timestamp.toFixed(0)}`
+    if (typeof season === 'number' && typeof episode === 'number') {
+      query += `&s=${season}&e=${episode}`
+    }
+    return `${root}/${itemPath}?${query}`
+  }, [item, translatorId, season, episode, timestamp])
 
   const toggleFavorite = useCallback(() => {
     setFavorite((prev) => !prev)
@@ -116,7 +133,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         </ActionButton>
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
-        <ShareMenu id={id} />
+        <ShareMenu link={shareLink} title={title} />
         <DownloadMenu filename={filename} qualities={qualities} />
       </section>
       {item.description && (
