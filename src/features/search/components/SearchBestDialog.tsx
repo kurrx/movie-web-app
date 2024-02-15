@@ -57,7 +57,6 @@ export function SearchBestDialog() {
     let link = `/explore/${type}/best`
     if (genre) link += `/${genre}`
     if (year) link += `/${year}`
-    link += '/'
     if (pathname !== link) {
       navigate(link)
     }

@@ -14,7 +14,7 @@ export function SearchItemMore(props: SearchItemProps) {
   const { pathname } = useLocation()
   const value = useMemo(() => `[Load more] ${query}`, [query])
   const route = useMemo(
-    () => `/explore/search/?do=search&subaction=search&q=${query}&page=2`,
+    () => `/explore/search?do=search&subaction=search&q=${query}&page=2`,
     [query],
   )
 
