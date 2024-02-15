@@ -3,6 +3,7 @@ import { FetchState } from '@/core'
 import { SearchQuery } from '@/types'
 
 import { SearchItem } from './SearchItem'
+import { SearchItemMore } from './SearchItemMore'
 import { SearchItemSkeleton } from './SearchItemSkeleton'
 
 export interface SearchContentProps {
@@ -50,6 +51,7 @@ export function SearchContent(props: SearchContentProps) {
       ) : (
         item.results.map((item) => <SearchItem key={item.id} onSelect={onSelect} {...item} />)
       )}
+      {item.paginated && <SearchItemMore query={item.query} onSelect={onSelect} />}
     </CommandGroup>
   )
 }

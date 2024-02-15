@@ -72,7 +72,7 @@ export function parseComponentsToIds(typeId?: string, genreId?: string, slug?: s
   return { typeId, type, genreId, genre, slug, id }
 }
 
-export function parseSearchDocument(document: Document): SearchItem[] {
+export function parseSearchDocument(document: Document) {
   const parser = new Parser(document)
   parser.setDefaultError(NOT_AVAILABLE_ERROR)
   parser.switchToChild('.b-content__inline_items', true)
@@ -129,7 +129,11 @@ export function parseSearchDocument(document: Document): SearchItem[] {
       posterUrl,
     })
   }
-  return results
+
+  parser.setParent(document)
+  const paginated = parser.hasChild('.b-navigation')
+
+  return { results, paginated }
 }
 
 function findItemTableElementWithText(parser: Parser, parent: Element, text: string) {

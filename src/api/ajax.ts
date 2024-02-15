@@ -60,7 +60,6 @@ export const html = new Request({
 
 export async function fetchSearch(args: FetchSearchArgs, retry = 0) {
   try {
-    // TODO: Add pagination support
     const { query, signal } = args
     const params = { q: query, do: 'search', subaction: 'search' }
     const { data } = await html.get<Document>('/search/', { params, signal })

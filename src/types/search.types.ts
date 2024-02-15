@@ -3,6 +3,7 @@ import type { FetchableState } from './store.types'
 
 export interface SearchQuery extends FetchableState {
   query: string
+  paginated: boolean
   results: SearchItem[] | null
 }
 
