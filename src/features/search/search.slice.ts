@@ -69,6 +69,7 @@ const searchSlice = createSlice({
           query.state = FetchState.SUCCESS
           query.results = action.payload.results
           query.paginated = action.payload.paginated
+          query.requestId = null
         }
       })
       .addCase(search.rejected, (state, action) => {
@@ -76,6 +77,7 @@ const searchSlice = createSlice({
         if (query && query.state === FetchState.LOADING) {
           query.state = FetchState.ERROR
           query.error = action.error
+          query.requestId = null
         }
       })
   },

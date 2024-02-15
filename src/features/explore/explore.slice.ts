@@ -61,6 +61,7 @@ const exploreSlice = createSlice({
         if (query && query.state === FetchState.LOADING) {
           query.state = FetchState.SUCCESS
           query.response = action.payload
+          query.requestId = null
         }
       })
       .addCase(exploreSearch.rejected, (state, action) => {
@@ -68,6 +69,7 @@ const exploreSlice = createSlice({
         if (query && query.state === FetchState.LOADING) {
           query.state = FetchState.ERROR
           query.error = action.error
+          query.requestId = null
         }
       })
   },
