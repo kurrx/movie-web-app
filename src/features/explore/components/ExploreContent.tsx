@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { Fragment, useCallback, useEffect, useMemo } from 'react'
 
 import { FetchState } from '@/core'
 import { useStore } from '@/hooks'
@@ -6,6 +6,7 @@ import { FallbackView } from '@/views'
 
 import { exploreSearch, selectExploreResult } from '../explore.slice'
 import { ExplorePagination } from './ExplorePagination'
+import { ExploreProvider } from './ExploreProvider'
 
 export function ExploreContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -29,9 +30,15 @@ export function ExploreContent({ url }: { url: string }) {
       error={exploreItem?.error}
       onReload={get}
     >
-      <div className='w-full max-w-full flex-1 flex flex-col'>
-        <ExplorePagination url={url} />
-      </div>
+      <ExploreProvider url={url}>
+        {(response) => (
+          <Fragment>
+            {response.pagination && (
+              <ExplorePagination url={url} pagination={response.pagination} />
+            )}
+          </Fragment>
+        )}
+      </ExploreProvider>
     </FallbackView>
   )
 }

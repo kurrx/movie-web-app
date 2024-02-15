@@ -1,3 +1,5 @@
+import { useCallback, useMemo } from 'react'
+
 import {
   Pagination,
   PaginationContent,
@@ -6,9 +8,7 @@ import {
   PaginationNext,
   PaginationPrev,
 } from '@/components'
-import { useAppSelector } from '@/hooks'
-
-import { selectExploreResponse } from '../explore.slice'
+import { ExploreResponse } from '@/types'
 
 function urlToRoute(url: string) {
   const instance = new URL(`${window.location.origin}/explore${url}`)
@@ -19,10 +19,15 @@ function urlToRoute(url: string) {
   return pathname + instance.search
 }
 
-export function ExplorePagination({ url }: { url: string }) {
-  const { pagination } = useAppSelector((state) => selectExploreResponse(state, url))
+export interface ExplorePaginationProps {
+  url: string
+  pagination: NonNullable<ExploreResponse['pagination']>
+}
 
-  if (!pagination) return null
+export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
+  const currentIndex = useMemo(() => pagination.pages.findIndex((p) => !p.link), [pagination])
+
+  const getDistance = useCallback((index: number) => Math.abs(currentIndex - index), [currentIndex])
 
   return (
     <div className='container mt-8'>
@@ -38,9 +43,13 @@ export function ExplorePagination({ url }: { url: string }) {
               <PaginationPrev to={urlToRoute(pagination.prev)} />
             </PaginationItem>
           )}
-          {pagination.pages.map((p) => (
+          {pagination.pages.map((p, index) => (
             <PaginationItem key={p.page}>
-              <PaginationLink to={urlToRoute(p.link || url)} className='text-xs'>
+              <PaginationLink
+                to={urlToRoute(p.link || url)}
+                className='text-xs'
+                data-distance={getDistance(index)}
+              >
                 {p.page}
               </PaginationLink>
             </PaginationItem>
