@@ -26,6 +26,9 @@ export function App() {
                   <Routes>
                     <Route path='/' element={<HomeView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
+                    <Route path='/explore/collections/' element={null} />
+                    <Route path='/explore/person/:personId' element={null} />
+                    <Route path='/explore/*' element={<ExploreView />} />
                     <Route path='*' element={<RedirectView to='/' />} />
                   </Routes>
                 </VPNMiddleware>
