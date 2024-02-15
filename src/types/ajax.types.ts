@@ -26,6 +26,33 @@ export interface SearchItem extends ItemFullID {
   title: string
   posterUrl: string
   description: string
+  rating: number | null
+}
+
+// Explore Types
+export interface FetchExploreArgs extends RequestArgs {
+  url: string
+}
+
+export interface ExploreResponse {
+  title: string
+  items: SearchItem[]
+  pagination?: {
+    prev?: string
+    next?: string
+    firstPage?: { page: string; link: string }
+    lastPage?: { page: string; link: string }
+    pages: { page: string; link?: string }[]
+  }
+  lastLink?: string
+  popularLink?: string
+  soonLink?: string
+  watchingLink?: string
+  allLink?: string
+  filmsLink?: string
+  seriesLink?: string
+  cartoonsLink?: string
+  animationLink?: string
 }
 
 // Item Types

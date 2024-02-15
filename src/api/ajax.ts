@@ -1,5 +1,6 @@
 import { Request } from '@/core'
 import {
+  FetchExploreArgs,
   FetchItemArgs,
   FetchItemMovieArgs,
   FetchItemSeriesArgs,
@@ -34,6 +35,7 @@ import {
   sendProxiedUserAgent,
 } from './interceptors'
 import {
+  parseExploreDocument,
   parseItemDocument,
   parseItemDocumentEpisodes,
   parseSearchDocument,
@@ -66,6 +68,17 @@ export async function fetchSearch(args: FetchSearchArgs, retry = 0) {
     return parseSearchDocument(data)
   } catch (err) {
     if (retry < 3) return await fetchSearch(args, retry + 1)
+    throw err
+  }
+}
+
+export async function fetchExplore(args: FetchExploreArgs, retry = 0) {
+  try {
+    const { url, signal } = args
+    const { data } = await html.get<Document>(url, { signal })
+    return parseExploreDocument(data)
+  } catch (err) {
+    if (retry < 3) return await fetchExplore(args, retry + 1)
     throw err
   }
 }

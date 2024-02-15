@@ -2,6 +2,7 @@ import { Parser, Thumbnails } from '@/core'
 import { explore } from '@/features'
 import {
   BaseItem,
+  ExploreResponse,
   ItemCollection,
   ItemEpisodeInfo,
   ItemFranchise,
@@ -108,10 +109,24 @@ export function parseSearchDocument(document: Document) {
 
     // Poster URL
     parser.setParent(item)
-    const itemPoster = parser.switchToChild(`img[alt="${title}"]`)
+    const itemPoster = parser.switchToChild(`img[alt*="${title}"]`)
     if (!itemPoster) continue
     const posterUrl = parser.attr('src')
     if (!posterUrl) continue
+
+    // Rating
+    parser.setParent(item)
+    let rating: number | null = null
+    const ratingElem = parser.switchToChild('.b-category-bestrating')
+    if (ratingElem) {
+      const ratingStr = parser.text()?.replaceAll('(', '').replaceAll(')', '').replaceAll(',', '.')
+      if (ratingStr) {
+        const ratingNumber = parseFloat(ratingStr)
+        if (!isNaN(ratingNumber)) {
+          rating = ratingNumber
+        }
+      }
+    }
 
     // IDs
     const ids = parseUrlToIds(url)
@@ -127,6 +142,7 @@ export function parseSearchDocument(document: Document) {
       title,
       description,
       posterUrl,
+      rating,
     })
   }
 
@@ -134,6 +150,115 @@ export function parseSearchDocument(document: Document) {
   const paginated = parser.hasChild('.b-navigation')
 
   return { results, paginated }
+}
+
+function findFilterLinkWithText(parser: Parser, document: Document, text: string) {
+  parser.setParent(document)
+  const filters = parser.all('.b-content__main_filters a')
+  for (const filter of filters) {
+    parser.setParent(filter)
+    if (parser.text() === text) {
+      const link = parser.attr('href')?.replaceAll(PROVIDER_URL, '')
+      return link
+    }
+  }
+  return null
+}
+
+export function parseExploreDocument(document: Document): ExploreResponse {
+  const parser = new Parser(document)
+  parser.setDefaultError(NOT_AVAILABLE_ERROR)
+  const { results, paginated } = parseSearchDocument(document)
+
+  parser.switchToChild('.b-content__htitle', true)
+  const title = parser.text()
+  if (!title) throw new Error(NOT_AVAILABLE_ERROR)
+
+  let pagination: ExploreResponse['pagination']
+  if (paginated) {
+    pagination = { pages: [] }
+    parser.setParent(document)
+    parser.switchToChild('.b-navigation', true)
+    const childs = parser.all(':scope > *')
+    for (let i = 0; i < childs.length; i++) {
+      const child = childs[i]
+      parser.setParent(child)
+      const link = parser.attr('href')?.replaceAll(PROVIDER_URL, '')
+
+      if (parser.hasChild('.b-navigation__prev')) {
+        if (link) pagination.prev = link
+        continue
+      }
+      if (parser.hasChild('.b-navigation__next')) {
+        if (link) pagination.next = link
+        continue
+      }
+
+      const page = parser.text()
+      if (!page) continue
+      if (page === '...') continue
+
+      if (parser.isNextSibling('nav_ext') && i === 1) {
+        if (link) pagination.firstPage = { page: '1', link }
+        continue
+      }
+      if (parser.isPrevSibling('nav_ext') && i === childs.length - 2) {
+        if (link) pagination.lastPage = { page, link }
+        continue
+      }
+
+      pagination.pages.push({ page, link })
+    }
+  }
+
+  const response: ExploreResponse = { title, items: results, pagination }
+
+  const lastLink = findFilterLinkWithText(parser, document, 'Последние поступления')
+  if (lastLink) {
+    response.lastLink = lastLink
+  }
+
+  const popularLink = findFilterLinkWithText(parser, document, 'Популярные')
+  if (popularLink) {
+    response.popularLink = popularLink
+  }
+
+  const soonLink = findFilterLinkWithText(parser, document, 'В ожидании')
+  if (soonLink) {
+    response.soonLink = soonLink
+  }
+
+  const watchingLink = findFilterLinkWithText(parser, document, 'Сейчас смотрят')
+  if (watchingLink) {
+    response.watchingLink = watchingLink
+  }
+
+  const allLink = findFilterLinkWithText(parser, document, 'Все')
+  if (allLink) {
+    response.allLink = allLink
+  }
+
+  const filmsLink = findFilterLinkWithText(parser, document, 'Фильмы')
+  if (filmsLink) {
+    response.filmsLink = filmsLink
+  }
+
+  const seriesLink = findFilterLinkWithText(parser, document, 'Сериалы')
+  if (seriesLink) {
+    response.seriesLink = seriesLink
+  }
+
+  const cartoonsLink = findFilterLinkWithText(parser, document, 'Мультфильмы')
+  if (cartoonsLink) {
+    response.cartoonsLink = cartoonsLink
+  }
+
+  const animationLink = findFilterLinkWithText(parser, document, 'Аниме')
+  if (animationLink) {
+    response.animationLink = animationLink
+  }
+
+  return response
 }
 
 function findItemTableElementWithText(parser: Parser, parent: Element, text: string) {

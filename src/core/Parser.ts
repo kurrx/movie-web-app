@@ -83,4 +83,16 @@ export class Parser {
     const text = this.parent.textContent
     return text ? trimStr(text) : null
   }
+
+  public isNextSibling(className: string) {
+    if (!(this.parent instanceof Element)) return false
+    const next = this.parent.nextElementSibling
+    return next && next.classList.contains(className)
+  }
+
+  public isPrevSibling(className: string) {
+    if (!(this.parent instanceof Element)) return false
+    const prev = this.parent.previousElementSibling
+    return prev && prev.classList.contains(className)
+  }
 }
