@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
+import { RocketIcon } from '@radix-ui/react-icons'
 import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -12,13 +12,13 @@ import {
   DialogTitle,
   Label,
 } from '@/components'
-import { selectExploreOpen, setExploreOpen } from '@/features/explore'
 import { explore } from '@/features/router'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
 
-import { SearchBestSelect } from './SearchBestSelect'
+import { selectExploreOpen, setExploreOpen } from '../explore.slice'
+import { ExploreBestSelect } from './ExploreBestSelect'
 
-export function SearchBestDialog() {
+export function ExploreBestDialog() {
   const open = useAppSelector(selectExploreOpen)
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -74,7 +74,7 @@ export function SearchBestDialog() {
             <Label htmlFor='type' className='text-right'>
               Type
             </Label>
-            <SearchBestSelect
+            <ExploreBestSelect
               id='type'
               emptyPlaceholder='Select type'
               inputPlaceholder='Search type...'
@@ -88,7 +88,7 @@ export function SearchBestDialog() {
                 <Label htmlFor='genre' className='text-right'>
                   Genre
                 </Label>
-                <SearchBestSelect
+                <ExploreBestSelect
                   id='genre'
                   emptyPlaceholder='Any'
                   inputPlaceholder='Search genre...'
@@ -102,7 +102,7 @@ export function SearchBestDialog() {
             <Label htmlFor='year' className='text-right'>
               Year
             </Label>
-            <SearchBestSelect
+            <ExploreBestSelect
               id='year'
               emptyPlaceholder='Any'
               inputPlaceholder='Search year...'
@@ -115,8 +115,8 @@ export function SearchBestDialog() {
         </div>
         <DialogFooter>
           <Button disabled={type === null} onClick={onSearch}>
-            <MagnifyingGlassIcon className='mr-2 h-4 w-4' />
-            Search
+            <RocketIcon className='mr-2 h-4 w-4' />
+            Explore
           </Button>
         </DialogFooter>
       </DialogContent>

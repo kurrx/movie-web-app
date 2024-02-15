@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 
 import { cn } from '@/api'
 import {
+  Button,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -12,9 +13,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components'
-import { Button } from '@/components/ui/button'
 
-export interface SearchBestSelectProps {
+export interface ExploreBestSelectProps {
   id: string
   emptyPlaceholder: string
   inputPlaceholder: string
@@ -24,7 +24,7 @@ export interface SearchBestSelectProps {
   onChange: (value: string | null) => void
 }
 
-export function SearchBestSelect(props: SearchBestSelectProps) {
+export function ExploreBestSelect(props: ExploreBestSelectProps) {
   const { id, emptyPlaceholder, inputPlaceholder, values, value, notFoundText, onChange } = props
   const selected = useMemo(() => values.find((v) => v.value === value), [value, values])
   const [open, setOpen] = useState(false)
