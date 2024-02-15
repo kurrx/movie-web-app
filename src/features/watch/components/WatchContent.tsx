@@ -48,7 +48,8 @@ export function WatchContent({ fullId }: { fullId: ItemFullID }) {
     return () => {
       signal.abort()
     }
-  }, [dispatch, fullId, nextState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, fullId])
 
   useEffect(() => {
     if (watchItem?.state !== FetchState.SUCCESS) return
