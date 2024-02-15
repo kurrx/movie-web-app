@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 
-import { cn, convertSeconds } from '@/api'
+import { cn } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
@@ -14,7 +14,6 @@ import {
   selectWatchItemQualities,
   selectWatchItemStateEpisode,
   selectWatchItemStateSeason,
-  selectWatchItemStateTimestamp,
   selectWatchItemStateTranslatorId,
 } from '../../watch.slice'
 import { ActionButton } from './ActionButton'
@@ -40,7 +39,6 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const translatorId = useAppSelector((state) => selectWatchItemStateTranslatorId(state, id))
   const season = useAppSelector((state) => selectWatchItemStateSeason(state, id))
   const episode = useAppSelector((state) => selectWatchItemStateEpisode(state, id))
-  const timestamp = useAppSelector((state) => selectWatchItemStateTimestamp(state, id))
   const [favorite, setFavorite] = useState(false)
   const [saved, setSaved] = useState(false)
   const [watched, setWatched] = useState(false)
@@ -91,12 +89,12 @@ export function WatchInfo({ id }: WatchInfoProps) {
     return `${window.location.origin}/watch/${item.typeId}/${item.genreId}/${item.slug}`
   }, [item])
   const shareLink = useMemo(() => {
-    let query = `tr=${translatorId}&t=${timestamp.toFixed(0)}`
+    let query = `tr=${translatorId}`
     if (typeof season === 'number' && typeof episode === 'number') {
       query += `&s=${season}&e=${episode}`
     }
     return `${itemLink}?${query}`
-  }, [itemLink, translatorId, season, episode, timestamp])
+  }, [itemLink, translatorId, season, episode])
 
   const toggleFavorite = useCallback(() => {
     setFavorite((prev) => !prev)
@@ -135,7 +133,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
         <ShareMenu
-          time={convertSeconds(timestamp)}
+          id={id}
           itemTitle={item.title}
           itemLink={itemLink}
           title={title}

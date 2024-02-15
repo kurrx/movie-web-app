@@ -1,7 +1,7 @@
 import { CheckIcon, CopyIcon, Cross2Icon } from '@radix-ui/react-icons'
 import { useCallback, useMemo, useRef, useState } from 'react'
 
-import { noop } from '@/api'
+import { convertSeconds, noop } from '@/api'
 import { ShareIcon } from '@/assets'
 import {
   Button,
@@ -17,30 +17,38 @@ import {
   Input,
   Label,
 } from '@/components'
+import { useAppSelector } from '@/hooks'
+
+import { selectWatchItemStateTimestamp } from '../../watch.slice'
 
 export interface ShareMenuProps {
-  time: string
+  id: number
   itemTitle: string
   itemLink: string
   title: string
   link: string
 }
 
-export function ShareMenu({ time, itemTitle, itemLink, title, link }: ShareMenuProps) {
+export function ShareMenu({ id, itemTitle, itemLink, title, link }: ShareMenuProps) {
   const ref = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const timestamp = useAppSelector((state) => selectWatchItemStateTimestamp(state, id))
   const [clicked, setClicked] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [includeTime, setIncludeTime] = useState(false)
+  const timestampStr = useMemo(() => convertSeconds(timestamp), [timestamp])
   const Icon = useMemo(
     () => (clicked ? (isSuccess ? CheckIcon : Cross2Icon) : CopyIcon),
     [clicked, isSuccess],
   )
   const finalTitle = useMemo(
-    () => (includeTime ? `${title}\n\nTime: ${time}` : itemTitle),
-    [includeTime, itemTitle, title, time],
+    () => (includeTime ? `${title}\n\nTime: ${timestampStr}` : itemTitle),
+    [includeTime, itemTitle, title, timestampStr],
   )
-  const finalLink = useMemo(() => (includeTime ? link : itemLink), [includeTime, itemLink, link])
+  const finalLink = useMemo(
+    () => (includeTime ? `${link}&t=${timestamp.toFixed(0)}` : itemLink),
+    [includeTime, itemLink, link, timestamp],
+  )
 
   const onIncludeTimeChange = useCallback((value: boolean | 'indeterminate') => {
     if (typeof value !== 'boolean') return
@@ -84,7 +92,7 @@ export function ShareMenu({ time, itemTitle, itemLink, title, link }: ShareMenuP
         </DialogHeader>
         <div className='flex items-center space-x-2'>
           <Checkbox id='terms' checked={includeTime} onCheckedChange={onIncludeTimeChange} />
-          <Label htmlFor='terms'>Include time: {time}</Label>
+          <Label htmlFor='terms'>Include time: {timestampStr}</Label>
         </div>
         <div className='flex items-center space-x-2'>
           <div className='grid flex-1 gap-2'>
