@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
-import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon, StarIcon } from '@/assets'
+import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
 import { useAppSelector } from '@/hooks'
@@ -20,6 +20,7 @@ import { DownloadMenu } from './DownloadMenu'
 import { IMDbButton } from './IMDbButton'
 import { KinopoiskButton } from './KinopoiskButton'
 import { Person } from './Person'
+import { ShareMenu } from './ShareMenu'
 import { Table } from './Table'
 
 export interface WatchInfoProps {
@@ -115,9 +116,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
         </ActionButton>
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
-        <ActionButton disabled Icon={ShareIcon}>
-          Share
-        </ActionButton>
+        <ShareMenu id={id} />
         <DownloadMenu filename={filename} qualities={qualities} />
       </section>
       {item.description && (

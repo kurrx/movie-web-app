@@ -24,9 +24,10 @@ export const dialogContentVariants = cva(
     variants: {
       location: {
         default: cn(
-          'left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]',
-          'max-w-lg data-[state=closed]:slide-out-to-left-1/2',
-          'w-full data-[state=open]:slide-in-from-left-1/2',
+          'left-[10px] right-[10px] sm:left-[50%] top-[50%] sm:right-[auto]',
+          'sm:translate-x-[-50%] translate-y-[-50%] sm:w-full',
+          'sm:max-w-lg sm:data-[state=closed]:slide-out-to-left-1/2',
+          'sm:data-[state=open]:slide-in-from-left-1/2',
           'data-[state=closed]:slide-out-to-top-1/2',
           'data-[state=open]:slide-in-from-top-1/2',
         ),
