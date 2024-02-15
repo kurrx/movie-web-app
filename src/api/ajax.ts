@@ -312,8 +312,18 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
       return seasons
     })
     const streamFor = {
-      season: season || seasons[0].number,
-      episode: episode || seasons[0].episodes[0].number,
+      season: seasons[0].number,
+      episode: seasons[0].episodes[0].number,
+    }
+    if (season && episode) {
+      const foundSeason = seasons.find((s) => s.number === season)
+      if (foundSeason) {
+        const foundEpisode = foundSeason.episodes.find((e) => e.number === episode)
+        if (foundEpisode) {
+          streamFor.season = season
+          streamFor.episode = episode
+        }
+      }
     }
     const stream = await fetchSeriesStream({
       id,
