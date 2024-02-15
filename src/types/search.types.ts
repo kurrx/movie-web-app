@@ -10,6 +10,5 @@ export interface SearchQuery extends FetchableState {
 export interface SearchStoreState {
   open: boolean
   disabled: boolean
-  bestOpen: boolean
   queries: SearchQuery[]
 }

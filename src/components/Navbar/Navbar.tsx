@@ -10,7 +10,7 @@ import {
   selectPlayerInitialized,
   selectPlayerTheater,
   selectSearchDisabled,
-  setSearchBestOpen,
+  setExploreOpen,
   ThemeSwitcher,
 } from '@/features'
 import { useAppSelector, useElementRect, useStoreBoolean } from '@/hooks'
@@ -51,14 +51,14 @@ export function Navbar() {
     () => (isMobile ? playerInitialized : playerInitialized && playerTheater),
     [isMobile, playerInitialized, playerTheater],
   )
-  const { setTrue: onBestOpen } = useStoreBoolean(setSearchBestOpen)
+  const { setTrue: onExploreOpen } = useStoreBoolean(setExploreOpen)
 
   useElementRect(ref, 'navbar')
 
   return (
     <header ref={ref} className={cn(classes.root, isDark && 'dark text-white')}>
       <div className={classes.container}>
-        <NavbarExplore navigation={explore} onBestOpen={onBestOpen}>
+        <NavbarExplore navigation={explore} onExploreOpen={onExploreOpen}>
           <NavLink className={classes.logo.link} to='/'>
             <LogoIcon className={classes.logo.icon} />
             <span className={classes.logo.text}>{APP_NAME}</span>

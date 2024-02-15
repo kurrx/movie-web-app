@@ -15,7 +15,7 @@ import {
 } from '../ui'
 import { NavbarExploreProps } from './NavbarExplore'
 
-export function NavbarExploreDesktop({ children, navigation, onBestOpen }: NavbarExploreProps) {
+export function NavbarExploreDesktop({ children, navigation, onExploreOpen }: NavbarExploreProps) {
   return (
     <div className='mr-4 hidden md:flex'>
       {children}
@@ -28,7 +28,7 @@ export function NavbarExploreDesktop({ children, navigation, onBestOpen }: Navba
             <DropdownMenuItem asChild>
               <NavLink to='/explore/collections'>All Collections</NavLink>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onBestOpen}>Best</DropdownMenuItem>
+            <DropdownMenuItem onClick={onExploreOpen}>Best</DropdownMenuItem>
             {Object.entries(navigation).map(([typeId, type]) => (
               <DropdownMenuSub key={typeId}>
                 <DropdownMenuSubTrigger>{type.title}</DropdownMenuSubTrigger>

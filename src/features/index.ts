@@ -1,5 +1,6 @@
 export * from './components'
 export * from './device'
+export * from './explore'
 export * from './player'
 export * from './router'
 export * from './search'

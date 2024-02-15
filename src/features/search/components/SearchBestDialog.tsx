@@ -12,17 +12,17 @@ import {
   DialogTitle,
   Label,
 } from '@/components'
+import { selectExploreOpen, setExploreOpen } from '@/features/explore'
 import { explore } from '@/features/router'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
 
-import { selectSearchBestOpen, setSearchBestOpen } from '../search.slice'
 import { SearchBestSelect } from './SearchBestSelect'
 
 export function SearchBestDialog() {
-  const open = useAppSelector(selectSearchBestOpen)
+  const open = useAppSelector(selectExploreOpen)
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { set: onOpenChange, setFalse: close } = useStoreBoolean(setSearchBestOpen)
+  const { set: onOpenChange, setFalse: close } = useStoreBoolean(setExploreOpen)
   const [type, setType] = useState<string | null>(null)
   const types = useMemo(
     () => Object.entries(explore).map(([key, value]) => ({ value: key, label: value.title })),

@@ -17,14 +17,14 @@ import {
 } from '../ui'
 import { NavbarExploreProps } from './NavbarExplore'
 
-export function NavbarExploreMobile({ children, navigation, onBestOpen }: NavbarExploreProps) {
+export function NavbarExploreMobile({ children, navigation, onExploreOpen }: NavbarExploreProps) {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
 
   const handleBestOpen = useCallback(() => {
     setOpen(false)
-    onBestOpen()
-  }, [onBestOpen])
+    onExploreOpen()
+  }, [onExploreOpen])
 
   useEffect(() => {
     setOpen(false)

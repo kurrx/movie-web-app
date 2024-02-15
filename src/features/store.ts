@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { APP_NAME, IS_DEV } from '@/api'
 
 import { deviceReducer } from './device'
+import { exploreReducer } from './explore'
 import {
   endDragging,
   endHovering,
@@ -23,6 +24,7 @@ import { updateTime, watchReducer } from './watch'
 export const store = configureStore({
   reducer: {
     device: deviceReducer,
+    explore: exploreReducer,
     player: playerReducer,
     search: searchReducer,
     theme: themeReducer,
