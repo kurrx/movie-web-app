@@ -2,7 +2,6 @@ import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, ShareIcon, StarIcon } from '@/assets'
-import { selectDeviceIsMobile } from '@/features/device'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
 import { useAppSelector } from '@/hooks'
@@ -28,7 +27,6 @@ export interface WatchInfoProps {
 }
 
 export function WatchInfo({ id }: WatchInfoProps) {
-  const isMobile = useAppSelector(selectDeviceIsMobile)
   const item = useAppSelector((state) => selectWatchItem(state, id))
   const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
   const filename = useAppSelector((state) => selectWatchItemFilename(state, id))
@@ -127,7 +125,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
           <Description links={links}>{item.description}</Description>
         </section>
       )}
-      {persons.length > 0 && isMobile && (
+      {persons.length > 0 && (
         <section className='mt-8'>
           <div className='container'>
             <h3 className='font-bold text-lg'>Cast</h3>
@@ -136,6 +134,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
             className={cn(
               'mt-4 w-full overflow-x-scroll grid gap-2',
               'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
+              'sm:container',
             )}
           >
             {persons.map((p) => (
@@ -144,7 +143,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
           </div>
         </section>
       )}
-      {collections.length > 0 && isMobile && (
+      {collections.length > 0 && (
         <section className='mt-8'>
           <div className='container'>
             <h3 className='font-bold text-lg'>Collections</h3>
@@ -153,6 +152,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
             className={cn(
               'mt-4 w-full overflow-x-scroll grid gap-4',
               'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
+              'sm:container',
             )}
           >
             {collections.map((c) => (
@@ -219,59 +219,6 @@ export function WatchInfo({ id }: WatchInfoProps) {
                   <Fragment key={to}>
                     <Table.Link to={to}>{title}</Table.Link>
                     {index !== genres.length - 1 && ', '}
-                  </Fragment>
-                ))}
-              </Table.Col>
-            </Table.Row>
-          )}
-          {item.directors.length > 0 && !isMobile && (
-            <Table.Row>
-              <Table.TitleCol>Directors</Table.TitleCol>
-              <Table.Col>
-                {item.directors.map(({ id, name, url }, index) => (
-                  <Fragment key={id}>
-                    <Table.Link to={`/explore${url}`}>{name}</Table.Link>
-                    {index !== item.directors.length - 1 && ', '}
-                  </Fragment>
-                ))}
-              </Table.Col>
-            </Table.Row>
-          )}
-          {item.actors.length > 0 && !isMobile && (
-            <Table.Row>
-              <Table.TitleCol>Actors</Table.TitleCol>
-              <Table.Col>
-                {item.actors.map(({ id, name, url }, index) => (
-                  <Fragment key={id}>
-                    <Table.Link to={`/explore${url}`}>{name}</Table.Link>
-                    {index !== item.actors.length - 1 && ', '}
-                  </Fragment>
-                ))}
-              </Table.Col>
-            </Table.Row>
-          )}
-          {item.bestOf.length > 0 && !isMobile && (
-            <Table.Row>
-              <Table.TitleCol>Best of</Table.TitleCol>
-              <Table.Col>
-                {item.bestOf.map(({ url, title, place }, index) => (
-                  <Fragment key={index}>
-                    <Table.Link to={`/explore${url}`}>{title}</Table.Link>
-                    {place && ` (${place} место)`}
-                    <br />
-                  </Fragment>
-                ))}
-              </Table.Col>
-            </Table.Row>
-          )}
-          {item.collections.length > 0 && !isMobile && (
-            <Table.Row>
-              <Table.TitleCol>Collections</Table.TitleCol>
-              <Table.Col>
-                {item.collections.map(({ url, title }, index) => (
-                  <Fragment key={index}>
-                    <Table.Link to={`/explore${url}`}>{title}</Table.Link>
-                    <br />
                   </Fragment>
                 ))}
               </Table.Col>
