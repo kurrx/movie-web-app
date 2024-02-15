@@ -179,11 +179,11 @@ class Database extends Dexie {
     const { id, translatorId } = args
     const key = { id, translatorId }
     const entry = await this.moviesThumbnails.get(key)
-    await this.clean(this.moviesThumbnails, false, Database.MAX_STREAMS, (entry) => ({
+    await this.clean(this.moviesThumbnails, true, Database.MAX_STREAMS, (entry) => ({
       id: entry.id,
       translatorId: entry.translatorId,
     }))
-    if (!entry) {
+    if (!entry || Database.isExpired(entry)) {
       const content = await fetch()
       const date = new Date()
       this.moviesThumbnails.add({
@@ -200,14 +200,14 @@ class Database extends Dexie {
   private async getSeriesThumbnails(args: FetchStreamThumbnailArgs, fetch: () => Promise<string>) {
     const { id, translatorId, season, episode } = args
     const key = { id, translatorId, season: season!, episode: episode! }
-    await this.clean(this.seriesThumbnails, false, Database.MAX_STREAMS, (entry) => ({
+    await this.clean(this.seriesThumbnails, true, Database.MAX_STREAMS, (entry) => ({
       id: entry.id,
       translatorId: entry.translatorId,
       season: entry.season,
       episode: entry.episode,
     }))
     const entry = await this.seriesThumbnails.get(key)
-    if (!entry) {
+    if (!entry || Database.isExpired(entry)) {
       const content = await fetch()
       const date = new Date()
       this.seriesThumbnails.add({
