@@ -28,6 +28,7 @@ export function NavbarExploreDesktop({ children, navigation }: NavbarExploreProp
             <DropdownMenuItem asChild>
               <NavLink to='/explore/collections'>All Collections</NavLink>
             </DropdownMenuItem>
+            <DropdownMenuItem>Best</DropdownMenuItem>
             {Object.entries(navigation).map(([typeId, type]) => (
               <DropdownMenuSub key={typeId}>
                 <DropdownMenuSubTrigger>{type.title}</DropdownMenuSubTrigger>
@@ -36,7 +37,6 @@ export function NavbarExploreDesktop({ children, navigation }: NavbarExploreProp
                     <DropdownMenuItem asChild>
                       <NavLink to={`/explore/${typeId}`}>All</NavLink>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>Best</DropdownMenuItem>
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger>Genres</DropdownMenuSubTrigger>
                       <DropdownMenuPortal>

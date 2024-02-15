@@ -44,16 +44,16 @@ export function NavbarExploreMobile({ children, navigation }: NavbarExploreProps
         {children}
         <ScrollArea className='my-4 h-[calc(var(--visual-vh)*100-5rem)] pl-6'>
           <div className='flex flex-col space-y-2'>
-            <NavLink to='/explore/collections' className='font-bold !mt-6'>
+            <NavLink to='/explore/collections' className='font-bold !mt-8'>
               All Collections
             </NavLink>
+            <button className='font-bold !mt-8 text-left'>Best</button>
             {Object.entries(navigation).map(([typeId, type]) => (
               <div key={typeId} className='flex flex-col pt-6'>
                 <h4 className='font-bold'>{type.title}</h4>
                 <NavLink to={`/explore/${typeId}`} className='text-muted-foreground pl-2 mt-3'>
                   All
                 </NavLink>
-                <button className='text-muted-foreground pl-2 mt-3 text-left'>Best</button>
                 <Accordion type='multiple' className='w-full pr-8 pl-2 pt-1.5'>
                   <AccordionItem value='Genres' className='border-0'>
                     <AccordionTrigger className='text-base py-1.5 hover:no-underline outline-none'>
