@@ -329,6 +329,7 @@ export async function fetchSeriesEpisodesStream(args: FetchSeriesEpisodesStreamA
       id,
       translatorId,
       favsId,
+      signal,
       ...streamFor,
     })
     return {
