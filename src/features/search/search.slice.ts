@@ -7,6 +7,7 @@ import { AppStoreState, SearchStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: SearchStoreState = {
   open: false,
+  bestOpen: false,
   disabled: true,
   queries: [],
 }
@@ -35,6 +36,11 @@ const searchSlice = createSlice({
     setSearchOpen(state, action: PayloadAction<SetStateAction<boolean>>) {
       const payload = action.payload
       state.open = typeof payload === 'function' ? payload(state.open) : payload
+    },
+
+    setSearchBestOpen(state, action: PayloadAction<SetStateAction<boolean>>) {
+      const payload = action.payload
+      state.bestOpen = typeof payload === 'function' ? payload(state.bestOpen) : payload
     },
 
     setSearchDisabled(state, action: PayloadAction<SetStateAction<boolean>>) {
@@ -81,9 +87,10 @@ const searchSlice = createSlice({
   },
 })
 
-export const { setSearchOpen, setSearchDisabled } = searchSlice.actions
+export const { setSearchOpen, setSearchBestOpen, setSearchDisabled } = searchSlice.actions
 
 export const selectSearchOpen = (state: AppStoreState) => state.search.open
+export const selectSearchBestOpen = (state: AppStoreState) => state.search.bestOpen
 export const selectSearchDisabled = (state: AppStoreState) => state.search.disabled
 export const selectSearchResult = (state: AppStoreState, query: string) =>
   state.search.queries.find((q) => q.query === query)

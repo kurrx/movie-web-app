@@ -7,6 +7,7 @@ import { NavbarExploreMobile } from './NavbarExploreMobile'
 
 export interface NavbarExploreProps extends PropsWithChildren {
   navigation: Navigation
+  onBestOpen: () => void
 }
 
 export function NavbarExplore(props: NavbarExploreProps) {

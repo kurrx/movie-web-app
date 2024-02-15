@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import { cn } from '@/api'
@@ -17,9 +17,14 @@ import {
 } from '../ui'
 import { NavbarExploreProps } from './NavbarExplore'
 
-export function NavbarExploreMobile({ children, navigation }: NavbarExploreProps) {
+export function NavbarExploreMobile({ children, navigation, onBestOpen }: NavbarExploreProps) {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
+
+  const handleBestOpen = useCallback(() => {
+    setOpen(false)
+    onBestOpen()
+  }, [onBestOpen])
 
   useEffect(() => {
     setOpen(false)
@@ -47,7 +52,12 @@ export function NavbarExploreMobile({ children, navigation }: NavbarExploreProps
             <NavLink to='/explore/collections' className='font-bold !mt-8'>
               All Collections
             </NavLink>
-            <button className='font-bold !mt-8 text-left'>Best</button>
+            <button
+              className='font-bold !mt-8 text-left focus:outline-none'
+              onClick={handleBestOpen}
+            >
+              Best
+            </button>
             {Object.entries(navigation).map(([typeId, type]) => (
               <div key={typeId} className='flex flex-col pt-6'>
                 <h4 className='font-bold'>{type.title}</h4>

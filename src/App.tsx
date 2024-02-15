@@ -4,7 +4,7 @@ import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
-import { FeaturesProvider, SearchDialog, store } from '@/features'
+import { FeaturesProvider, SearchBestDialog, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
 import { VPNMiddleware } from '@/middlewares'
 import { HomeView, RedirectView, WatchView } from '@/views'
@@ -22,6 +22,7 @@ export function App() {
               <main id='content'>
                 <VPNMiddleware>
                   <SearchDialog />
+                  <SearchBestDialog />
                   <Routes>
                     <Route path='/' element={<HomeView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
