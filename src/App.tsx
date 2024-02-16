@@ -18,7 +18,7 @@ export function App() {
         <BrowserRouter>
           <FeaturesProvider>
             <Navbar />
-            <ScrollArea hideBar>
+            <ScrollArea hideBar id='app-scroll'>
               <main id='content'>
                 <VPNMiddleware>
                   <SearchDialog />

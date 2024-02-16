@@ -5,6 +5,8 @@ export function useScrollTop() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+    const scrollElement = document.querySelector('#app-scroll > [data-radix-scroll-area-viewport]')
+    if (!scrollElement) return
+    scrollElement.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }, [pathname])
 }
