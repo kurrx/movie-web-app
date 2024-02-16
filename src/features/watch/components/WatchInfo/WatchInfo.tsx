@@ -2,6 +2,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
+import { Table } from '@/components'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
 import { useAppSelector } from '@/hooks'
@@ -24,7 +25,6 @@ import { IMDbButton } from './IMDbButton'
 import { KinopoiskButton } from './KinopoiskButton'
 import { Person } from './Person'
 import { ShareMenu } from './ShareMenu'
-import { Table } from './Table'
 
 export interface WatchInfoProps {
   id: number
