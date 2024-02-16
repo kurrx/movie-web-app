@@ -165,15 +165,17 @@ function findFilterLinkWithText(parser: Parser, document: Document, text: string
   for (const filter of filters) {
     parser.setParent(filter)
     if (parser.text() === text) {
-      const link = parser
-        .attr('href')
-        ?.replaceAll('https://', '')
-        .replaceAll('http://', '')
-        .replaceAll(PROVIDER_DOMAIN, '')
-      return link
+      const link =
+        parser
+          .attr('href')
+          ?.replaceAll('https://', '')
+          .replaceAll('http://', '')
+          .replaceAll(PROVIDER_DOMAIN, '') || null
+      const isActive = parser.contains('active')
+      return [link, isActive] as const
     }
   }
-  return null
+  return [null, false] as const
 }
 
 export function parseExploreDocument(document: Document): ExploreResponse {
@@ -234,49 +236,46 @@ export function parseExploreDocument(document: Document): ExploreResponse {
 
   const response: ExploreResponse = { title, items: results, pagination }
 
-  const lastLink = findFilterLinkWithText(parser, document, 'Последние поступления')
-  if (lastLink) {
-    response.lastLink = lastLink
+  const [last, lastActive] = findFilterLinkWithText(parser, document, 'Последние поступления')
+  const [popular, popularActive] = findFilterLinkWithText(parser, document, 'Популярные')
+  const [soon, soonActive] = findFilterLinkWithText(parser, document, 'В ожидании')
+  const [watching, watchingActive] = findFilterLinkWithText(parser, document, 'Сейчас смотрят')
+  const isSomeSortActive = lastActive || popularActive || soonActive || watchingActive
+  if (last && popular && soon && watching && isSomeSortActive) {
+    let active: NonNullable<ExploreResponse['sort']>['active'] = 'last'
+    if (popularActive) active = 'popular'
+    if (soonActive) active = 'soon'
+    if (watchingActive) active = 'watching'
+    response.sort = {
+      last,
+      popular,
+      soon,
+      watching,
+      active,
+    }
   }
 
-  const popularLink = findFilterLinkWithText(parser, document, 'Популярные')
-  if (popularLink) {
-    response.popularLink = popularLink
-  }
-
-  const soonLink = findFilterLinkWithText(parser, document, 'В ожидании')
-  if (soonLink) {
-    response.soonLink = soonLink
-  }
-
-  const watchingLink = findFilterLinkWithText(parser, document, 'Сейчас смотрят')
-  if (watchingLink) {
-    response.watchingLink = watchingLink
-  }
-
-  const allLink = findFilterLinkWithText(parser, document, 'Все')
-  if (allLink) {
-    response.allLink = allLink
-  }
-
-  const filmsLink = findFilterLinkWithText(parser, document, 'Фильмы')
-  if (filmsLink) {
-    response.filmsLink = filmsLink
-  }
-
-  const seriesLink = findFilterLinkWithText(parser, document, 'Сериалы')
-  if (seriesLink) {
-    response.seriesLink = seriesLink
-  }
-
-  const cartoonsLink = findFilterLinkWithText(parser, document, 'Мультфильмы')
-  if (cartoonsLink) {
-    response.cartoonsLink = cartoonsLink
-  }
-
-  const animationLink = findFilterLinkWithText(parser, document, 'Аниме')
-  if (animationLink) {
-    response.animationLink = animationLink
+  const [all, allActive] = findFilterLinkWithText(parser, document, 'Все')
+  const [films, filmsActive] = findFilterLinkWithText(parser, document, 'Фильмы')
+  const [series, seriesActive] = findFilterLinkWithText(parser, document, 'Сериалы')
+  const [cartoons, cartoonsActive] = findFilterLinkWithText(parser, document, 'Мультфильмы')
+  const [animation, animationActive] = findFilterLinkWithText(parser, document, 'Аниме')
+  const isFilterSomeActive =
+    allActive || filmsActive || seriesActive || cartoonsActive || animationActive
+  if (all && films && series && cartoons && animation && isFilterSomeActive) {
+    let active: NonNullable<ExploreResponse['filter']>['active'] = 'all'
+    if (filmsActive) active = 'films'
+    if (seriesActive) active = 'series'
+    if (cartoonsActive) active = 'cartoons'
+    if (animationActive) active = 'animation'
+    response.filter = {
+      all,
+      films,
+      series,
+      cartoons,
+      animation,
+      active,
+    }
   }
 
   return response

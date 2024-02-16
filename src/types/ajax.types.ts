@@ -44,15 +44,21 @@ export interface ExploreResponse {
     lastPage?: { page: string; link: string }
     pages: { page: string; link?: string }[]
   }
-  lastLink?: string
-  popularLink?: string
-  soonLink?: string
-  watchingLink?: string
-  allLink?: string
-  filmsLink?: string
-  seriesLink?: string
-  cartoonsLink?: string
-  animationLink?: string
+  sort?: {
+    last: string
+    popular: string
+    soon: string
+    watching: string
+    active: 'last' | 'popular' | 'soon' | 'watching'
+  }
+  filter?: {
+    all: string
+    films: string
+    series: string
+    cartoons: string
+    animation: string
+    active: 'all' | 'films' | 'series' | 'cartoons' | 'animation'
+  }
 }
 
 // Item Types
