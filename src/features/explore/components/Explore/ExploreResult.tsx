@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components'
 import { ExploreResponse } from '@/types'
+import { ErrorView } from '@/views'
 
 import { ExploreItems } from '../ExploreItems'
 import { urlToRoute } from '../utils'
@@ -34,7 +35,7 @@ function filterLink(sort: Filter, key: Filter['active'], url: string) {
 
 export function ExploreResult({ url, response }: ExploreResultProps) {
   return (
-    <div className='container mt-8 mb-16'>
+    <div className='container flex-1 flex flex-col mt-8 mb-16'>
       <h1 className='text-xl font-bold'>{response.title}</h1>
       {(response.sort || response.filter) && (
         <div className='flex items-center justify-start space-x-2 mt-4'>
@@ -91,7 +92,11 @@ export function ExploreResult({ url, response }: ExploreResultProps) {
           )}
         </div>
       )}
-      <ExploreItems url={url} items={response.items} pagination={response.pagination} />
+      {response.items.length > 0 ? (
+        <ExploreItems url={url} items={response.items} pagination={response.pagination} />
+      ) : (
+        <ErrorView title='Oops' subtitle='Nothing found.' docTitle='Not Found' />
+      )}
     </div>
   )
 }
