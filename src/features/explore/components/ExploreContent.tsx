@@ -1,11 +1,11 @@
-import { Fragment, useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { FetchState } from '@/core'
 import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
 import { exploreSearch, selectExploreResult } from '../explore.slice'
-import { ExplorePagination } from './ExplorePagination'
+import { ExploreItems } from './ExploreItems'
 import { ExploreProvider } from './ExploreProvider'
 
 export function ExploreContent({ url }: { url: string }) {
@@ -31,13 +31,7 @@ export function ExploreContent({ url }: { url: string }) {
       onReload={get}
     >
       <ExploreProvider url={url}>
-        {(response) => (
-          <Fragment>
-            {response.pagination && (
-              <ExplorePagination url={url} pagination={response.pagination} />
-            )}
-          </Fragment>
-        )}
+        {(response) => <ExploreItems url={url} response={response} />}
       </ExploreProvider>
     </FallbackView>
   )
