@@ -58,7 +58,7 @@ export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
   }, [pagination, isMobile, currentIndex, showFirstPage, showLastPage])
 
   return (
-    <div className='container mt-8'>
+    <div className='container mt-8 mb-16'>
       <Pagination>
         <PaginationContent>
           {showFirstPage && firstPageLink && (
