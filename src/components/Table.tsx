@@ -1,29 +1,50 @@
 import { PropsWithChildren } from 'react'
 import { NavLink } from 'react-router-dom'
 
-function Root({ children }: PropsWithChildren) {
-  return <div className='mt-2'>{children}</div>
+import { cn } from '@/api'
+
+export interface TableProps extends PropsWithChildren {
+  className?: string
 }
 
-function Row({ children }: PropsWithChildren) {
+function Root({ children, className }: TableProps) {
+  return <div className={cn('mt-2', className)}>{children}</div>
+}
+
+function Row({ children, className }: TableProps) {
   return (
-    <div className='flex items-baseline sm:py-2 py-1 sm:text-base text-sm text-muted-foreground'>
+    <div
+      className={cn(
+        'flex items-baseline sm:py-2',
+        'py-1 sm:text-base text-sm',
+        'text-muted-foreground',
+        className,
+      )}
+    >
       {children}
     </div>
   )
 }
 
-function TitleCol({ children }: PropsWithChildren) {
-  return <div className='w-[10rem] font-light'>{children}</div>
+function TitleCol({ children, className }: TableProps) {
+  return <div className={cn('w-[10rem] font-light', className)}>{children}</div>
 }
 
-function Col({ children }: PropsWithChildren) {
-  return <div className='flex-1 font-medium'>{children}</div>
+function Col({ children, className }: TableProps) {
+  return <div className={cn('flex-1 font-medium', className)}>{children}</div>
 }
 
-function Link({ children, to }: PropsWithChildren<{ to: string }>) {
+interface LinkProps extends PropsWithChildren {
+  to: string
+  className?: string
+}
+
+function Link({ children, to, className }: LinkProps) {
   return (
-    <NavLink to={to} className='text-primary hover:text-[var(--ui-primary)] transition-colors'>
+    <NavLink
+      to={to}
+      className={cn('text-primary hover:text-[var(--ui-primary)] transition-colors', className)}
+    >
       {children}
     </NavLink>
   )
