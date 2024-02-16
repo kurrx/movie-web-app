@@ -7,8 +7,9 @@ import { FallbackView } from '@/views'
 
 import { explorePerson, selectExplorePersonResult } from '../../explore.slice'
 import { ExplorePersonProvider } from './ExplorePersonProvider'
+import { ExplorePersonResult } from './ExplorePersonResult'
 
-export function ExplorePersonResult({ id }: { id: string }) {
+export function ExplorePersonContent({ id }: { id: string }) {
   const [dispatch, selector] = useStore()
   const personResult = selector((state) => selectExplorePersonResult(state, id))
   const state = useMemo(() => personResult?.state || FetchState.LOADING, [personResult])
@@ -34,6 +35,7 @@ export function ExplorePersonResult({ id }: { id: string }) {
         {(person) => (
           <Fragment>
             <Title>{person.name}</Title>
+            <ExplorePersonResult person={person} />
           </Fragment>
         )}
       </ExplorePersonProvider>
