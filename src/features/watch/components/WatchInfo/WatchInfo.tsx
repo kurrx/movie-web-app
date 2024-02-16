@@ -154,8 +154,11 @@ export function WatchInfo({ id }: WatchInfoProps) {
           <div
             className={cn(
               'mt-4 w-full overflow-x-scroll grid gap-2',
-              'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
+              'grid-flow-col no-scrollbar sm:px-8 px-4',
               'sm:container',
+              persons.length >= 3 && 'grid-rows-3',
+              persons.length === 2 && 'grid-rows-2',
+              persons.length === 1 && 'grid-rows-1',
             )}
           >
             {persons.map((p) => (
@@ -172,8 +175,11 @@ export function WatchInfo({ id }: WatchInfoProps) {
           <div
             className={cn(
               'mt-4 w-full overflow-x-scroll grid gap-4',
-              'grid-rows-3 grid-flow-col no-scrollbar sm:px-8 px-4',
+              'grid-flow-col no-scrollbar sm:px-8 px-4',
               'sm:container',
+              collections.length >= 3 && 'grid-rows-3',
+              collections.length === 2 && 'grid-rows-2',
+              collections.length === 1 && 'grid-rows-1',
             )}
           >
             {collections.map((c) => (
