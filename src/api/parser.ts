@@ -170,7 +170,7 @@ function findFilterLinkWithText(parser: Parser, document: Document, text: string
           .attr('href')
           ?.replaceAll('https://', '')
           .replaceAll('http://', '')
-          .replaceAll(PROVIDER_DOMAIN, '') || null
+          .replaceAll(PROVIDER_DOMAIN, '') || 'current'
       const isActive = parser.contains('active')
       return [link, isActive] as const
     }

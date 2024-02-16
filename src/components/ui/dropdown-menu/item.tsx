@@ -24,6 +24,7 @@ export const DropdownMenuItem = forwardRef<Ref, DropdownMenuItemProps>(
           'outline-none transition-colors focus:bg-accent',
           'focus:text-accent-foreground',
           'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+          'data-[active=true]:bg-primary data-[active=true]:text-primary-foreground',
           inset && 'pl-8',
           className,
         )}
