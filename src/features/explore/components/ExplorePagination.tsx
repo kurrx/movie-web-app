@@ -11,14 +11,7 @@ import {
 } from '@/components'
 import { ExploreResponse } from '@/types'
 
-function urlToRoute(url: string) {
-  const instance = new URL(`${window.location.origin}/explore${url}`)
-  let pathname = instance.pathname
-  if (pathname.endsWith('/')) {
-    pathname = pathname.slice(0, -1)
-  }
-  return pathname + instance.search
-}
+import { urlToRoute } from './utils'
 
 export interface ExplorePaginationProps {
   url: string
