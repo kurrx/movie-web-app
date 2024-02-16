@@ -10,8 +10,8 @@ import {
 } from '@/components'
 import { ExploreResponse } from '@/types'
 
-import { ExploreItems } from './ExploreItems'
-import { urlToRoute } from './utils'
+import { ExploreItems } from '../ExploreItems'
+import { urlToRoute } from '../utils'
 
 export interface ExploreResultProps {
   url: string

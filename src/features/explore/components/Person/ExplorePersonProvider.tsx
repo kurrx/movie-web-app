@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/hooks'
 import { ExplorePerson } from '@/types'
 
-import { selectExplorePerson } from '../explore.slice'
+import { selectExplorePerson } from '../../explore.slice'
 
 export interface ExplorePersonProviderProps {
   id: string

@@ -1,7 +1,7 @@
 import { useAppSelector } from '@/hooks'
 import { ExploreResponse } from '@/types'
 
-import { selectExploreResponse } from '../explore.slice'
+import { selectExploreResponse } from '../../explore.slice'
 
 export interface ExploreProviderProps {
   url: string

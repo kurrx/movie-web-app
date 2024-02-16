@@ -1,3 +1,3 @@
-export * from './ExploreBestDialog'
-export * from './ExploreContent'
-export * from './ExplorePersonContent'
+export * from './Best'
+export * from './Explore'
+export * from './Person'

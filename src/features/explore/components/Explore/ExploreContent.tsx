@@ -5,7 +5,7 @@ import { Title } from '@/features/router'
 import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
-import { exploreSearch, selectExploreResult } from '../explore.slice'
+import { exploreSearch, selectExploreResult } from '../../explore.slice'
 import { ExploreProvider } from './ExploreProvider'
 import { ExploreResult } from './ExploreResult'
 

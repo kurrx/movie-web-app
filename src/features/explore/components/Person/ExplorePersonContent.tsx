@@ -5,7 +5,7 @@ import { Title } from '@/features/router'
 import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
-import { explorePerson, selectExplorePersonResult } from '../explore.slice'
+import { explorePerson, selectExplorePersonResult } from '../../explore.slice'
 import { ExplorePersonProvider } from './ExplorePersonProvider'
 
 export function ExplorePersonResult({ id }: { id: string }) {

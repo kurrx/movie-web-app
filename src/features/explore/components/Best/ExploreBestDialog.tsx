@@ -15,7 +15,7 @@ import {
 import { explore } from '@/features/router'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
 
-import { selectExploreOpen, setExploreOpen } from '../explore.slice'
+import { selectExploreOpen, setExploreOpen } from '../../explore.slice'
 import { ExploreBestSelect } from './ExploreBestSelect'
 
 export function ExploreBestDialog() {
