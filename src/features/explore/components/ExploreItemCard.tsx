@@ -1,5 +1,5 @@
 import { PlayIcon } from '@radix-ui/react-icons'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { cn } from '@/api'
@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
   KinopoiskBadge,
+  Skeleton,
 } from '@/components'
 import { SearchItem } from '@/types'
 
@@ -21,19 +22,24 @@ export interface ExploreItemCardProps {
 }
 
 export function ExploreItemCard({ item }: ExploreItemCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false)
   const to = useMemo(() => `/watch/${item.typeId}/${item.genreId}/${item.slug}`, [item])
 
   return (
     <Card className='w-full flex overflow-hidden'>
       <div className='relative w-[35%] rounded-lg overflow-hidden shrink-0'>
         <div className='pb-[150%]' />
-        <div
-          className='absolute w-full h-full top-0 left-0'
-          style={{
-            backgroundImage: `url("${item.posterUrl}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
+        <img
+          src={item.posterUrl}
+          alt={item.title}
+          className={cn(
+            'absolute w-full h-full top-0 left-0 object-cover',
+            !imageLoaded ? 'hidden' : 'inline-block',
+          )}
+          onLoad={() => setImageLoaded(true)}
+        />
+        <Skeleton
+          className={cn('absolute w-full h-full top-0 left-0 ', !imageLoaded ? 'block' : 'hidden')}
         />
         {item.rating && (
           <div className='absolute left-[0.5rem] top-[0.5rem]'>
