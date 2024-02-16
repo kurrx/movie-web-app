@@ -192,3 +192,7 @@ export function transliterate(str: string) {
 export function refererFromId(fullId: ItemFullID) {
   return `${PROVIDER_URL}/${fullId.typeId}/${fullId.genreId}/${fullId.slug}.html`
 }
+
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}

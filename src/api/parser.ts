@@ -20,7 +20,14 @@ import {
 } from '@/types'
 
 import { PROVIDER_DOMAIN, PROXY_URL } from './env'
-import { base64ToString, product, stringToBase64, unite } from './utils'
+import {
+  base64ToString,
+  capitalizeFirstLetter,
+  product,
+  stringToBase64,
+  trimStr,
+  unite,
+} from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
 const NOT_REALEASED_ERROR = 'This title is not released yet.'
@@ -175,7 +182,7 @@ export function parseExploreDocument(document: Document): ExploreResponse {
   const { results, paginated } = parseSearchDocument(document)
 
   parser.switchToChild('.b-content__htitle', true)
-  const title = parser.text()
+  let title = parser.text()?.replaceAll(' в HD онлайн', '').replaceAll('Смотреть ', '')
   if (!title) throw new Error(NOT_AVAILABLE_ERROR)
 
   let pagination: ExploreResponse['pagination']
@@ -215,9 +222,15 @@ export function parseExploreDocument(document: Document): ExploreResponse {
         continue
       }
 
+      if (!link) {
+        title = title.replaceAll(`, страница ${page}`, '')
+      }
+
       pagination.pages.push({ page, link })
     }
   }
+
+  title = capitalizeFirstLetter(trimStr(title))
 
   const response: ExploreResponse = { title, items: results, pagination }
 
