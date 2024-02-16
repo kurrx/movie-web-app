@@ -19,7 +19,7 @@ import {
   StreamSuccessResponse,
 } from '@/types'
 
-import { PROVIDER_URL, PROXY_URL } from './env'
+import { PROVIDER_DOMAIN, PROXY_URL } from './env'
 import { base64ToString, product, stringToBase64, unite } from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
@@ -158,7 +158,11 @@ function findFilterLinkWithText(parser: Parser, document: Document, text: string
   for (const filter of filters) {
     parser.setParent(filter)
     if (parser.text() === text) {
-      const link = parser.attr('href')?.replaceAll(PROVIDER_URL, '')
+      const link = parser
+        .attr('href')
+        ?.replaceAll('https://', '')
+        .replaceAll('http://', '')
+        .replaceAll(PROVIDER_DOMAIN, '')
       return link
     }
   }
@@ -183,7 +187,11 @@ export function parseExploreDocument(document: Document): ExploreResponse {
     for (let i = 0; i < childs.length; i++) {
       const child = childs[i]
       parser.setParent(child)
-      const link = parser.attr('href')?.replaceAll(PROVIDER_URL, '')
+      const link = parser
+        .attr('href')
+        ?.replaceAll('https://', '')
+        .replaceAll('http://', '')
+        .replaceAll(PROVIDER_DOMAIN, '')
 
       if (parser.hasChild('.b-navigation__prev')) {
         if (link) pagination.prev = link
@@ -331,7 +339,12 @@ function parseItemCollections(parser: Parser, parent: Element, text: string): It
     parser.setParent(link)
 
     // URL
-    const url = parser.attr('href')?.replaceAll(`${PROVIDER_URL}`, '').slice(0, -1)
+    const url = parser
+      .attr('href')
+      ?.replaceAll('https://', '')
+      .replaceAll('http://', '')
+      .replaceAll(PROVIDER_DOMAIN, '')
+      .slice(0, -1)
     if (!url) continue
 
     // Title
@@ -382,7 +395,12 @@ function parseItemPersons(parser: Parser, parent: Element, type: string): ItemPe
       if (!name) continue
 
       // URL
-      const url = parser.attr('href')?.replaceAll(`${PROVIDER_URL}`, '').slice(0, -1)
+      const url = parser
+        .attr('href')
+        ?.replaceAll('https://', '')
+        .replaceAll('http://', '')
+        .replaceAll(PROVIDER_DOMAIN, '')
+        .slice(0, -1)
       if (!url) continue
 
       results.push({ id, name, photoUrl, job, url })
@@ -672,7 +690,11 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
     if (link) {
       const link = parser.attr('href')
       if (link) {
-        const yearStr = link.replaceAll(`${PROVIDER_URL}/year/`, '').slice(0, -1)
+        const yearStr = link
+          .replaceAll('https://', '')
+          .replaceAll('http://', '')
+          .replaceAll(`${PROVIDER_DOMAIN}/year/`, '')
+          .slice(0, -1)
         if (yearStr) {
           year = parseInt(yearStr)
           if (isNaN(year)) year = null
@@ -717,7 +739,12 @@ export function parseItemDocument(document: Document, fullId: ItemFullID): BaseI
     parser.setParent(genre.parentElement)
     const url = parser.attr('href')
     if (!url) continue
-    const genreId = url.replaceAll(`${PROVIDER_URL}/`, '').slice(0, -1).split('/')[1]
+    const genreId = url
+      .replaceAll('https://', '')
+      .replaceAll('http://', '')
+      .replaceAll(PROVIDER_DOMAIN + '/', '')
+      .slice(0, -1)
+      .split('/')[1]
     if (!genreId) continue
     genreIds.push(genreId)
   }
