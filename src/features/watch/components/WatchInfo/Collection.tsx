@@ -8,7 +8,7 @@ export function Collection({ collection }: { collection: ItemCollection }) {
     <NavLink to={`/explore${collection.url}`} className='w-[20rem] shrink-0 flex items-center'>
       <span
         className='w-16 h-16 shrink-0 mr-4 rounded-md'
-        style={{ backgroundImage: randomGradient(`${collection.title}-${Date.now()}`, 'diagonal') }}
+        style={{ backgroundImage: randomGradient(collection.title, 'diagonal') }}
       />
       <span className='grow min-w-0'>
         <p className='font-bold text-sm leading-[1.2]'>{collection.title}</p>
