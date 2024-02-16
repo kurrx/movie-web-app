@@ -2,6 +2,7 @@ import { Parser, Thumbnails } from '@/core'
 import { explore } from '@/features'
 import {
   BaseItem,
+  ExplorePagination,
   ExploreResponse,
   ItemCollection,
   ItemEpisodeInfo,
@@ -80,11 +81,8 @@ export function parseComponentsToIds(typeId?: string, genreId?: string, slug?: s
   return { typeId, type, genreId, genre, slug, id }
 }
 
-export function parseSearchDocument(document: Document) {
-  const parser = new Parser(document)
-  parser.setDefaultError(NOT_AVAILABLE_ERROR)
-  parser.switchToChild('.b-content__inline_items', true)
-
+function parseSearchItems(parser: Parser, document: Document) {
+  parser.setParent(document)
   const results: SearchItem[] = []
   const items = parser.all('.b-content__inline_item')
   for (const item of items) {
@@ -152,9 +150,17 @@ export function parseSearchDocument(document: Document) {
       rating,
     })
   }
+  return results
+}
+
+export function parseSearchDocument(document: Document) {
+  const parser = new Parser(document)
+  parser.setDefaultError(NOT_AVAILABLE_ERROR)
+  parser.switchToChild('.b-content__inline_items', true)
 
   parser.setParent(document)
   const paginated = parser.hasChild('.b-navigation')
+  const results = parseSearchItems(parser, document)
 
   return { results, paginated }
 }
@@ -178,7 +184,48 @@ function findFilterLinkWithText(parser: Parser, document: Document, text: string
   return [null, false] as const
 }
 
-export function parseExploreDocument(document: Document): ExploreResponse {
+function parseExplorePagination(parser: Parser, document: Document) {
+  parser.setParent(document)
+  parser.switchToChild('.b-navigation', true)
+  const pagination: ExplorePagination = { pages: [] }
+  const childs = parser.all(':scope > *')
+  for (let i = 0; i < childs.length; i++) {
+    const child = childs[i]
+    parser.setParent(child)
+    const link = parser
+      .attr('href')
+      ?.replaceAll('https://', '')
+      .replaceAll('http://', '')
+      .replaceAll(PROVIDER_DOMAIN, '')
+
+    if (parser.hasChild('.b-navigation__prev')) {
+      if (link) pagination.prev = link
+      continue
+    }
+    if (parser.hasChild('.b-navigation__next')) {
+      if (link) pagination.next = link
+      continue
+    }
+
+    const page = parser.text()
+    if (!page) continue
+    if (page === '...') continue
+
+    if (parser.isNextSibling('nav_ext') && i === 1) {
+      if (link) pagination.firstPage = { page: '1', link }
+      continue
+    }
+    if (parser.isPrevSibling('nav_ext') && i === childs.length - 2) {
+      if (link) pagination.lastPage = { page, link }
+      continue
+    }
+
+    pagination.pages.push({ page, link })
+  }
+  return pagination
+}
+
+export function parseExploreDocument(document: Document) {
   const parser = new Parser(document)
   parser.setDefaultError(NOT_AVAILABLE_ERROR)
   const { results, paginated } = parseSearchDocument(document)
@@ -187,48 +234,12 @@ export function parseExploreDocument(document: Document): ExploreResponse {
   let title = parser.text()?.replaceAll(' в HD онлайн', '').replaceAll('Смотреть ', '')
   if (!title) throw new Error(NOT_AVAILABLE_ERROR)
 
-  let pagination: ExploreResponse['pagination']
+  let pagination: ExplorePagination | undefined
   if (paginated) {
-    pagination = { pages: [] }
-    parser.setParent(document)
-    parser.switchToChild('.b-navigation', true)
-    const childs = parser.all(':scope > *')
-    for (let i = 0; i < childs.length; i++) {
-      const child = childs[i]
-      parser.setParent(child)
-      const link = parser
-        .attr('href')
-        ?.replaceAll('https://', '')
-        .replaceAll('http://', '')
-        .replaceAll(PROVIDER_DOMAIN, '')
-
-      if (parser.hasChild('.b-navigation__prev')) {
-        if (link) pagination.prev = link
-        continue
-      }
-      if (parser.hasChild('.b-navigation__next')) {
-        if (link) pagination.next = link
-        continue
-      }
-
-      const page = parser.text()
-      if (!page) continue
-      if (page === '...') continue
-
-      if (parser.isNextSibling('nav_ext') && i === 1) {
-        if (link) pagination.firstPage = { page: '1', link }
-        continue
-      }
-      if (parser.isPrevSibling('nav_ext') && i === childs.length - 2) {
-        if (link) pagination.lastPage = { page, link }
-        continue
-      }
-
-      if (!link) {
-        title = title.replaceAll(`, страница ${page}`, '')
-      }
-
-      pagination.pages.push({ page, link })
+    pagination = parseExplorePagination(parser, document)
+    const currentPage = pagination.pages.find((page) => !page.link)
+    if (currentPage) {
+      title = title.replaceAll(`, страница ${currentPage.page}`, '')
     }
   }
 

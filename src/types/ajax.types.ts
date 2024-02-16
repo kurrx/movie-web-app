@@ -34,16 +34,22 @@ export interface FetchExploreArgs extends RequestArgs {
   url: string
 }
 
+export interface FetchPersonArgs extends RequestArgs {
+  id: string
+}
+
+export interface ExplorePagination {
+  prev?: string
+  next?: string
+  firstPage?: { page: string; link: string }
+  lastPage?: { page: string; link: string }
+  pages: { page: string; link?: string }[]
+}
+
 export interface ExploreResponse {
   title: string
   items: SearchItem[]
-  pagination?: {
-    prev?: string
-    next?: string
-    firstPage?: { page: string; link: string }
-    lastPage?: { page: string; link: string }
-    pages: { page: string; link?: string }[]
-  }
+  pagination?: ExplorePagination
   sort?: {
     last: string
     popular: string

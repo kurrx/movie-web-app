@@ -9,13 +9,13 @@ import {
   PaginationNext,
   PaginationPrev,
 } from '@/components'
-import { ExploreResponse } from '@/types'
+import { ExplorePagination as IExplorePagination } from '@/types'
 
 import { urlToRoute } from './utils'
 
 export interface ExplorePaginationProps {
   url: string
-  pagination: NonNullable<ExploreResponse['pagination']>
+  pagination: IExplorePagination
 }
 
 export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
