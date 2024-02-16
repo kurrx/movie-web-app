@@ -358,11 +358,11 @@ export function parsePersonDocument(document: Document) {
 
   // Gallery
   parser.setParent(parent)
-  const images = parser.all('.b-person__gallery_list img')
+  const images = parser.all('.b-person__gallery_list a')
   const gallery: string[] = []
   for (const image of images) {
     parser.setParent(image)
-    const url = parser.attr('src')
+    const url = parser.attr('href')
     if (url) gallery.push(url)
   }
 
