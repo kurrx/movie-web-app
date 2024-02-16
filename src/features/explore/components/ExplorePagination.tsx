@@ -1,4 +1,5 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useMediaQuery } from 'usehooks-ts'
 
 import {
   Pagination,
@@ -25,17 +26,51 @@ export interface ExplorePaginationProps {
 }
 
 export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
+  const isMobile = useMediaQuery('(max-width: 600px)')
   const currentIndex = useMemo(() => pagination.pages.findIndex((p) => !p.link), [pagination])
-
-  const getDistance = useCallback((index: number) => Math.abs(currentIndex - index), [currentIndex])
+  const showFirstPage = useMemo(
+    () => pagination.firstPage || (isMobile && !pagination.firstPage && currentIndex > 1),
+    [isMobile, currentIndex, pagination],
+  )
+  const firstPageLink = useMemo(() => {
+    if (pagination.firstPage) return pagination.firstPage.link
+    if (showFirstPage) return pagination.pages[0].link!
+  }, [pagination, showFirstPage])
+  const showLastPage = useMemo(
+    () =>
+      pagination.lastPage ||
+      (isMobile && !pagination.lastPage && currentIndex < pagination.pages.length - 2),
+    [isMobile, currentIndex, pagination],
+  )
+  const lastPageLink = useMemo(() => {
+    if (pagination.lastPage) return pagination.lastPage.link
+    if (showLastPage) return pagination.pages[pagination.pages.length - 1].link!
+  }, [pagination, showLastPage])
+  const pages = useMemo(() => {
+    let minDistance = -1,
+      maxDistance = 1
+    if (!pagination.prev) maxDistance++
+    if (!pagination.next) minDistance--
+    if (!showFirstPage) maxDistance++
+    if (!showLastPage) minDistance--
+    if (!pagination.prev && !showFirstPage) maxDistance++
+    if (!pagination.next && !showLastPage) minDistance--
+    return pagination.pages.filter((p, i) => {
+      if (!isMobile) return true
+      if (i === currentIndex) return true
+      const distance = i - currentIndex
+      if (distance >= minDistance && distance <= maxDistance) return true
+      return false
+    })
+  }, [pagination, isMobile, currentIndex, showFirstPage, showLastPage])
 
   return (
     <div className='container mt-8'>
       <Pagination>
         <PaginationContent>
-          {pagination.firstPage && (
+          {showFirstPage && firstPageLink && (
             <PaginationItem>
-              <PaginationPrev first to={urlToRoute(pagination.firstPage.link)} />
+              <PaginationPrev first to={urlToRoute(firstPageLink)} />
             </PaginationItem>
           )}
           {pagination.prev && (
@@ -43,13 +78,9 @@ export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
               <PaginationPrev to={urlToRoute(pagination.prev)} />
             </PaginationItem>
           )}
-          {pagination.pages.map((p, index) => (
+          {pages.map((p) => (
             <PaginationItem key={p.page}>
-              <PaginationLink
-                to={urlToRoute(p.link || url)}
-                className='text-xs'
-                data-distance={getDistance(index)}
-              >
+              <PaginationLink to={urlToRoute(p.link || url)} className='text-xs'>
                 {p.page}
               </PaginationLink>
             </PaginationItem>
@@ -59,9 +90,9 @@ export function ExplorePagination({ url, pagination }: ExplorePaginationProps) {
               <PaginationNext to={urlToRoute(pagination.next)} />
             </PaginationItem>
           )}
-          {pagination.lastPage && (
+          {showLastPage && lastPageLink && (
             <PaginationItem>
-              <PaginationNext last to={urlToRoute(pagination.lastPage.link)} />
+              <PaginationNext last to={urlToRoute(lastPageLink)} />
             </PaginationItem>
           )}
         </PaginationContent>
