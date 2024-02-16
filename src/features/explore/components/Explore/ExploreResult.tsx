@@ -36,7 +36,7 @@ function filterLink(sort: Filter, key: Filter['active'], url: string) {
 export function ExploreResult({ url, response }: ExploreResultProps) {
   return (
     <div className='container flex-1 flex flex-col mt-8 mb-16'>
-      <h1 className='text-xl font-bold'>{response.title}</h1>
+      <h1 className='sm:text-4xl text-2xl font-bold'>{response.title}</h1>
       {(response.sort || response.filter) && (
         <div className='flex items-center justify-start space-x-2 mt-4'>
           {response.sort && (
