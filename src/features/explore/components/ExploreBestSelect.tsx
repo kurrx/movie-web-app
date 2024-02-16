@@ -33,6 +33,7 @@ export function ExploreBestSelect(props: ExploreBestSelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant='outline'
           role='combobox'
           aria-expanded={open}
@@ -49,7 +50,7 @@ export function ExploreBestSelect(props: ExploreBestSelectProps) {
             return 0
           }}
         >
-          <CommandInput id={id} placeholder={inputPlaceholder} />
+          <CommandInput placeholder={inputPlaceholder} />
           <CommandEmpty>{notFoundText} not found</CommandEmpty>
           <CommandGroup className='max-h-[10.5rem]'>
             {selected && (
