@@ -1,13 +1,14 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
-import { fetchExplore } from '@/api'
+import { fetchExplore, fetchPerson } from '@/api'
 import { FetchState } from '@/core'
 import { AppStoreState, ExploreStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: ExploreStoreState = {
   open: false,
   queries: [],
+  persons: [],
 }
 
 type ExploreReturnType = Awaited<ReturnType<typeof fetchExplore>>
@@ -22,6 +23,22 @@ export const exploreSearch = createAsyncThunk<ExploreReturnType, ExploreParamTyp
       const findQuery = queries.find((q) => q.url === arg)
       if (!findQuery) return true
       return findQuery.state !== FetchState.SUCCESS
+    },
+  },
+)
+
+type PersonReturnType = Awaited<ReturnType<typeof fetchPerson>>
+type PersonParamType = string
+export const explorePerson = createAsyncThunk<PersonReturnType, PersonParamType, ThunkApiConfig>(
+  'explore/person',
+  async (id, { signal }) => await fetchPerson({ id, signal }),
+  {
+    condition(arg, api) {
+      if (!arg) return false
+      const persons = api.getState().explore.persons
+      const findPerson = persons.find((p) => p.id === arg)
+      if (!findPerson) return true
+      return findPerson.state !== FetchState.SUCCESS
     },
   },
 )
@@ -72,6 +89,41 @@ const exploreSlice = createSlice({
           query.requestId = null
         }
       })
+
+    builder
+      .addCase(explorePerson.pending, (state, action) => {
+        const person = state.persons.find((q) => q.id === action.meta.arg)
+        if (!person) {
+          state.persons.push({
+            id: action.meta.arg,
+            state: FetchState.LOADING,
+            error: null,
+            requestId: action.meta.requestId,
+            person: null,
+          })
+        } else {
+          person.state = FetchState.LOADING
+          person.error = null
+          person.requestId = action.meta.requestId
+          person.person = null
+        }
+      })
+      .addCase(explorePerson.fulfilled, (state, action) => {
+        const person = state.persons.find((q) => q.requestId === action.meta.requestId)
+        if (person && person.state === FetchState.LOADING) {
+          person.state = FetchState.SUCCESS
+          person.person = action.payload
+          person.requestId = null
+        }
+      })
+      .addCase(explorePerson.rejected, (state, action) => {
+        const person = state.persons.find((q) => q.requestId === action.meta.requestId)
+        if (person && person.state === FetchState.LOADING) {
+          person.state = FetchState.ERROR
+          person.error = action.error
+          person.requestId = null
+        }
+      })
   },
 })
 
@@ -81,5 +133,11 @@ export const selectExploreOpen = (state: AppStoreState) => state.explore.open
 export const selectExploreResult = (state: AppStoreState, url: string) =>
   state.explore.queries.find((q) => q.url === url)
 export const selectExploreResponse = createSelector(selectExploreResult, (item) => item!.response!)
+export const selectExplorePersonResult = (state: AppStoreState, id: string) =>
+  state.explore.persons.find((p) => p.id === id)
+export const selectExplorePerson = createSelector(
+  selectExplorePersonResult,
+  (item) => item!.person!,
+)
 
 export const exploreReducer = exploreSlice.reducer
