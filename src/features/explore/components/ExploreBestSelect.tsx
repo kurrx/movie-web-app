@@ -61,8 +61,8 @@ export function ExploreBestSelect(props: ExploreBestSelectProps) {
                   setOpen(false)
                 }}
               >
-                <CheckIcon className='mr-2 h-4 w-4' />
                 {selected.label}
+                <CheckIcon className='ml-auto h-4 w-4' />
               </CommandItem>
             )}
             {values
@@ -77,10 +77,13 @@ export function ExploreBestSelect(props: ExploreBestSelectProps) {
                     setOpen(false)
                   }}
                 >
-                  <CheckIcon
-                    className={cn('mr-2 h-4 w-4', value === v.value ? 'opacity-100' : 'opacity-0')}
-                  />
                   {v.label}
+                  <CheckIcon
+                    className={cn(
+                      'ml-auto h-4 w-4',
+                      value === v.value ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
                 </CommandItem>
               ))}
           </CommandGroup>
