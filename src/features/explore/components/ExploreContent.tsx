@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { Fragment, useCallback, useEffect, useMemo } from 'react'
 
 import { FetchState } from '@/core'
+import { Title } from '@/features/router'
 import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
@@ -31,7 +32,12 @@ export function ExploreContent({ url }: { url: string }) {
       onReload={get}
     >
       <ExploreProvider url={url}>
-        {(response) => <ExploreItems url={url} response={response} />}
+        {(response) => (
+          <Fragment>
+            <Title>{response.title}</Title>
+            <ExploreItems url={url} response={response} />
+          </Fragment>
+        )}
       </ExploreProvider>
     </FallbackView>
   )
