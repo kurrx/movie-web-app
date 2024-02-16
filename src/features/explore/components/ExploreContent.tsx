@@ -6,8 +6,8 @@ import { useStore } from '@/hooks'
 import { FallbackView } from '@/views'
 
 import { exploreSearch, selectExploreResult } from '../explore.slice'
-import { ExploreItems } from './ExploreItems'
 import { ExploreProvider } from './ExploreProvider'
+import { ExploreResult } from './ExploreResult'
 
 export function ExploreContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -35,7 +35,7 @@ export function ExploreContent({ url }: { url: string }) {
         {(response) => (
           <Fragment>
             <Title>{response.title}</Title>
-            <ExploreItems url={url} response={response} />
+            <ExploreResult url={url} response={response} />
           </Fragment>
         )}
       </ExploreProvider>
