@@ -67,6 +67,24 @@ export interface ExploreResponse {
   }
 }
 
+export interface ExplorePersonItem {
+  title: string
+  subtitle: string
+  items: SearchItem[]
+}
+
+export interface ExplorePerson {
+  name: string
+  engName: string | null
+  photoUrl: string | null
+  roles: string[]
+  birthDate: Date | null
+  birthPlace: string | null
+  height: number | null
+  gallery: string[]
+  rolesItems: ExplorePersonItem[]
+}
+
 // Item Types
 export interface FetchItemArgs extends RequestArgs {
   fullId: ItemFullID

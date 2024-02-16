@@ -3,6 +3,7 @@ import { explore } from '@/features'
 import {
   BaseItem,
   ExplorePagination,
+  ExplorePersonItem,
   ExploreResponse,
   ItemCollection,
   ItemEpisodeInfo,
@@ -81,8 +82,8 @@ export function parseComponentsToIds(typeId?: string, genreId?: string, slug?: s
   return { typeId, type, genreId, genre, slug, id }
 }
 
-function parseSearchItems(parser: Parser, document: Document) {
-  parser.setParent(document)
+function parseSearchItems(parser: Parser, parent: ParentNode) {
+  parser.setParent(parent)
   const results: SearchItem[] = []
   const items = parser.all('.b-content__inline_item')
   for (const item of items) {
@@ -290,6 +291,117 @@ export function parseExploreDocument(document: Document) {
   }
 
   return response
+}
+
+export function parsePersonDocument(document: Document) {
+  const parser = new Parser(document)
+  parser.setDefaultError(NOT_AVAILABLE_ERROR)
+  const parent = parser.switchToChild('.b-content__main', true)
+
+  // Name
+  parser.switchToChild('[itemprop="name"]', true)
+  const name = parser.text()
+  if (!name) throw new Error(NOT_AVAILABLE_ERROR)
+
+  // English Name
+  parser.setParent(parent)
+  const engNameElem = parser.switchToChild('[itemprop="alternativeHeadline"]')
+  let engName: string | null = null
+  if (engNameElem) {
+    engName = parser.text()
+  }
+
+  // Photo URL
+  parser.setParent(parent)
+  const photoUrlElem = parser.switchToChild('[itemprop="image"]')
+  let photoUrl: string | null = null
+  if (photoUrlElem) {
+    photoUrl = parser.attr('src')
+  }
+
+  // Roles
+  parser.setParent(parent)
+  const roles: string[] = []
+  const roleElements = parser.all('[itemprop="jobTitle"]')
+  for (const roleElement of roleElements) {
+    parser.setParent(roleElement)
+    const role = parser.text()
+    if (role) roles.push(capitalizeFirstLetter(role))
+  }
+
+  // Birth Date
+  parser.setParent(parent)
+  const birthDateElement = parser.switchToChild('[itemprop="birthDate"]')
+  let birthDate: Date | null = null
+  if (birthDateElement) {
+    const birthDateStr = parser.attr('datetime')
+    if (birthDateStr) {
+      birthDate = new Date(birthDateStr)
+      if (isNaN(birthDate.getTime())) {
+        birthDate = null
+      }
+    }
+  }
+
+  // Birth Place
+  const birthPlace = parseItemTableText(parser, parent, 'Место рождения')
+
+  // Height
+  const heightMeterStr = parseItemTableText(parser, parent, 'Рост')
+  let height: number | null = null
+  if (heightMeterStr) {
+    const heightMeter = parseFloat(heightMeterStr.replaceAll(' м', ''))
+    if (!isNaN(heightMeter)) {
+      height = heightMeter * 100
+    }
+  }
+
+  // Gallery
+  parser.setParent(parent)
+  const images = parser.all('.b-person__gallery_list img')
+  const gallery: string[] = []
+  for (const image of images) {
+    parser.setParent(image)
+    const url = parser.attr('src')
+    if (url) gallery.push(url)
+  }
+
+  parser.setParent(parent)
+  const rolesItems: ExplorePersonItem[] = []
+  const careers = parser.all('.b-person__career')
+  for (const career of careers) {
+    parser.setParent(career)
+
+    // Title
+    const titleElem = parser.switchToChild('h2')
+    if (!titleElem) continue
+    const title = parser.text()
+    if (!title) continue
+
+    // Subtitle
+    parser.setParent(career)
+    const subtitleElem = parser.switchToChild('.b-person__career_stats')
+    if (!subtitleElem) continue
+    const subtitle = parser.text()
+    if (!subtitle) continue
+
+    // Items
+    const items = parseSearchItems(parser, career)
+
+    rolesItems.push({ title, subtitle, items })
+  }
+
+  return {
+    name,
+    engName,
+    photoUrl,
+    roles,
+    birthDate,
+    birthPlace,
+    height,
+    gallery,
+    rolesItems,
+  }
 }
 
 function findItemTableElementWithText(parser: Parser, parent: Element, text: string) {

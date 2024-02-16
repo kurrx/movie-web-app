@@ -6,6 +6,7 @@ import {
   FetchItemSeriesArgs,
   FetchMovieStreamArgs,
   FetchMovieTranslatorArgs,
+  FetchPersonArgs,
   FetchSearchArgs,
   FetchSeriesEpisodesStreamArgs,
   FetchSeriesStreamArgs,
@@ -38,6 +39,7 @@ import {
   parseExploreDocument,
   parseItemDocument,
   parseItemDocumentEpisodes,
+  parsePersonDocument,
   parseSearchDocument,
   parseStream,
   parseStreamSeasons,
@@ -79,6 +81,17 @@ export async function fetchExplore(args: FetchExploreArgs, retry = 0) {
     return parseExploreDocument(data)
   } catch (err) {
     if (retry < 3) return await fetchExplore(args, retry + 1)
+    throw err
+  }
+}
+
+export async function fetchPerson(args: FetchPersonArgs, retry = 0) {
+  try {
+    const { id, signal } = args
+    const { data } = await html.get<Document>(`/person/${id}/`, { signal })
+    return parsePersonDocument(data)
+  } catch (err) {
+    if (retry < 3) return await fetchPerson(args, retry + 1)
     throw err
   }
 }
