@@ -196,3 +196,12 @@ export function refererFromId(fullId: ItemFullID) {
 export function capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
+
+export function notEmpty<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}
+
+export function wrap(min: number, max: number, value: number) {
+  const rangeSize = max - min
+  return ((((value - min) % rangeSize) + rangeSize) % rangeSize) + min
+}
