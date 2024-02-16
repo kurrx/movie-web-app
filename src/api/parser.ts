@@ -109,7 +109,7 @@ export function parseSearchDocument(document: Document) {
 
     // Poster URL
     parser.setParent(item)
-    const itemPoster = parser.switchToChild(`img[alt*="${title}"]`)
+    const itemPoster = parser.switchToChild(`img[alt*='${title}']`)
     if (!itemPoster) continue
     const posterUrl = parser.attr('src')
     if (!posterUrl) continue
