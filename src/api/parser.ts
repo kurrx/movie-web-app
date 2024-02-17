@@ -437,12 +437,13 @@ export function parseCollectionsDocument(document: Document) {
     parser.setParent(itemElem)
 
     // URL
-    const url = parser
+    let url = parser
       .attr('data-url')
       ?.replaceAll('https://', '')
       .replaceAll('http://', '')
       .replaceAll(PROVIDER_DOMAIN, '')
     if (!url) continue
+    if (url.endsWith('/')) url = url.slice(0, -1)
 
     // Image URL
     const imageElem = parser.switchToChild('img')
