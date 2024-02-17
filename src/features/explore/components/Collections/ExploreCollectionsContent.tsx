@@ -7,6 +7,7 @@ import { FallbackView } from '@/views'
 
 import { exploreCollections, selectExploreCollectionsResult } from '../../explore.slice'
 import { ExploreCollectionsProvider } from './ExploreCollectionsProvider'
+import { ExploreCollectionsResult } from './ExploreCollectionsResult'
 
 export function ExploreCollectionsContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -34,6 +35,7 @@ export function ExploreCollectionsContent({ url }: { url: string }) {
         {(collections) => (
           <Fragment>
             <Title>{collections.title}</Title>
+            <ExploreCollectionsResult url={url} collections={collections} />
           </Fragment>
         )}
       </ExploreCollectionsProvider>
