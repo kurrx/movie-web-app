@@ -33,7 +33,11 @@ export function App() {
                   <Routes>
                     <Route path='/' element={<HomeView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
-                    <Route path='/explore/collections/*' element={<ExploreCollectionsView />} />
+                    <Route path='/explore/collections' element={<ExploreCollectionsView />} />
+                    <Route
+                      path='/explore/collections/page/:page'
+                      element={<ExploreCollectionsView />}
+                    />
                     <Route path='/explore/person/:personId' element={<ExplorePersonView />} />
                     <Route path='/explore/*' element={<ExploreView />} />
                     <Route path='*' element={<RedirectView to='/' />} />
