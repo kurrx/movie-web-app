@@ -1,4 +1,5 @@
 export * from './ErrorView'
+export * from './ExploreCollectionsView'
 export * from './ExplorePersonView'
 export * from './ExploreView'
 export * from './FallbackView'
