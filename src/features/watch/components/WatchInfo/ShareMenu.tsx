@@ -109,9 +109,7 @@ export function ShareMenu({ id, itemTitle, itemLink, title, link }: ShareMenuPro
         </div>
         <DialogFooter className='sm:justify-start'>
           <DialogClose asChild>
-            <Button type='button' variant='secondary'>
-              Close
-            </Button>
+            <Button variant='secondary'>Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
