@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -41,10 +40,6 @@ export function IssuesMenu({ id }: { id: number }) {
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Troubleshoot Issuse</DialogTitle>
-          <DialogDescription>
-            Purpose of this menu is to correct errors related with video playback. If you do not
-            have any errors, please close this menu.
-          </DialogDescription>
         </DialogHeader>
         <div className='text-sm space-y-2'>
           <p className='leading-5'>
@@ -72,10 +67,7 @@ export function IssuesMenu({ id }: { id: number }) {
                 </code>{' '}
                 button.
               </li>
-              <li>
-                If all of the above does not solve the issue, please contact me directly. I will try
-                to solve the issue as soon as possible.
-              </li>
+              <li>If all of the above does not solve the issue, please contact me directly.</li>
             </ul>
           </div>
           <p className='leading-5'>
