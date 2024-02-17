@@ -79,7 +79,7 @@ export function ExplorePersonGallery({ person }: { person: ExplorePerson }) {
                   x: { type: 'spring', stiffness: 300, damping: 30 },
                   opacity: { duration: 0.2 },
                 }}
-                drag='x'
+                drag={gallery.length > 1 ? 'x' : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={1}
                 onDragEnd={(e, { offset, velocity }) => {
