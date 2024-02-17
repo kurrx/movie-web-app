@@ -7,6 +7,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuPortal,
+  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -26,10 +27,10 @@ export function NavbarExploreDesktop({ children, navigation, onExploreOpen }: Na
         <DropdownMenuContent className='w-40' align='start'>
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <NavLink to='/explore/new'>New</NavLink>
+              <NavLink to='/explore/new'>Arrivals</NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <NavLink to='/explore/collections'>All Collections</NavLink>
+              <NavLink to='/explore/collections'>Collections</NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onExploreOpen}>Best</DropdownMenuItem>
             {Object.entries(navigation).map(([typeId, type]) => (
@@ -37,39 +38,23 @@ export function NavbarExploreDesktop({ children, navigation, onExploreOpen }: Na
                 <DropdownMenuSubTrigger>{type.title}</DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
-                    <DropdownMenuItem asChild>
-                      <NavLink to={`/explore/${typeId}`}>All</NavLink>
-                    </DropdownMenuItem>
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>Genres</DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                          <ScrollArea className='h-40'>
-                            {Object.entries(type.genres).map(([genreId, genre]) => (
-                              <DropdownMenuItem key={genreId} asChild>
-                                <NavLink to={`/explore/${typeId}/${genreId}`}>{genre}</NavLink>
-                              </DropdownMenuItem>
-                            ))}
-                          </ScrollArea>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>Collections</DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                          <ScrollArea className={type.collections.length > 5 ? 'h-40' : ''}>
-                            {type.collections.map((collection) => (
-                              <DropdownMenuItem key={collection.url} asChild>
-                                <NavLink to={`/explore${collection.url}`}>
-                                  {collection.title}
-                                </NavLink>
-                              </DropdownMenuItem>
-                            ))}
-                          </ScrollArea>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
+                    <ScrollArea className='h-[10.6rem]'>
+                      <DropdownMenuItem asChild>
+                        <NavLink to={`/explore/${typeId}`}>{type.title}</NavLink>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {Object.entries(type.genres).map(([genreId, genre]) => (
+                        <DropdownMenuItem key={genreId} asChild>
+                          <NavLink to={`/explore/${typeId}/${genreId}`}>{genre}</NavLink>
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuSeparator />
+                      {type.collections.map((collection) => (
+                        <DropdownMenuItem key={collection.url} asChild>
+                          <NavLink to={`/explore${collection.url}`}>{collection.title}</NavLink>
+                        </DropdownMenuItem>
+                      ))}
+                    </ScrollArea>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>

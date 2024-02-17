@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
   Button,
   ScrollArea,
+  Separator,
   Sheet,
   SheetContent,
   SheetTrigger,
@@ -49,64 +50,54 @@ export function NavbarExploreMobile({ children, navigation, onExploreOpen }: Nav
         {children}
         <ScrollArea className='my-4 h-[calc(var(--visual-vh)*100-5rem)] pl-6'>
           <div className='flex flex-col space-y-2'>
-            <NavLink to='/explore/new' className='font-bold !mt-8'>
-              New
+            <NavLink to='/explore/new' className='font-bold !mt-6'>
+              Arrivals
             </NavLink>
-            <NavLink to='/explore/collections' className='font-bold !mt-8'>
-              All Collections
+            <NavLink to='/explore/collections' className='font-bold !mt-6'>
+              Collections
             </NavLink>
             <button
-              className='font-bold !mt-8 text-left focus:outline-none'
+              className='font-bold !mt-6 text-left focus:outline-none'
               onClick={handleBestOpen}
             >
               Best
             </button>
-            {Object.entries(navigation).map(([typeId, type]) => (
-              <div key={typeId} className='flex flex-col pt-6'>
-                <h4 className='font-bold'>{type.title}</h4>
-                <NavLink to={`/explore/${typeId}`} className='text-muted-foreground pl-2 mt-3'>
-                  All
-                </NavLink>
-                <Accordion type='multiple' className='w-full pr-8 pl-2 pt-1.5'>
-                  <AccordionItem value='Genres' className='border-0'>
-                    <AccordionTrigger className='text-base py-1.5 hover:no-underline outline-none'>
-                      <h5 className='font-medium'>Genres</h5>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className='flex flex-col space-y-3 text-base pt-1'>
-                        {Object.entries(type.genres).map(([genreId, genre]) => (
-                          <NavLink
-                            key={genreId}
-                            to={`/explore/${typeId}/${genreId}`}
-                            className='text-muted-foreground pl-2'
-                          >
-                            {genre}
-                          </NavLink>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value='Collections' className='border-0'>
-                    <AccordionTrigger className='text-base py-1.5 hover:no-underline outline-none'>
-                      <h5 className='font-medium'>Collections</h5>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className='flex flex-col space-y-3 text-base pt-1'>
-                        {type.collections.map((collection) => (
-                          <NavLink
-                            key={collection.url}
-                            to={`/explore${collection.url}`}
-                            className='text-muted-foreground pl-2'
-                          >
-                            {collection.title}
-                          </NavLink>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            ))}
+            <Accordion type='multiple' className='w-full !mt-0'>
+              {Object.entries(navigation).map(([typeId, type]) => (
+                <AccordionItem key={typeId} value={typeId} className='border-0 !mt-6'>
+                  <AccordionTrigger className='text-base hover:no-underline outline-none pr-8 py-0'>
+                    <h4 className='font-bold'>{type.title}</h4>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='flex flex-col space-y-3 text-base mt-4'>
+                      <NavLink to={`/explore/${typeId}`} className='text-muted-foreground pl-4'>
+                        {type.title}
+                      </NavLink>
+                      <Separator className='w-[calc(100%-2rem)] mx-auto' />
+                      {Object.entries(type.genres).map(([genreId, genre]) => (
+                        <NavLink
+                          key={genreId}
+                          to={`/explore/${typeId}/${genreId}`}
+                          className='text-muted-foreground pl-4'
+                        >
+                          {genre}
+                        </NavLink>
+                      ))}
+                      <Separator className='w-[calc(100%-2rem)] mx-auto' />
+                      {type.collections.map((collection) => (
+                        <NavLink
+                          key={collection.url}
+                          to={`/explore${collection.url}`}
+                          className='text-muted-foreground pl-4'
+                        >
+                          {collection.title}
+                        </NavLink>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </ScrollArea>
       </SheetContent>
