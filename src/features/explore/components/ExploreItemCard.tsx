@@ -65,7 +65,7 @@ export function ExploreItemCard({ item }: ExploreItemCardProps) {
         <CardFooter className='!px-4 !pb-2 flex-col space-y-2'>
           <Button asChild size='sm' className='w-full'>
             <NavLink to={to}>
-              <PlayIcon className='h-5 w-5 mr-2' />
+              <PlayIcon className='h-4 w-4 mr-1' />
               Watch
             </NavLink>
           </Button>
