@@ -22,6 +22,7 @@ import { Collection } from './Collection'
 import { Description } from './Description'
 import { DownloadMenu } from './DownloadMenu'
 import { IMDbButton } from './IMDbButton'
+import { IssuesMenu } from './IssuesMenu'
 import { KinopoiskButton } from './KinopoiskButton'
 import { Person } from './Person'
 import { ShareMenu } from './ShareMenu'
@@ -140,6 +141,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
           link={shareLink}
         />
         <DownloadMenu filename={filename} qualities={qualities} />
+        <IssuesMenu id={id} />
       </section>
       {item.description && (
         <section className='container'>

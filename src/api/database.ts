@@ -82,6 +82,17 @@ class Database extends Dexie {
     await table.delete(getKey(lastItem))
   }
 
+  async cleanById(id: number) {
+    await this.items.delete(id)
+    await this.movies.where({ id }).delete()
+    await this.series.where({ id }).delete()
+    await this.seasons.where({ id }).delete()
+    await this.moviesSizes.where({ id }).delete()
+    await this.seriesSizes.where({ id }).delete()
+    await this.moviesThumbnails.where({ id }).delete()
+    await this.seriesThumbnails.where({ id }).delete()
+  }
+
   async getItem(id: number, fetch: () => Promise<Document>) {
     await this.clean(this.items, false, Database.MAX_ITEMS, (entry) => entry.id)
     const entry = await this.items.get(id)
