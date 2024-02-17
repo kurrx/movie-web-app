@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
-import { fetchExplore, fetchPerson } from '@/api'
+import { fetchCollections, fetchExplore, fetchPerson } from '@/api'
 import { FetchState } from '@/core'
 import { AppStoreState, ExploreStoreState, ThunkApiConfig } from '@/types'
 
@@ -9,6 +9,7 @@ const initialState: ExploreStoreState = {
   open: false,
   queries: [],
   persons: [],
+  collections: [],
 }
 
 type ExploreReturnType = Awaited<ReturnType<typeof fetchExplore>>
@@ -39,6 +40,22 @@ export const explorePerson = createAsyncThunk<PersonReturnType, PersonParamType,
       const findPerson = persons.find((p) => p.id === arg)
       if (!findPerson) return true
       return findPerson.state !== FetchState.SUCCESS
+    },
+  },
+)
+
+type CReturnType = Awaited<ReturnType<typeof fetchCollections>>
+type CParamType = string
+export const exploreCollections = createAsyncThunk<CReturnType, CParamType, ThunkApiConfig>(
+  'explore/collections',
+  async (url, { signal }) => await fetchCollections({ url, signal }),
+  {
+    condition(arg, api) {
+      if (!arg) return false
+      const collections = api.getState().explore.collections
+      const findCollections = collections.find((c) => c.url === arg)
+      if (!findCollections) return true
+      return findCollections.state !== FetchState.SUCCESS
     },
   },
 )
@@ -124,6 +141,41 @@ const exploreSlice = createSlice({
           person.requestId = null
         }
       })
+
+    builder
+      .addCase(exploreCollections.pending, (state, action) => {
+        const collections = state.collections.find((q) => q.url === action.meta.arg)
+        if (!collections) {
+          state.collections.push({
+            url: action.meta.arg,
+            state: FetchState.LOADING,
+            error: null,
+            requestId: action.meta.requestId,
+            collections: null,
+          })
+        } else {
+          collections.state = FetchState.LOADING
+          collections.error = null
+          collections.requestId = action.meta.requestId
+          collections.collections = null
+        }
+      })
+      .addCase(exploreCollections.fulfilled, (state, action) => {
+        const collections = state.collections.find((q) => q.requestId === action.meta.requestId)
+        if (collections && collections.state === FetchState.LOADING) {
+          collections.state = FetchState.SUCCESS
+          collections.collections = action.payload
+          collections.requestId = null
+        }
+      })
+      .addCase(exploreCollections.rejected, (state, action) => {
+        const collections = state.collections.find((q) => q.requestId === action.meta.requestId)
+        if (collections && collections.state === FetchState.LOADING) {
+          collections.state = FetchState.ERROR
+          collections.error = action.error
+          collections.requestId = null
+        }
+      })
   },
 })
 
@@ -138,6 +190,12 @@ export const selectExplorePersonResult = (state: AppStoreState, id: string) =>
 export const selectExplorePerson = createSelector(
   selectExplorePersonResult,
   (item) => item!.person!,
+)
+export const selectExploreCollectionsResult = (state: AppStoreState, url: string) =>
+  state.explore.collections.find((c) => c.url === url)
+export const selectExploreCollections = createSelector(
+  selectExploreCollectionsResult,
+  (item) => item!.collections!,
 )
 
 export const exploreReducer = exploreSlice.reducer

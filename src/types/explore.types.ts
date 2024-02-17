@@ -1,4 +1,4 @@
-import type { ExplorePerson, ExploreResponse } from './ajax.types'
+import type { ExploreCollection, ExplorePerson, ExploreResponse } from './ajax.types'
 import type { FetchableState } from './store.types'
 
 export interface ExploreQuery extends FetchableState {
@@ -11,8 +11,14 @@ export interface ExplorePersonQuery extends FetchableState {
   person: ExplorePerson | null
 }
 
+export interface ExploreCollectionsQuery extends FetchableState {
+  url: string
+  collections: ExploreCollection | null
+}
+
 export interface ExploreStoreState {
   open: boolean
   queries: ExploreQuery[]
   persons: ExplorePersonQuery[]
+  collections: ExploreCollectionsQuery[]
 }
