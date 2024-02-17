@@ -15,7 +15,7 @@ export function ExploreCollectionCard({ collection }: ExploreCollectionCardProps
 
   return (
     <NavLink to={to} className='w-full'>
-      <div className='relative w-full rounded-xl overflow-hidden'>
+      <div className='relative w-full rounded-xl overflow-hidden light'>
         <div className='pb-[calc((15/26)*100%)]' />
         <img
           src={collection.imageUrl}
