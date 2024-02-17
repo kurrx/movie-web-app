@@ -7,7 +7,7 @@ import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
 import { ExploreBestDialog, FeaturesProvider, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
 import { VPNMiddleware } from '@/middlewares'
-import { ExplorePerson, ExploreView, HomeView, RedirectView, WatchView } from '@/views'
+import { ExplorePersonView, ExploreView, HomeView, RedirectView, WatchView } from '@/views'
 
 export function App() {
   useAppViewport()
@@ -27,7 +27,7 @@ export function App() {
                     <Route path='/' element={<HomeView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
                     <Route path='/explore/collections/' element={null} />
-                    <Route path='/explore/person/:personId' element={<ExplorePerson />} />
+                    <Route path='/explore/person/:personId' element={<ExplorePersonView />} />
                     <Route path='/explore/*' element={<ExploreView />} />
                     <Route path='*' element={<RedirectView to='/' />} />
                   </Routes>

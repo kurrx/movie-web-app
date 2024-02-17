@@ -4,7 +4,7 @@ import { ExplorePersonContent } from '@/features'
 
 import { ErrorView } from './ErrorView'
 
-export function ExplorePerson() {
+export function ExplorePersonView() {
   const { personId } = useParams<{ personId?: string }>()
 
   if (!personId) {
