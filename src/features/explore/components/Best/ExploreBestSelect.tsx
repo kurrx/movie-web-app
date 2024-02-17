@@ -12,6 +12,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  ScrollArea,
 } from '@/components'
 
 export interface ExploreBestSelectProps {
@@ -51,42 +52,44 @@ export function ExploreBestSelect(props: ExploreBestSelectProps) {
           }}
         >
           <CommandInput placeholder={inputPlaceholder} />
-          <CommandEmpty>{notFoundText} not found</CommandEmpty>
-          <CommandGroup className='max-h-[10.5rem]'>
-            {selected && (
-              <CommandItem
-                value={selected.value}
-                onSelect={() => {
-                  onChange(null)
-                  setOpen(false)
-                }}
-              >
-                {selected.label}
-                <CheckIcon className='ml-auto h-4 w-4' />
-              </CommandItem>
-            )}
-            {values
-              .filter((v) => v.value !== selected?.value)
-              .map((v) => (
+          <ScrollArea className='h-[8.5rem]'>
+            <CommandEmpty>{notFoundText} not found</CommandEmpty>
+            <CommandGroup>
+              {selected && (
                 <CommandItem
-                  key={v.value}
-                  value={`${v.value}__${v.label}`}
-                  onSelect={(next) => {
-                    const nextValue = next.split('__')[0]
-                    onChange(nextValue === value ? null : nextValue)
+                  value={selected.value}
+                  onSelect={() => {
+                    onChange(null)
                     setOpen(false)
                   }}
                 >
-                  {v.label}
-                  <CheckIcon
-                    className={cn(
-                      'ml-auto h-4 w-4',
-                      value === v.value ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
+                  {selected.label}
+                  <CheckIcon className='ml-auto h-4 w-4' />
                 </CommandItem>
-              ))}
-          </CommandGroup>
+              )}
+              {values
+                .filter((v) => v.value !== selected?.value)
+                .map((v) => (
+                  <CommandItem
+                    key={v.value}
+                    value={`${v.value}__${v.label}`}
+                    onSelect={(next) => {
+                      const nextValue = next.split('__')[0]
+                      onChange(nextValue === value ? null : nextValue)
+                      setOpen(false)
+                    }}
+                  >
+                    {v.label}
+                    <CheckIcon
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        value === v.value ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          </ScrollArea>
         </Command>
       </PopoverContent>
     </Popover>
