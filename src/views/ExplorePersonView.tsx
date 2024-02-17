@@ -11,5 +11,5 @@ export function ExplorePersonView() {
     return <ErrorView title='404' subtitle='Page not found.' docTitle='Not Found' />
   }
 
-  return <ExplorePersonContent id={personId} />
+  return <ExplorePersonContent key={personId} id={personId} />
 }
