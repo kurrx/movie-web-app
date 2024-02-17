@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { NavLink } from 'react-router-dom'
 
 import { cn, SOCIAL_PORTFOLIO_URL } from '@/api'
 import { useElementRect } from '@/hooks'
@@ -40,6 +41,10 @@ export function Footer() {
             </TooltipTrigger>
             <TooltipContent>Portfolio</TooltipContent>
           </Tooltip>
+          &nbsp;Read app&nbsp;
+          <NavLink to='/policy' className={classes.link}>
+            policy.
+          </NavLink>
         </div>
       </div>
     </footer>

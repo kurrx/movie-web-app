@@ -12,6 +12,7 @@ import {
   ExplorePersonView,
   ExploreView,
   HomeView,
+  PolicyView,
   RedirectView,
   WatchView,
 } from '@/views'
@@ -32,6 +33,7 @@ export function App() {
                   <ExploreBestDialog />
                   <Routes>
                     <Route path='/' element={<HomeView />} />
+                    <Route path='/policy' element={<PolicyView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
                     <Route path='/explore/collections' element={<ExploreCollectionsView />} />
                     <Route
