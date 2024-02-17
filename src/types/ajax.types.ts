@@ -85,6 +85,19 @@ export interface ExplorePerson {
   rolesItems: ExplorePersonItem[]
 }
 
+export interface ExploreCollectionItem {
+  title: string
+  url: string
+  count: number
+  imageUrl: string
+}
+
+export interface ExploreCollection {
+  title: string
+  pagination?: ExplorePagination
+  items: ExploreCollectionItem[]
+}
+
 // Item Types
 export interface FetchItemArgs extends RequestArgs {
   fullId: ItemFullID

@@ -2,6 +2,7 @@ import { Parser, Thumbnails } from '@/core'
 import { explore } from '@/features'
 import {
   BaseItem,
+  ExploreCollectionItem,
   ExplorePagination,
   ExplorePersonItem,
   ExploreResponse,
@@ -402,6 +403,69 @@ export function parsePersonDocument(document: Document) {
     gallery,
     rolesItems,
   }
+}
+
+export function parseCollectionsDocument(document: Document) {
+  const parser = new Parser(document)
+  parser.setDefaultError(NOT_AVAILABLE_ERROR)
+
+  // Title
+  parser.switchToChild('.b-content__htitle', true)
+  let title = parser.text()?.replaceAll(' в HD онлайн', '').replaceAll('Смотреть ', '')
+  if (!title) throw new Error(NOT_AVAILABLE_ERROR)
+
+  parser.setParent(document)
+  const parent = parser.switchToChild('.b-content__main', true)
+
+  // Pagination
+  parser.setParent(parent)
+  const paginated = parser.hasChild('.b-navigation')
+  let pagination: ExplorePagination | undefined
+  if (paginated) {
+    pagination = parseExplorePagination(parser, document)
+    const currentPage = pagination.pages.find((page) => !page.link)
+    if (currentPage) {
+      title = title.replaceAll(`, страница ${currentPage.page}`, '')
+    }
+  }
+
+  // Items
+  parser.setParent(parent)
+  const items: ExploreCollectionItem[] = []
+  const itemElems = parser.all('.b-content__collections_item')
+  for (const itemElem of itemElems) {
+    parser.setParent(itemElem)
+
+    // URL
+    const url = parser.attr('data-url')
+    if (!url) continue
+
+    // Image URL
+    const imageElem = parser.switchToChild('img')
+    if (!imageElem) continue
+    const imageUrl = parser.attr('src')
+    if (!imageUrl) continue
+
+    // Title
+    parser.setParent(itemElem)
+    const titleElem = parser.switchToChild('a')
+    if (!titleElem) continue
+    const title = parser.text()
+    if (!title) continue
+
+    // Count
+    parser.setParent(itemElem)
+    const countElem = parser.switchToChild('.num')
+    if (!countElem) continue
+    const countStr = parser.text()
+    if (!countStr) continue
+    const count = parseInt(countStr)
+    if (isNaN(count)) continue
+
+    items.push({ url, imageUrl, title, count })
+  }
+
+  return { title, items, pagination }
 }
 
 function findItemTableElementWithText(parser: Parser, parent: Element, text: string) {
