@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 import { useStore } from '@/hooks'
 
-import { selectProfileIsLoggedIn, setProfileLoginDialog } from '../profile.slice'
+import { selectProfileIsLoggedIn, setProfileDialog } from '../profile.slice'
 
 export function useLoginGuard(cb: () => void | Promise<void>) {
   const [dispatch, selector] = useStore()
@@ -10,7 +10,7 @@ export function useLoginGuard(cb: () => void | Promise<void>) {
 
   return useCallback(() => {
     if (!isLoggedIn) {
-      dispatch(setProfileLoginDialog(true))
+      dispatch(setProfileDialog(true))
     } else {
       return cb()
     }

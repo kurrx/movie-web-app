@@ -1,11 +1,10 @@
+import { SerializedError } from '@reduxjs/toolkit'
 import { User } from 'firebase/auth'
 
-import { LoginState } from '@/core'
-
-import { FetchableState } from './store.types'
-
 export interface ProfileStoreState {
-  loginDialog: boolean
-  loginState: FetchableState<LoginState>
+  dialog: boolean
+  loading: boolean
+  error: SerializedError | null
+  requestId: string | null
   user: User | null
 }

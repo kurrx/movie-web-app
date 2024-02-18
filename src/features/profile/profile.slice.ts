@@ -3,16 +3,13 @@ import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
 import { googleSignIn } from '@/api'
-import { LoginState } from '@/core'
 import { AppStoreState, ProfileStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: ProfileStoreState = {
-  loginDialog: false,
-  loginState: {
-    state: LoginState.LOADING,
-    error: null,
-    requestId: null,
-  },
+  dialog: false,
+  loading: true,
+  error: null,
+  requestId: null,
   user: null,
 }
 
@@ -22,8 +19,10 @@ export const signIn = createAsyncThunk<SignInReturn, void, ThunkApiConfig>(
   async () => await googleSignIn(),
   {
     condition(_, api) {
-      const state = api.getState().profile.loginState.state
-      return state !== LoginState.SUCCESS && state !== LoginState.LOADING
+      const state = api.getState().profile
+      const loading = state.loading
+      const user = state.user
+      return !user && !loading
     },
   },
 )
@@ -33,72 +32,65 @@ const profileSlice = createSlice({
   initialState,
 
   reducers: {
-    setProfileLoginDialog(state, action: PayloadAction<SetStateAction<boolean>>) {
+    setProfileDialog(state, action: PayloadAction<SetStateAction<boolean>>) {
+      if (state.user) {
+        state.dialog = false
+        return
+      }
       const payload = action.payload
-      const next = typeof payload === 'function' ? payload(state.loginDialog) : payload
-      state.loginDialog = next
+      const next = typeof payload === 'function' ? payload(state.dialog) : payload
+      state.dialog = next
     },
 
     setProfileReady(state) {
-      if (state.loginState.state === LoginState.LOADING) {
-        state.loginState.state = LoginState.IDLE
-      }
+      state.loading = false
     },
 
     setProfileUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload
-      if (action.payload) {
-        state.loginState.state = LoginState.SUCCESS
-      } else {
-        state.loginState.state = LoginState.IDLE
-      }
-    },
-
-    clearProfile(state) {
-      state.loginDialog = false
-      state.loginState.state = LoginState.IDLE
-      state.loginState.error = null
-      state.loginState.requestId = null
-      state.user = null
     },
   },
 
   extraReducers(builder) {
     builder
       .addCase(signIn.pending, (state, action) => {
-        state.loginState.state = LoginState.LOADING
-        state.loginState.requestId = action.meta.requestId
-        state.loginState.error = null
+        state.dialog = true
+        state.loading = true
+        state.error = null
+        state.requestId = action.meta.requestId
+        state.user = null
       })
       .addCase(signIn.fulfilled, (state, action) => {
-        if (action.meta.requestId === state.loginState.requestId) {
-          state.loginState.state = LoginState.SUCCESS
-          state.loginState.requestId = null
-          state.loginState.error = null
+        if (action.meta.requestId === state.requestId) {
+          state.dialog = false
+          state.loading = false
+          state.error = null
+          state.requestId = null
           state.user = action.payload.user
         }
       })
       .addCase(signIn.rejected, (state, action) => {
-        if (action.meta.requestId === state.loginState.requestId) {
-          state.loginState.state = LoginState.ERROR
-          state.loginState.requestId = null
-          state.loginState.error = action.error
+        if (action.meta.requestId === state.requestId) {
+          state.dialog = true
+          state.loading = false
+          state.error = action.error
+          state.requestId = null
+          state.user = null
         }
       })
   },
 })
 
-export const { setProfileLoginDialog, setProfileReady, setProfileUser, clearProfile } =
-  profileSlice.actions
+export const { setProfileDialog, setProfileReady, setProfileUser } = profileSlice.actions
 
-export const selectProfileIsLoggedIn = (state: AppStoreState) =>
-  state.profile.loginState.state === LoginState.SUCCESS && state.profile.user !== null
-export const selectProfileLoginDialog = createSelector(
+export const selectProfileIsLoggedIn = (state: AppStoreState) => state.profile.user !== null
+export const selectProfileDialog = createSelector(
   selectProfileIsLoggedIn,
-  (state: AppStoreState) => state.profile.loginDialog,
+  (state: AppStoreState) => state.profile.dialog,
   (isLoggedIn, loginDialog) => loginDialog && !isLoggedIn,
 )
-export const selectProfileUser = (state: AppStoreState) => state.profile.user
-export const selectProfileLoginState = (state: AppStoreState) => state.profile.loginState
+export const selectProfileUser = (state: AppStoreState) => state.profile.user!
+export const selectProfileLoading = (state: AppStoreState) => state.profile.loading
+export const selectProfileError = (state: AppStoreState) => state.profile.error
 
 export const profileReducer = profileSlice.reducer

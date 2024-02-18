@@ -12,38 +12,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components'
-import { LoginState } from '@/core'
 import { useStore, useStoreBoolean } from '@/hooks'
 
 import {
-  selectProfileLoginDialog,
-  selectProfileLoginState,
-  setProfileLoginDialog,
+  selectProfileDialog,
+  selectProfileError,
+  selectProfileLoading,
+  setProfileDialog,
   signIn,
 } from '../profile.slice'
 
 export function LoginDialog() {
   const [dispatch, selector] = useStore()
   const location = useLocation()
-  const open = selector(selectProfileLoginDialog)
-  const { state, error } = selector(selectProfileLoginState)
-  const { set: onOpenChange, setFalse: close } = useStoreBoolean(setProfileLoginDialog)
-  const Icon = useMemo(() => {
-    switch (state) {
-      case LoginState.LOADING:
-        return LoaderIcon
-      default:
-        return GoogleLogoIcon
-    }
-  }, [state])
-  const text = useMemo(() => {
-    switch (state) {
-      case LoginState.LOADING:
-        return 'Loading...'
-      default:
-        return 'Google'
-    }
-  }, [state])
+  const open = selector(selectProfileDialog)
+  const loading = selector(selectProfileLoading)
+  const error = selector(selectProfileError)
+  const { set: onOpenChange, setFalse: close } = useStoreBoolean(setProfileDialog)
+  const Icon = useMemo(() => (loading ? LoaderIcon : GoogleLogoIcon), [loading])
+  const text = useMemo(() => (loading ? 'Loading...' : 'Google'), [loading])
 
   const onLogin = useCallback(() => {
     dispatch(signIn())
@@ -72,7 +59,7 @@ export function LoginDialog() {
             <Icon className='mr-2 h-4 w-4' />
             {text}
           </Button>
-          {state === LoginState.ERROR && error && (
+          {error && (
             <p className='mt-4 text-sm text-destructive'>
               {error.message || 'Something went wrong'}
             </p>
