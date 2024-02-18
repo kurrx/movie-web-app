@@ -21,6 +21,7 @@ const profileSlice = createSlice({
 
 export const { setProfileLoginDialog } = profileSlice.actions
 
+export const selectProfileIsLoggedIn = (state: AppStoreState) => false
 export const selectProfileLoginDialog = (state: AppStoreState) => state.profile.loginDialog
 
 export const profileReducer = profileSlice.reducer
