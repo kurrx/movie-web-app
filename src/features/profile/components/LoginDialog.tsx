@@ -16,7 +16,6 @@ import { LoginState } from '@/core'
 import { useStore, useStoreBoolean } from '@/hooks'
 
 import {
-  selectProfileIsLoggedIn,
   selectProfileLoginDialog,
   selectProfileLoginState,
   setProfileLoginDialog,
@@ -27,7 +26,6 @@ export function LoginDialog() {
   const [dispatch, selector] = useStore()
   const location = useLocation()
   const open = selector(selectProfileLoginDialog)
-  const isLoggedIn = selector(selectProfileIsLoggedIn)
   const { state, error } = selector(selectProfileLoginState)
   const { set: onOpenChange, setFalse: close } = useStoreBoolean(setProfileLoginDialog)
   const Icon = useMemo(() => {
@@ -56,7 +54,7 @@ export function LoginDialog() {
   }, [close, location])
 
   return (
-    <Dialog open={open && !isLoggedIn} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant='ghost' size='icon'>
           <PersonIcon />

@@ -21,13 +21,13 @@ export const firebaseApp = initializeApp({
 
 const googleProvider = new GoogleAuthProvider()
 
-const auth = getAuth()
-auth.useDeviceLanguage()
+export const firebaseAuth = getAuth()
+firebaseAuth.useDeviceLanguage()
 
 export async function googleSignIn() {
-  return await signInWithPopup(auth, googleProvider)
+  return await signInWithPopup(firebaseAuth, googleProvider)
 }
 
 export async function googleSignOut() {
-  return await signOut(auth)
+  return await signOut(firebaseAuth)
 }
