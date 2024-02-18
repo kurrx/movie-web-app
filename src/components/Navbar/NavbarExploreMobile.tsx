@@ -51,7 +51,7 @@ export function NavbarExploreMobile({ children, navigation, onExploreOpen }: Nav
         <ScrollArea className='my-4 h-[calc(var(--visual-vh)*100-5rem)] pl-6'>
           <div className='flex flex-col space-y-2'>
             <NavLink to='/explore/new' className='font-bold !mt-6'>
-              Новинка
+              Новинки
             </NavLink>
             <NavLink to='/explore/collections' className='font-bold !mt-6'>
               Подборки
