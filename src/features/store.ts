@@ -17,6 +17,7 @@ import {
   startHovering,
   timelineMove,
 } from './player'
+import { profileReducer } from './profile'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
 import { updateTime, watchReducer } from './watch'
@@ -26,6 +27,7 @@ export const store = configureStore({
     device: deviceReducer,
     explore: exploreReducer,
     player: playerReducer,
+    profile: profileReducer,
     search: searchReducer,
     theme: themeReducer,
     watch: watchReducer,
