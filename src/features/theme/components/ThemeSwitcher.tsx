@@ -34,26 +34,35 @@ export function ThemeSwitcher() {
 
   return (
     <DropdownMenuSub>
-      <DropdownMenuSubTrigger>
-        <Icon className='h-3 w-3 mr-2' />
+      <DropdownMenuSubTrigger className='flex items-center justify-start'>
+        <Icon className='h-4 w-4 mr-2' />
         Theme
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent>
-          <DropdownMenuItem onClick={() => onValueChange('light')}>
-            <SunIcon className='h-3 w-3 mr-2' />
+          <DropdownMenuItem
+            className='flex items-center justify-start'
+            onClick={() => onValueChange('light')}
+          >
+            <SunIcon className='h-4 w-4 mr-2' />
             Light
-            {theme === 'light' && <CheckIcon className='ml-auto h-3 w-3' />}
+            {theme === 'light' && <CheckIcon className='ml-auto h-4 w-4' />}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onValueChange('dark')}>
-            <MoonIcon className='h-3 w-3 mr-2' />
+          <DropdownMenuItem
+            className='flex items-center justify-start'
+            onClick={() => onValueChange('dark')}
+          >
+            <MoonIcon className='h-4 w-4 mr-2' />
             Dark
-            {theme === 'dark' && <CheckIcon className='ml-auto h-3 w-3' />}
+            {theme === 'dark' && <CheckIcon className='ml-auto h-4 w-4' />}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onValueChange('system')}>
-            <DesktopIcon className='h-3 w-3 mr-2' />
+          <DropdownMenuItem
+            className='flex items-center justify-start'
+            onClick={() => onValueChange('system')}
+          >
+            <DesktopIcon className='h-4 w-4 mr-2' />
             System
-            {theme === 'system' && <CheckIcon className='ml-auto h-3 w-3' />}
+            {theme === 'system' && <CheckIcon className='ml-auto h-4 w-4' />}
           </DropdownMenuItem>
         </DropdownMenuSubContent>
       </DropdownMenuPortal>

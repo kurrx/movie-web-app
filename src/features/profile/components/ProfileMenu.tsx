@@ -88,31 +88,31 @@ export function ProfileMenu() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <PersonIcon className='h-3 w-3 mr-2' />
+            <DropdownMenuItem className='flex items-center justify-start'>
+              <PersonIcon className='h-4 w-4 mr-2' />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <HeartIcon className='h-3 w-3 mr-2' />
+            <DropdownMenuItem className='flex items-center justify-start'>
+              <HeartIcon className='h-4 w-4 mr-2' />
               Favorites
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <BookMarkIcon className='h-3 w-3 mr-2 fill-transparent' />
+            <DropdownMenuItem className='flex items-center justify-start'>
+              <BookMarkIcon className='h-4 w-4 mr-2 fill-transparent' />
               Saved
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <EyeIcon className='h-3 w-3 mr-2' />
+            <DropdownMenuItem className='flex items-center justify-start'>
+              <EyeIcon className='h-4 w-4 mr-2' />
               Watched
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <StarIcon className='h-3 w-3 mr-2' />
+            <DropdownMenuItem className='flex items-center justify-start'>
+              <StarIcon className='h-4 w-4 mr-2' />
               Rated
             </DropdownMenuItem>
           </Fragment>
         )}
         {!user && (
-          <DropdownMenuItem onClick={openLoginDialog}>
-            <EnterIcon className='h-3 w-3 mr-2' />
+          <DropdownMenuItem className='flex items-center justify-start' onClick={openLoginDialog}>
+            <EnterIcon className='h-4 w-4 mr-2' />
             Login
           </DropdownMenuItem>
         )}
@@ -121,10 +121,13 @@ export function ProfileMenu() {
           <Fragment>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className='bg-logout/0 !text-logout focus:bg-logout/20'
+              className={cn(
+                'bg-logout/0 !text-logout focus:bg-logout/20',
+                'flex items-center justify-start',
+              )}
               onClick={googleSignOut}
             >
-              <ExitIcon className='h-3 w-3 mr-2' />
+              <ExitIcon className='h-4 w-4 mr-2' />
               Logout
             </DropdownMenuItem>
           </Fragment>
