@@ -1,24 +1,14 @@
 import type { ExploreCollection, ExplorePerson, ExploreResponse } from './ajax.types'
 import type { FetchableState } from './store.types'
 
-export interface ExploreQuery extends FetchableState {
-  url: string
-  response: ExploreResponse | null
-}
-
-export interface ExplorePersonQuery extends FetchableState {
+export interface ExploreQuery<T> extends FetchableState {
   id: string
-  person: ExplorePerson | null
-}
-
-export interface ExploreCollectionsQuery extends FetchableState {
-  url: string
-  collections: ExploreCollection | null
+  response: T | null
 }
 
 export interface ExploreStoreState {
   open: boolean
-  queries: ExploreQuery[]
-  persons: ExplorePersonQuery[]
-  collections: ExploreCollectionsQuery[]
+  queries: ExploreQuery<ExploreResponse>[]
+  persons: ExploreQuery<ExplorePerson>[]
+  collections: ExploreQuery<ExploreCollection>[]
 }

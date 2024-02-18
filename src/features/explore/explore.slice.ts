@@ -1,9 +1,84 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  PayloadAction,
+  SerializedError,
+} from '@reduxjs/toolkit'
 import { SetStateAction } from 'react'
 
 import { fetchCollections, fetchExplore, fetchPerson } from '@/api'
 import { FetchState } from '@/core'
-import { AppStoreState, ExploreStoreState, ThunkApiConfig } from '@/types'
+import {
+  AppStoreState,
+  ExploreCollection,
+  ExplorePerson,
+  ExploreResponse,
+  ExploreStoreState,
+  ThunkApiConfig,
+} from '@/types'
+
+type Explore = 'queries' | 'persons' | 'collections'
+type ThunkConditionApi = { getState: () => AppStoreState }
+
+type PendingPayload = PayloadAction<undefined, string, { arg: string; requestId: string }>
+function explorePending(explore: Explore) {
+  return function (state: ExploreStoreState, action: PendingPayload) {
+    const find = state[explore].find((q) => q.id === action.meta.arg)
+    if (!find) {
+      state[explore].push({
+        id: action.meta.arg,
+        response: null,
+        state: FetchState.LOADING,
+        error: null,
+        requestId: action.meta.requestId,
+      })
+    } else {
+      find.state = FetchState.LOADING
+      find.error = null
+      find.requestId = action.meta.requestId
+      find.response = null
+    }
+  }
+}
+
+type Fulfilled = ExploreResponse | ExplorePerson | ExploreCollection
+type FulfilledPayload = PayloadAction<Fulfilled, string, { arg: string; requestId: string }>
+function exploreFulfilled(explore: Explore) {
+  return function (state: ExploreStoreState, action: FulfilledPayload) {
+    const find = state[explore].find((i) => i.requestId === action.meta.requestId)
+    if (find && find.state === FetchState.LOADING) {
+      find.state = FetchState.SUCCESS
+      find.response = action.payload
+      find.requestId = null
+    }
+  }
+}
+
+type Error = SerializedError | undefined
+type RejectedPayload = PayloadAction<Error, string, { arg: string; requestId: string }>
+function exploreRejected(explore: Explore) {
+  return function (state: ExploreStoreState, action: RejectedPayload) {
+    const find = state[explore].find((i) => i.requestId === action.meta.requestId)
+    if (find && find.state === FetchState.LOADING) {
+      find.state = FetchState.ERROR
+      find.error = action.payload || null
+      find.requestId = null
+    }
+  }
+}
+
+function getExploreOptions(explore: Explore) {
+  return {
+    condition(arg: string, { getState }: ThunkConditionApi) {
+      if (!arg) return false
+      const items = getState().explore[explore]
+      const find = items.find((q) => q.id === arg)
+      if (!find) return true
+      return find.state !== FetchState.SUCCESS
+    },
+  }
+}
 
 const initialState: ExploreStoreState = {
   open: false,
@@ -17,15 +92,7 @@ type ExploreParamType = string
 export const exploreSearch = createAsyncThunk<ExploreReturnType, ExploreParamType, ThunkApiConfig>(
   'explore/search',
   async (url, { signal }) => await fetchExplore({ url, signal }),
-  {
-    condition(arg, api) {
-      if (!arg) return false
-      const queries = api.getState().explore.queries
-      const findQuery = queries.find((q) => q.url === arg)
-      if (!findQuery) return true
-      return findQuery.state !== FetchState.SUCCESS
-    },
-  },
+  getExploreOptions('queries'),
 )
 
 type PersonReturnType = Awaited<ReturnType<typeof fetchPerson>>
@@ -33,15 +100,7 @@ type PersonParamType = string
 export const explorePerson = createAsyncThunk<PersonReturnType, PersonParamType, ThunkApiConfig>(
   'explore/person',
   async (id, { signal }) => await fetchPerson({ id, signal }),
-  {
-    condition(arg, api) {
-      if (!arg) return false
-      const persons = api.getState().explore.persons
-      const findPerson = persons.find((p) => p.id === arg)
-      if (!findPerson) return true
-      return findPerson.state !== FetchState.SUCCESS
-    },
-  },
+  getExploreOptions('persons'),
 )
 
 type CReturnType = Awaited<ReturnType<typeof fetchCollections>>
@@ -49,15 +108,7 @@ type CParamType = string
 export const exploreCollections = createAsyncThunk<CReturnType, CParamType, ThunkApiConfig>(
   'explore/collections',
   async (url, { signal }) => await fetchCollections({ url, signal }),
-  {
-    condition(arg, api) {
-      if (!arg) return false
-      const collections = api.getState().explore.collections
-      const findCollections = collections.find((c) => c.url === arg)
-      if (!findCollections) return true
-      return findCollections.state !== FetchState.SUCCESS
-    },
-  },
+  getExploreOptions('collections'),
 )
 
 const exploreSlice = createSlice({
@@ -73,109 +124,19 @@ const exploreSlice = createSlice({
 
   extraReducers(builder) {
     builder
-      .addCase(exploreSearch.pending, (state, action) => {
-        const query = state.queries.find((q) => q.url === action.meta.arg)
-        if (!query) {
-          state.queries.push({
-            url: action.meta.arg,
-            state: FetchState.LOADING,
-            error: null,
-            requestId: action.meta.requestId,
-            response: null,
-          })
-        } else {
-          query.state = FetchState.LOADING
-          query.error = null
-          query.requestId = action.meta.requestId
-          query.response = null
-        }
-      })
-      .addCase(exploreSearch.fulfilled, (state, action) => {
-        const query = state.queries.find((q) => q.requestId === action.meta.requestId)
-        if (query && query.state === FetchState.LOADING) {
-          query.state = FetchState.SUCCESS
-          query.response = action.payload
-          query.requestId = null
-        }
-      })
-      .addCase(exploreSearch.rejected, (state, action) => {
-        const query = state.queries.find((q) => q.requestId === action.meta.requestId)
-        if (query && query.state === FetchState.LOADING) {
-          query.state = FetchState.ERROR
-          query.error = action.error
-          query.requestId = null
-        }
-      })
+      .addCase(exploreSearch.pending, explorePending('queries'))
+      .addCase(exploreSearch.fulfilled, exploreFulfilled('queries'))
+      .addCase(exploreSearch.rejected, exploreRejected('queries'))
 
     builder
-      .addCase(explorePerson.pending, (state, action) => {
-        const person = state.persons.find((q) => q.id === action.meta.arg)
-        if (!person) {
-          state.persons.push({
-            id: action.meta.arg,
-            state: FetchState.LOADING,
-            error: null,
-            requestId: action.meta.requestId,
-            person: null,
-          })
-        } else {
-          person.state = FetchState.LOADING
-          person.error = null
-          person.requestId = action.meta.requestId
-          person.person = null
-        }
-      })
-      .addCase(explorePerson.fulfilled, (state, action) => {
-        const person = state.persons.find((q) => q.requestId === action.meta.requestId)
-        if (person && person.state === FetchState.LOADING) {
-          person.state = FetchState.SUCCESS
-          person.person = action.payload
-          person.requestId = null
-        }
-      })
-      .addCase(explorePerson.rejected, (state, action) => {
-        const person = state.persons.find((q) => q.requestId === action.meta.requestId)
-        if (person && person.state === FetchState.LOADING) {
-          person.state = FetchState.ERROR
-          person.error = action.error
-          person.requestId = null
-        }
-      })
+      .addCase(explorePerson.pending, explorePending('persons'))
+      .addCase(explorePerson.fulfilled, exploreFulfilled('persons'))
+      .addCase(explorePerson.rejected, exploreRejected('persons'))
 
     builder
-      .addCase(exploreCollections.pending, (state, action) => {
-        const collections = state.collections.find((q) => q.url === action.meta.arg)
-        if (!collections) {
-          state.collections.push({
-            url: action.meta.arg,
-            state: FetchState.LOADING,
-            error: null,
-            requestId: action.meta.requestId,
-            collections: null,
-          })
-        } else {
-          collections.state = FetchState.LOADING
-          collections.error = null
-          collections.requestId = action.meta.requestId
-          collections.collections = null
-        }
-      })
-      .addCase(exploreCollections.fulfilled, (state, action) => {
-        const collections = state.collections.find((q) => q.requestId === action.meta.requestId)
-        if (collections && collections.state === FetchState.LOADING) {
-          collections.state = FetchState.SUCCESS
-          collections.collections = action.payload
-          collections.requestId = null
-        }
-      })
-      .addCase(exploreCollections.rejected, (state, action) => {
-        const collections = state.collections.find((q) => q.requestId === action.meta.requestId)
-        if (collections && collections.state === FetchState.LOADING) {
-          collections.state = FetchState.ERROR
-          collections.error = action.error
-          collections.requestId = null
-        }
-      })
+      .addCase(exploreCollections.pending, explorePending('collections'))
+      .addCase(exploreCollections.fulfilled, exploreFulfilled('collections'))
+      .addCase(exploreCollections.rejected, exploreRejected('collections'))
   },
 })
 
@@ -183,19 +144,19 @@ export const { setExploreOpen } = exploreSlice.actions
 
 export const selectExploreOpen = (state: AppStoreState) => state.explore.open
 export const selectExploreResult = (state: AppStoreState, url: string) =>
-  state.explore.queries.find((q) => q.url === url)
+  state.explore.queries.find((q) => q.id === url)
 export const selectExploreResponse = createSelector(selectExploreResult, (item) => item!.response!)
 export const selectExplorePersonResult = (state: AppStoreState, id: string) =>
   state.explore.persons.find((p) => p.id === id)
 export const selectExplorePerson = createSelector(
   selectExplorePersonResult,
-  (item) => item!.person!,
+  (item) => item!.response!,
 )
 export const selectExploreCollectionsResult = (state: AppStoreState, url: string) =>
-  state.explore.collections.find((c) => c.url === url)
+  state.explore.collections.find((c) => c.id === url)
 export const selectExploreCollections = createSelector(
   selectExploreCollectionsResult,
-  (item) => item!.collections!,
+  (item) => item!.response!,
 )
 
 export const exploreReducer = exploreSlice.reducer
