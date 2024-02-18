@@ -1,7 +1,8 @@
 import { PersonIcon } from '@radix-ui/react-icons'
-import { NavLink } from 'react-router-dom'
+import { useCallback, useEffect, useMemo } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 
-import { GoogleLogoIcon } from '@/assets'
+import { GoogleLogoIcon, LoaderIcon } from '@/assets'
 import {
   Button,
   Dialog,
@@ -11,17 +12,51 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components'
+import { LoginState } from '@/core'
 import { useStore, useStoreBoolean } from '@/hooks'
 
-import { selectProfileLoginDialog, setProfileLoginDialog } from '../profile.slice'
+import {
+  selectProfileIsLoggedIn,
+  selectProfileLoginDialog,
+  selectProfileLoginState,
+  setProfileLoginDialog,
+  signIn,
+} from '../profile.slice'
 
 export function LoginDialog() {
   const [dispatch, selector] = useStore()
+  const location = useLocation()
   const open = selector(selectProfileLoginDialog)
-  const { set: onOpenChange } = useStoreBoolean(setProfileLoginDialog)
+  const isLoggedIn = selector(selectProfileIsLoggedIn)
+  const { state, error } = selector(selectProfileLoginState)
+  const { set: onOpenChange, setFalse: close } = useStoreBoolean(setProfileLoginDialog)
+  const Icon = useMemo(() => {
+    switch (state) {
+      case LoginState.LOADING:
+        return LoaderIcon
+      default:
+        return GoogleLogoIcon
+    }
+  }, [state])
+  const text = useMemo(() => {
+    switch (state) {
+      case LoginState.LOADING:
+        return 'Loading...'
+      default:
+        return 'Google'
+    }
+  }, [state])
+
+  const onLogin = useCallback(() => {
+    dispatch(signIn())
+  }, [dispatch])
+
+  useEffect(() => {
+    close()
+  }, [close, location])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open && !isLoggedIn} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant='ghost' size='icon'>
           <PersonIcon />
@@ -34,12 +69,17 @@ export function LoginDialog() {
             Create an account or login to existing one to continue watching
           </DialogDescription>
         </DialogHeader>
-        <div className='w-full space-y-6'>
-          <Button variant='outline' className='w-full'>
-            <GoogleLogoIcon className='mr-2 h-4 w-4' />
-            Google
+        <div className='w-full'>
+          <Button variant='outline' className='w-full' onClick={onLogin}>
+            <Icon className='mr-2 h-4 w-4' />
+            {text}
           </Button>
-          <p className='px-8 text-center text-sm text-muted-foreground'>
+          {state === LoginState.ERROR && error && (
+            <p className='mt-4 text-sm text-destructive'>
+              {error.message || 'Something went wrong'}
+            </p>
+          )}
+          <p className='px-8 mt-6 text-center text-sm text-muted-foreground'>
             By clicking continue, you agree with{' '}
             <NavLink to='/policy' className='underline underline-offset-4 hover:text-primary'>
               policy

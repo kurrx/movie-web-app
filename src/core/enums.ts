@@ -9,3 +9,10 @@ export enum SwitchState {
   LOADING,
   ERROR,
 }
+
+export enum LoginState {
+  IDLE,
+  LOADING,
+  SUCCESS,
+  ERROR,
+}
