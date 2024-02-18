@@ -20,7 +20,7 @@ export const DropdownMenuSubTrigger = forwardRef<Ref, DropdownMenuSubTriggerProp
       <SubTrigger
         ref={ref}
         className={cn(
-          'flex cursor-default select-none items-center',
+          'flex cursor-default select-none items-center focus:cursor-pointer',
           'rounded-sm px-2 py-1.5 text-sm outline-none',
           'focus:bg-accent data-[state=open]:bg-accent',
           inset && 'pl-8',

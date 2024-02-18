@@ -21,7 +21,7 @@ export const CommandItem = forwardRef<Ref, CommandItemProps>(function CommandIte
         'outline-none aria-selected:bg-accent',
         'aria-selected:text-accent-foreground',
         'data-[disabled]:pointer-events-none',
-        'data-[disabled]:opacity-50',
+        'data-[disabled]:opacity-50 aria-selected:cursor-pointer',
         className,
       )}
       {...restProps}
