@@ -27,7 +27,7 @@ export function NavbarExploreDesktop({ children, navigation, onExploreOpen }: Na
         <DropdownMenuContent className='w-40' align='start'>
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <NavLink to='/explore/new'>Новинка</NavLink>
+              <NavLink to='/explore/new'>Новинки</NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <NavLink to='/explore/collections'>Подборки</NavLink>
