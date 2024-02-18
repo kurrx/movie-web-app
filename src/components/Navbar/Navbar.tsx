@@ -5,6 +5,7 @@ import { APP_NAME, cn, SOCIAL_GITHUB_URL, SOCIAL_X_URL } from '@/api'
 import { GithubLogoIcon, LogoIcon, XLogoIcon } from '@/assets'
 import {
   explore,
+  ProfileMenu,
   SearchButton,
   selectDeviceIsMobile,
   selectPlayerInitialized,
@@ -77,6 +78,7 @@ export function Navbar() {
               <XLogoIcon className={classes.socials.icon.x} />
             </NavbarSocialLink>
             <ThemeSwitcher />
+            <ProfileMenu />
           </div>
         </div>
       </div>
