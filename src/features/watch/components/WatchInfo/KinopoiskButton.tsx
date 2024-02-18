@@ -37,7 +37,7 @@ export function KinopoiskButton({ rating }: { rating: ItemRating }) {
         <KinopoiskLogoIcon className='mr-2 h-4 w-4' />
         <span className='flex items-center justify-center space-x-0.5'>
           {color === 'gold' && <LeafIcon className='w-2 h-4' />}
-          <span>{fixed}</span>
+          <span>{fixed.toFixed(1)}</span>
           {color === 'gold' && <LeafIcon className='w-2 h-4' style={{ transform: 'scaleX(-1)' }} />}
         </span>
         <span className='opacity-50 font-normal text-[0.6rem] leading-[0.6rem] ml-1'>
