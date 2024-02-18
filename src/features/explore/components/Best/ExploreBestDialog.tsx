@@ -67,7 +67,7 @@ export function ExploreBestDialog() {
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Explore Best</DialogTitle>
-          <DialogDescription>Find best title that fits to your mood.</DialogDescription>
+          <DialogDescription>Find best title that fits your mood.</DialogDescription>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-5 items-center gap-4'>
