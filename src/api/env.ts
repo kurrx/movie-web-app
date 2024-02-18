@@ -10,6 +10,13 @@ export const PROVIDER_DOMAIN = PROVIDER_URL.replaceAll('https://', '').replaceAl
 export const PROXY_URL = import.meta.env.VITE_PROXY_URL
 export const PROXY_IP = import.meta.env.VITE_PROXY_IP
 
+export const FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY
+export const FIREBASE_AUTH_DOMAIN = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
+export const FIREBASE_PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID
+export const FIREBASE_STORAGE_BUCKET = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
+export const FIREBASE_MESSAGING_SENDER_ID = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID
+export const FIREBASE_APP_ID = import.meta.env.VITE_FIREBASE_APP_ID
+
 export const SOCIAL_GITHUB_URL = import.meta.env.VITE_SOCIAL_GITHUB_URL
 export const SOCIAL_X_URL = import.meta.env.VITE_SOCIAL_X_URL
 export const SOCIAL_PORTFOLIO_URL = import.meta.env.VITE_SOCIAL_PORTFOLIO_URL

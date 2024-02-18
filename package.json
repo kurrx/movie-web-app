@@ -56,6 +56,7 @@
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",
     "dexie": "^3.2.5",
+    "firebase": "^10.8.0",
     "framer-motion": "^11.0.3",
     "random-gradient": "^0.0.2",
     "react": "^18.2.0",
