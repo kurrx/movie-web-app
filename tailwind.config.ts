@@ -54,6 +54,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        logout: {
+          DEFAULT: 'hsl(var(--logout))',
+          foreground: 'hsl(var(--logout-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

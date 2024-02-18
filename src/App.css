@@ -27,6 +27,8 @@
     --radius: 0.5rem;
 
     --ui-primary: #f00;
+    --logout: 0 84.2% 60.2%;
+    --logout-foreground: 0 0% 98%;
   }
 
   .dark {
@@ -51,6 +53,8 @@
     --ring: 211 96% 78%;
 
     --ui-primary: #f00;
+    --logout: 0 84.2% 60.2%;
+    --logout-foreground: 0 0% 98%;
   }
 
   @media (min-width: 932px) {

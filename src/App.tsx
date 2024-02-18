@@ -4,7 +4,7 @@ import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
-import { ExploreBestDialog, FeaturesProvider, SearchDialog, store } from '@/features'
+import { ExploreBestDialog, FeaturesProvider, LoginDialog, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
 import { VPNMiddleware } from '@/middlewares'
 import {
@@ -31,6 +31,7 @@ export function App() {
                 <VPNMiddleware>
                   <SearchDialog />
                   <ExploreBestDialog />
+                  <LoginDialog />
                   <Routes>
                     <Route path='/' element={<HomeView />} />
                     <Route path='/policy' element={<PolicyView />} />

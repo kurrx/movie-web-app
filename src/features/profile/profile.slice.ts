@@ -89,7 +89,7 @@ export const selectProfileDialog = createSelector(
   (state: AppStoreState) => state.profile.dialog,
   (isLoggedIn, loginDialog) => loginDialog && !isLoggedIn,
 )
-export const selectProfileUser = (state: AppStoreState) => state.profile.user!
+export const selectProfileUser = (state: AppStoreState) => state.profile.user
 export const selectProfileLoading = (state: AppStoreState) => state.profile.loading
 export const selectProfileError = (state: AppStoreState) => state.profile.error
 

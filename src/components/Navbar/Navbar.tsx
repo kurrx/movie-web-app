@@ -12,7 +12,6 @@ import {
   selectPlayerTheater,
   selectSearchDisabled,
   setExploreOpen,
-  ThemeSwitcher,
 } from '@/features'
 import { useAppSelector, useElementRect, useStoreBoolean } from '@/hooks'
 
@@ -77,7 +76,6 @@ export function Navbar() {
             <NavbarSocialLink href={SOCIAL_X_URL} label='Twitter'>
               <XLogoIcon className={classes.socials.icon.x} />
             </NavbarSocialLink>
-            <ThemeSwitcher />
             <ProfileMenu />
           </div>
         </div>

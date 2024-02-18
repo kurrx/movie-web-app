@@ -1,4 +1,3 @@
-import { PersonIcon } from '@radix-ui/react-icons'
 import { useCallback, useEffect, useMemo } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
@@ -10,7 +9,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components'
 import { useStore, useStoreBoolean } from '@/hooks'
 
@@ -42,11 +40,6 @@ export function LoginDialog() {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant='ghost' size='icon'>
-          <PersonIcon />
-        </Button>
-      </DialogTrigger>
       <DialogContent className='sm:w-[500px]'>
         <DialogHeader>
           <DialogTitle>Login</DialogTitle>
