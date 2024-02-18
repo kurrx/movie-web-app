@@ -6,10 +6,8 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components'
 import { Theme } from '@/types'
@@ -50,8 +48,6 @@ export function ThemeSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuLabel>Theme</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={theme} onValueChange={onValueChange}>
           <DropdownMenuRadioItem value='light'>Light</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value='dark'>Dark</DropdownMenuRadioItem>
