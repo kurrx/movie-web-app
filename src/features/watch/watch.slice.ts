@@ -32,8 +32,10 @@ import { setProfileUser } from '../profile'
 type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
 type GetItemReturn = {
+  uid: string
   item: Awaited<ReturnType<typeof fetchItem>>
   itemState: WatchItemState
+  exists: boolean
 }
 type GetItemParam = { fullId: ItemFullID; nextState?: WatchItemState | null }
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
@@ -139,10 +141,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         subtitle: 'null',
       }
     }
-    if (!exists) {
-      await saveItemState(uid, fullId.id, itemState)
-    }
-    return { item, itemState }
+    return { uid, item, itemState, exists }
   },
   {
     condition(arg, api) {
@@ -305,6 +304,8 @@ const watchSlice = createSlice({
         if (item && item.state === FetchState.LOADING) {
           const fetchedItem = action.payload.item
           const nextState = action.payload.itemState
+          const uid = action.payload.uid
+          const exists = action.payload.exists
           let stream: Stream
           if (fetchedItem.itemType === 'series') {
             const seasons = fetchedItem.streams.find(
@@ -330,6 +331,9 @@ const watchSlice = createSlice({
           }
           checkState(stream!, nextState)
           state.states[action.meta.arg.fullId.id] = nextState
+          if (!exists) {
+            saveItemState(uid, action.meta.arg.fullId.id, nextState)
+          }
           item.requestId = null
           item.state = FetchState.SUCCESS
           item.item = fetchedItem
