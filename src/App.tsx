@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
 import { ExploreBestDialog, FeaturesProvider, LoginDialog, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
-import { VPNMiddleware } from '@/middlewares'
+import { AuthMiddleware, VPNMiddleware } from '@/middlewares'
 import {
   ExploreCollectionsView,
   ExplorePersonView,
@@ -35,7 +35,14 @@ export function App() {
                   <Routes>
                     <Route path='/' element={<HomeView />} />
                     <Route path='/policy' element={<PolicyView />} />
-                    <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
+                    <Route
+                      path='/watch/:typeId/:genreId/:slug'
+                      element={
+                        <AuthMiddleware>
+                          <WatchView />
+                        </AuthMiddleware>
+                      }
+                    />
                     <Route path='/explore/collections' element={<ExploreCollectionsView />} />
                     <Route
                       path='/explore/collections/page/:page'
