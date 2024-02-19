@@ -7,6 +7,7 @@ import {
   fetchTranslator,
   getItemState,
   refererFromId,
+  saveItemState,
   transliterate,
 } from '@/api'
 import { FetchState, SwitchState } from '@/core'
@@ -106,8 +107,11 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   async ({ fullId, nextState }, { signal, getState }) => {
     const uid = getState().profile.user!.uid
     let itemState: WatchItemState | null | undefined = getState().watch.states[fullId.id]
+    let exists = true
     if (!itemState) {
-      itemState = await getItemState(uid, fullId.id)
+      const firestoreState = await getItemState(uid, fullId.id)
+      itemState = firestoreState.state
+      exists = firestoreState.exists
       if (nextState) {
         if (itemState) {
           itemState.translatorId = nextState.translatorId
@@ -134,6 +138,9 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         quality: 'auto',
         subtitle: 'null',
       }
+    }
+    if (!exists) {
+      await saveItemState(uid, fullId.id, itemState)
     }
     return { item, itemState }
   },

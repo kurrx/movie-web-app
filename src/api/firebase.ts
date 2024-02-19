@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore/lite'
 
-import { FirestoreItemState, WatchItemState } from '@/types'
+import { FirestoreItemState, UpdateItemStateArgs, WatchItemState } from '@/types'
 
 import {
   FIREBASE_API_KEY,
@@ -40,7 +40,7 @@ export const statesRef = collection(firestore, 'states')
 function convertState(document: FirestoreItemState) {
   const state: WatchItemState = {
     translatorId: document.translatorId,
-    timestamp: document.timestamp,
+    timestamp: 0,
     quality: document.quality,
     subtitle: null,
   }
@@ -59,7 +59,6 @@ function serializeState(uid: string, id: number, state: WatchItemState) {
     uid,
     id,
     translatorId: state.translatorId,
-    timestamp: state.timestamp,
     quality: state.quality,
     subtitle: null,
     season: null,
@@ -78,13 +77,18 @@ function serializeState(uid: string, id: number, state: WatchItemState) {
 export async function getItemState(uid: string, id: number) {
   const docRef = doc(statesRef, `${uid}-${id}`)
   const docSnap = await getDoc(docRef)
-  if (!docSnap.exists()) return null
+  if (!docSnap.exists()) return { state: null, exists: false }
   const document = docSnap.data() as FirestoreItemState
-  return convertState(document)
+  return { state: convertState(document), exists: true }
 }
 
 export async function saveItemState(uid: string, id: number, state: WatchItemState) {
   const docRef = doc(statesRef, `${uid}-${id}`)
   const document = serializeState(uid, id, state)
   return await setDoc(docRef, document)
+}
+
+export async function updateItemState(uid: string, id: number, state: UpdateItemStateArgs) {
+  const docRef = doc(statesRef, `${uid}-${id}`)
+  return await setDoc(docRef, state, { merge: true })
 }
