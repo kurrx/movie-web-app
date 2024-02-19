@@ -16,6 +16,7 @@ export const FIREBASE_PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID
 export const FIREBASE_STORAGE_BUCKET = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
 export const FIREBASE_MESSAGING_SENDER_ID = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID
 export const FIREBASE_APP_ID = import.meta.env.VITE_FIREBASE_APP_ID
+export const FIREBASE_DB_URL = import.meta.env.VITE_FIREBASE_DB_URL
 
 export const SOCIAL_GITHUB_URL = import.meta.env.VITE_SOCIAL_GITHUB_URL
 export const SOCIAL_X_URL = import.meta.env.VITE_SOCIAL_X_URL

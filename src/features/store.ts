@@ -20,7 +20,7 @@ import {
 import { profileReducer } from './profile'
 import { searchReducer } from './search'
 import { themeReducer } from './theme'
-import { updateTime, watchReducer } from './watch'
+import { watchReducer } from './watch'
 
 export const store = configureStore({
   reducer: {
@@ -42,7 +42,10 @@ export const store = configureStore({
   devTools: IS_DEV && {
     name: APP_NAME,
     actionsDenylist: [
-      updateTime.type,
+      'watch/updateTime',
+      'watch/updateTime/pending',
+      'watch/updateTime/fulfilled',
+      'watch/updateTime/rejected',
       setPlayerProgress.type,
       setPlayerLoadedProgress.type,
       setPlayerInteracted.type,

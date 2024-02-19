@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit'
 
 import {
   fetchItem,
@@ -32,7 +32,9 @@ import {
 import { setProfileUser } from '../profile'
 
 type Thunk = ThunkApiConfig
-type ThunkConditionApi = { getState: () => AppStoreState }
+type ThunkApi = { getState: () => AppStoreState }
+type UpdateReturn<T> = { uid: string; result: T }
+type UpdateParam = { id: number }
 type GetItemReturn = {
   uid: string
   item: Awaited<ReturnType<typeof fetchItem>>
@@ -42,15 +44,17 @@ type GetItemReturn = {
 type GetItemParam = { fullId: ItemFullID; nextState?: WatchItemState | null }
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
 type GetStreamParam = number
-type SwitchParam = { id: number }
-type SwitchReturn<T> = { uid: string; result: T }
-type SEpisodeReturn = SwitchReturn<Awaited<ReturnType<typeof fetchSeriesStream>> | null>
-type SEpisodeParam = { season: number; episode: number } & SwitchParam
-type STranslatorReturn = SwitchReturn<Awaited<ReturnType<typeof fetchTranslator>>>
-type STranslatorParam = { translatorId: number } & SwitchParam
-type SQualityReturn = SwitchReturn<null>
-type SQualityParam = { quality: string } & SwitchParam
+type SEpisodeReturn = UpdateReturn<Awaited<ReturnType<typeof fetchSeriesStream>> | null>
+type SEpisodeParam = { season: number; episode: number } & UpdateParam
+type STranslatorReturn = UpdateReturn<Awaited<ReturnType<typeof fetchTranslator>>>
+type STranslatorParam = { translatorId: number } & UpdateParam
+type SQualityReturn = UpdateReturn<null>
+type SQualityParam = { quality: string } & UpdateParam
 type SwitchAction = { meta: { arg: { id: number }; requestId: string } }
+type UTimeParam = { time: number } & UpdateParam
+type UTimeReturn = UpdateReturn<null>
+type USubtitleParam = { subtitle: string | null } & UpdateParam
+type USubtitleReturn = UpdateReturn<null>
 
 function switchPending(state: WatchStoreState, action: SwitchAction) {
   const switchState = state.switchStates.find((s) => s.id === action.meta.arg.id)!
@@ -112,6 +116,11 @@ const initialState: WatchStoreState = {
   states: {},
   switchStates: [],
 }
+
+const blankAsync = async (_: unknown, { getState }: ThunkApi) => ({
+  uid: getState().profile.user!.uid,
+  result: null,
+})
 
 export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
@@ -187,7 +196,7 @@ export const getStreamDetails = createAsyncThunk<GetStreamReturn, GetStreamParam
 )
 
 const switchOptions = {
-  condition({ id }: SwitchParam, { getState }: ThunkConditionApi): boolean {
+  condition({ id }: UpdateParam, { getState }: ThunkApi): boolean {
     const switchStates = getState().watch.switchStates
     const switchState = switchStates.find((s) => s.id === id)!
     return switchState.state !== SwitchState.LOADING
@@ -236,7 +245,7 @@ export const switchTranslator = createAsyncThunk<STranslatorReturn, STranslatorP
 )
 export const switchQuality = createAsyncThunk<SQualityReturn, SQualityParam, Thunk>(
   'watch/switchQuality',
-  async (_, { getState }) => ({ uid: getState().profile.user!.uid, result: null }),
+  blankAsync,
   switchOptions,
 )
 export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
@@ -274,19 +283,20 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
   },
 )
 
+export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
+  'watch/updateTime',
+  blankAsync,
+)
+export const setSubtitle = createAsyncThunk<USubtitleReturn, USubtitleParam, Thunk>(
+  'watch/setSubtitle',
+  blankAsync,
+)
+
 const watchSlice = createSlice({
   name: 'watch',
   initialState,
 
-  reducers: {
-    updateTime(state, action: PayloadAction<{ id: number; time: number }>) {
-      state.states[action.payload.id]!.timestamp = action.payload.time
-    },
-
-    setSubtitle(state, action: PayloadAction<{ id: number; subtitle: string | null }>) {
-      state.states[action.payload.id]!.subtitle = action.payload.subtitle
-    },
-  },
+  reducers: {},
 
   extraReducers(builder) {
     builder
@@ -370,16 +380,25 @@ const watchSlice = createSlice({
         }
       })
 
-    builder.addCase(getStreamDetails.fulfilled, (state, action) => {
-      const stream = getItemStream(state, action.meta.arg)
-      stream.detailsFetched = true
-      stream.thumbnails.parse(action.payload.thumbnails)
-      for (const size of action.payload.sizes) {
-        const quality = stream.qualities.find((q) => q.id === size.id)!
-        quality.downloadSize = size.downloadSize
-        quality.downloadSizeStr = size.downloadSizeStr
-      }
-    })
+    builder
+      .addCase(updateTime.fulfilled, (state, action) => {
+        const uid = action.payload.uid
+        const timestamp = action.meta.arg.time
+        const itemState = state.states[action.meta.arg.id]!
+        if (itemState.timestamp !== timestamp) {
+          itemState.timestamp = timestamp
+          updateItemState(uid, action.meta.arg.id, { timestamp })
+        }
+      })
+      .addCase(setSubtitle.fulfilled, (state, action) => {
+        const uid = action.payload.uid
+        const subtitle = action.meta.arg.subtitle
+        const itemState = state.states[action.meta.arg.id]!
+        if (itemState.subtitle !== subtitle) {
+          itemState.subtitle = subtitle
+          updateItemState(uid, action.meta.arg.id, { subtitle })
+        }
+      })
 
     builder
       .addCase(switchEpisode.pending, switchPending)
@@ -491,17 +510,26 @@ const watchSlice = createSlice({
         }
       })
 
-    builder.addCase(setProfileUser, (state, action) => {
-      if (!action.payload) {
-        state.states = {}
-        state.items = []
-        state.switchStates = []
-      }
-    })
+    builder
+      .addCase(setProfileUser, (state, action) => {
+        if (!action.payload) {
+          state.states = {}
+          state.items = []
+          state.switchStates = []
+        }
+      })
+      .addCase(getStreamDetails.fulfilled, (state, action) => {
+        const stream = getItemStream(state, action.meta.arg)
+        stream.detailsFetched = true
+        stream.thumbnails.parse(action.payload.thumbnails)
+        for (const size of action.payload.sizes) {
+          const quality = stream.qualities.find((q) => q.id === size.id)!
+          quality.downloadSize = size.downloadSize
+          quality.downloadSizeStr = size.downloadSizeStr
+        }
+      })
   },
 })
-
-export const { updateTime, setSubtitle } = watchSlice.actions
 
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
