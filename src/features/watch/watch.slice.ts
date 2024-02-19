@@ -26,6 +26,8 @@ import {
   WatchStoreState,
 } from '@/types'
 
+import { setProfileUser } from '../profile'
+
 type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
 type GetItemReturn = {
@@ -443,6 +445,14 @@ const watchSlice = createSlice({
           switchState.requestId = null
         }
       })
+
+    builder.addCase(setProfileUser, (state, action) => {
+      if (!action.payload) {
+        state.states = {}
+        state.items = []
+        state.switchStates = []
+      }
+    })
   },
 })
 
