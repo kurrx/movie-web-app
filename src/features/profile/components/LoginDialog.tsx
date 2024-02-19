@@ -13,11 +13,11 @@ import {
 import { useStore, useStoreBoolean } from '@/hooks'
 
 import {
+  login,
   selectProfileDialog,
   selectProfileError,
   selectProfileLoading,
   setProfileDialog,
-  signIn,
 } from '../profile.slice'
 
 export function LoginDialog() {
@@ -31,7 +31,7 @@ export function LoginDialog() {
   const text = useMemo(() => (loading ? 'Loading...' : 'Google'), [loading])
 
   const onLogin = useCallback(() => {
-    dispatch(signIn())
+    dispatch(login())
   }, [dispatch])
 
   useEffect(() => {

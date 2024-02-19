@@ -2,7 +2,7 @@ import { EnterIcon, ExitIcon, PersonIcon } from '@radix-ui/react-icons'
 import randomGradient from 'random-gradient'
 import { Fragment, useState } from 'react'
 
-import { cn, googleSignOut } from '@/api'
+import { cn, googleLogout } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, LoaderIcon, StarIcon } from '@/assets'
 import {
   Button,
@@ -125,7 +125,7 @@ export function ProfileMenu() {
                 'bg-logout/0 !text-logout focus:bg-logout/20',
                 'flex items-center justify-start',
               )}
-              onClick={googleSignOut}
+              onClick={googleLogout}
             >
               <ExitIcon className='h-4 w-4 mr-2' />
               Logout

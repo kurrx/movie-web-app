@@ -2,7 +2,7 @@ import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@r
 import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
-import { googleSignIn } from '@/api'
+import { googleLogin } from '@/api'
 import { AppStoreState, ProfileStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: ProfileStoreState = {
@@ -13,10 +13,10 @@ const initialState: ProfileStoreState = {
   user: null,
 }
 
-type SignInReturn = Awaited<ReturnType<typeof googleSignIn>>
-export const signIn = createAsyncThunk<SignInReturn, void, ThunkApiConfig>(
-  'profile/signIn',
-  async () => await googleSignIn(),
+type LoginReturn = Awaited<ReturnType<typeof googleLogin>>
+export const login = createAsyncThunk<LoginReturn, void, ThunkApiConfig>(
+  'profile/login',
+  async () => await googleLogin(),
   {
     condition(_, api) {
       const state = api.getState().profile
@@ -53,14 +53,14 @@ const profileSlice = createSlice({
 
   extraReducers(builder) {
     builder
-      .addCase(signIn.pending, (state, action) => {
+      .addCase(login.pending, (state, action) => {
         state.dialog = true
         state.loading = true
         state.error = null
         state.requestId = action.meta.requestId
         state.user = null
       })
-      .addCase(signIn.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         if (action.meta.requestId === state.requestId) {
           state.dialog = false
           state.loading = false
@@ -69,7 +69,7 @@ const profileSlice = createSlice({
           state.user = action.payload.user
         }
       })
-      .addCase(signIn.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         if (action.meta.requestId === state.requestId) {
           state.dialog = true
           state.loading = false
