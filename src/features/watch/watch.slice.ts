@@ -9,6 +9,7 @@ import {
   refererFromId,
   saveItemState,
   transliterate,
+  updateItemState,
 } from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
@@ -18,6 +19,7 @@ import {
   ItemSeries,
   Stream,
   ThunkApiConfig,
+  UpdateItemStateArgs,
   WatchItemState,
   WatchPlaylist,
   WatchPlaylistItem,
@@ -35,17 +37,18 @@ type GetItemReturn = {
   uid: string
   item: Awaited<ReturnType<typeof fetchItem>>
   itemState: WatchItemState
-  exists: boolean
+  needToSave: boolean
 }
 type GetItemParam = { fullId: ItemFullID; nextState?: WatchItemState | null }
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
 type GetStreamParam = number
 type SwitchParam = { id: number }
-type SEpisodeReturn = Awaited<ReturnType<typeof fetchSeriesStream>> | null
+type SwitchReturn<T> = { uid: string; result: T }
+type SEpisodeReturn = SwitchReturn<Awaited<ReturnType<typeof fetchSeriesStream>> | null>
 type SEpisodeParam = { season: number; episode: number } & SwitchParam
-type STranslatorReturn = Awaited<ReturnType<typeof fetchTranslator>>
+type STranslatorReturn = SwitchReturn<Awaited<ReturnType<typeof fetchTranslator>>>
 type STranslatorParam = { translatorId: number } & SwitchParam
-type SQualityReturn = Awaited<Promise<null>>
+type SQualityReturn = SwitchReturn<null>
 type SQualityParam = { quality: string } & SwitchParam
 type SwitchAction = { meta: { arg: { id: number }; requestId: string } }
 
@@ -70,13 +73,19 @@ function switchRejected(type: 'episode' | 'translator' | 'quality') {
     }
   }
 }
-function checkState(stream: Stream, state: WatchItemState) {
+function checkState(stream: Stream, state: WatchItemState, update?: UpdateItemStateArgs) {
   const isQualityPresent = stream.qualities.some((q) => q.id === state.quality)
   if (!isQualityPresent) {
+    if (update) {
+      update.quality = stream.defaultQuality
+    }
     state.quality = stream.defaultQuality
   }
   const isSubtitlePresent = stream.subtitles.some((s) => s.id === state.subtitle)
   if (!isSubtitlePresent) {
+    if (update) {
+      update.subtitle = stream.defaultSubtitle
+    }
     state.subtitle = stream.defaultSubtitle
   }
 }
@@ -109,12 +118,13 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   async ({ fullId, nextState }, { signal, getState }) => {
     const uid = getState().profile.user!.uid
     let itemState: WatchItemState | null | undefined = getState().watch.states[fullId.id]
-    let exists = true
+    let needToSave = false
     if (!itemState) {
       const firestoreState = await getItemState(uid, fullId.id)
       itemState = firestoreState.state
-      exists = firestoreState.exists
+      needToSave = !firestoreState.exists
       if (nextState) {
+        needToSave = true
         if (itemState) {
           itemState.translatorId = nextState.translatorId
           itemState.timestamp = nextState.timestamp
@@ -141,7 +151,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         subtitle: 'null',
       }
     }
-    return { uid, item, itemState, exists }
+    return { uid, item, itemState, needToSave }
   },
   {
     condition(arg, api) {
@@ -186,14 +196,15 @@ const switchOptions = {
 export const switchEpisode = createAsyncThunk<SEpisodeReturn, SEpisodeParam, Thunk>(
   'watch/switchEpisode',
   async ({ id, season, episode }, { signal, getState }) => {
+    const uid = getState().profile.user!.uid
     const item = getState().watch.items.find((i) => i.id === id)!.item! as ItemSeries
     const state = getState().watch.states[id]!
     const stream = item.streams
       .find((s) => s.translatorId === state.translatorId)!
       .seasons!.find((s) => s.number === season)!
       .episodes.find((e) => e.number === episode)!.stream
-    if (stream) return null
-    return await fetchSeriesStream({
+    if (stream) return { uid, result: null }
+    const result = await fetchSeriesStream({
       id,
       favsId: item.favsId,
       translatorId: state.translatorId,
@@ -202,27 +213,30 @@ export const switchEpisode = createAsyncThunk<SEpisodeReturn, SEpisodeParam, Thu
       signal,
       referer: refererFromId(item),
     })
+    return { uid, result }
   },
   switchOptions,
 )
 export const switchTranslator = createAsyncThunk<STranslatorReturn, STranslatorParam, Thunk>(
   'watch/switchTranslator',
   async ({ id, translatorId }, { signal, getState }) => {
+    const uid = getState().profile.user!.uid
     const item = getState().watch.items.find((i) => i.id === id)!.item!
     const state = getState().watch.states[id]!
-    return await fetchTranslator({
+    const result = await fetchTranslator({
       item,
       translatorId,
       state,
       signal,
       referer: refererFromId(item),
     })
+    return { uid, result }
   },
   switchOptions,
 )
 export const switchQuality = createAsyncThunk<SQualityReturn, SQualityParam, Thunk>(
   'watch/switchQuality',
-  async () => null,
+  async (_, { getState }) => ({ uid: getState().profile.user!.uid, result: null }),
   switchOptions,
 )
 export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
@@ -305,7 +319,7 @@ const watchSlice = createSlice({
           const fetchedItem = action.payload.item
           const nextState = action.payload.itemState
           const uid = action.payload.uid
-          const exists = action.payload.exists
+          const needToSave = action.payload.needToSave
           let stream: Stream
           if (fetchedItem.itemType === 'series') {
             const seasons = fetchedItem.streams.find(
@@ -331,7 +345,7 @@ const watchSlice = createSlice({
           }
           checkState(stream!, nextState)
           state.states[action.meta.arg.fullId.id] = nextState
-          if (!exists) {
+          if (needToSave) {
             saveItemState(uid, action.meta.arg.fullId.id, nextState)
           }
           item.requestId = null
@@ -373,6 +387,8 @@ const watchSlice = createSlice({
       .addCase(switchEpisode.fulfilled, (state, action) => {
         const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
         if (switchState && switchState.state === SwitchState.LOADING) {
+          const uid = action.payload.uid
+          const update: UpdateItemStateArgs = {}
           const { id, season, episode } = action.meta.arg
           const itemState = state.states[id]!
           const item = state.items.find((i) => i.id === id)!.item! as ItemSeries
@@ -380,16 +396,22 @@ const watchSlice = createSlice({
             .find((s) => s.translatorId === itemState.translatorId)!
             .seasons!.find((s) => s.number === season)!
             .episodes.find((e) => e.number === episode)!
-          let stream = action.payload
+          let stream = action.payload.result
           if (!stream) {
             stream = episodeStream.stream!
           } else {
             episodeStream.stream = stream
           }
-          checkState(stream, itemState)
-          itemState.timestamp = 0
-          itemState.season = season
-          itemState.episode = episode
+          checkState(stream, itemState, update)
+          if (itemState.season !== season || itemState.episode !== episode) {
+            itemState.timestamp = 0
+            update.timestamp = 0
+            itemState.season = season
+            update.season = season
+            itemState.episode = episode
+            update.episode = episode
+          }
+          updateItemState(uid, id, update)
 
           switchState.state = SwitchState.IDLE
           switchState.requestId = null
@@ -402,8 +424,10 @@ const watchSlice = createSlice({
       .addCase(switchTranslator.fulfilled, (state, action) => {
         const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
         if (switchState && switchState.state === SwitchState.LOADING) {
+          const update: UpdateItemStateArgs = {}
           const { id, translatorId } = action.meta.arg
-          const payload = action.payload
+          const uid = action.payload.uid
+          const payload = action.payload.result
           const item = state.items.find((i) => i.id === id)!.item!
           const itemState = state.states[id]!
           let stream: Stream
@@ -427,9 +451,12 @@ const watchSlice = createSlice({
             }
             if (itemState.season !== stateTo.season || itemState.episode !== stateTo.episode) {
               itemState.timestamp = 0
+              update.timestamp = 0
+              itemState.season = stateTo.season
+              update.season = stateTo.season
+              itemState.episode = stateTo.episode
+              update.episode = stateTo.episode
             }
-            itemState.season = stateTo.season
-            itemState.episode = stateTo.episode
           } else {
             const translator = (item as ItemMovie).streams.find(
               (s) => s.translatorId === translatorId,
@@ -437,8 +464,12 @@ const watchSlice = createSlice({
             if (payload.stream) translator.stream = payload.stream
             stream = translator.stream!
           }
-          checkState(stream, itemState)
-          itemState.translatorId = translatorId
+          checkState(stream, itemState, update)
+          if (itemState.translatorId !== translatorId) {
+            itemState.translatorId = translatorId
+            update.translatorId = translatorId
+          }
+          updateItemState(uid, id, update)
 
           switchState.state = SwitchState.IDLE
           switchState.requestId = null
@@ -451,7 +482,10 @@ const watchSlice = createSlice({
       .addCase(switchQuality.fulfilled, (state, action) => {
         const switchState = state.switchStates.find((s) => s.requestId === action.meta.requestId)
         if (switchState && switchState.state === SwitchState.LOADING) {
+          const { id } = action.meta.arg
+          const uid = action.payload.uid
           state.states[action.meta.arg.id]!.quality = action.meta.arg.quality
+          updateItemState(uid, id, { quality: action.meta.arg.quality })
           switchState.state = SwitchState.IDLE
           switchState.requestId = null
         }

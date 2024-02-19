@@ -26,8 +26,9 @@ export interface FirestoreItemState extends FirestoreModel {
 }
 
 export interface UpdateItemStateArgs {
-  translatorId?: number | null
-  quality?: string | null
+  timestamp?: number
+  translatorId?: number
+  quality?: string
   subtitle?: string | null
   season?: number | null
   episode?: number | null

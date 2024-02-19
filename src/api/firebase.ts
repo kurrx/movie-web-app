@@ -12,6 +12,7 @@ import {
   FIREBASE_PROJECT_ID,
   FIREBASE_STORAGE_BUCKET,
 } from './env'
+import { noop } from './utils'
 
 export const firebaseApp = initializeApp({
   apiKey: FIREBASE_API_KEY,
@@ -85,10 +86,16 @@ export async function getItemState(uid: string, id: number) {
 export async function saveItemState(uid: string, id: number, state: WatchItemState) {
   const docRef = doc(statesRef, `${uid}-${id}`)
   const document = serializeState(uid, id, state)
-  return await setDoc(docRef, document)
+  return await setDoc(docRef, document).catch(noop)
 }
 
 export async function updateItemState(uid: string, id: number, state: UpdateItemStateArgs) {
+  if (Object.keys(state).length === 0) return
   const docRef = doc(statesRef, `${uid}-${id}`)
-  return await setDoc(docRef, state, { merge: true })
+  const timestamp = state.timestamp
+  if (typeof timestamp === 'number') {
+    delete state.timestamp
+    console.log(timestamp)
+  }
+  return await setDoc(docRef, state, { merge: true }).catch(noop)
 }
