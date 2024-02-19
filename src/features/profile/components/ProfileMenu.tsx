@@ -59,7 +59,7 @@ export function ProfileMenu() {
         <Button
           size='icon'
           variant='ghost'
-          className='relative h-8 w-8 rounded-full overflow-hidden ml-2'
+          className='relative h-8 w-8 rounded-full overflow-hidden ml-2 bg-accent'
           disabled={loading}
         >
           {loading ? (
