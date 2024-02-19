@@ -5,7 +5,6 @@ import { useAppPlayer } from '../player'
 import { useAppProfile } from '../profile'
 import { useScrollTop } from '../router'
 import { useAppTheme } from '../theme'
-import { useWatch } from '../watch'
 
 export function FeaturesProvider({ children }: PropsWithChildren) {
   useAppTheme()
@@ -13,7 +12,6 @@ export function FeaturesProvider({ children }: PropsWithChildren) {
   useAppDevice()
   useAppProfile()
   useScrollTop()
-  useWatch()
 
   return children
 }

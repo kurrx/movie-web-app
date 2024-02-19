@@ -7,7 +7,6 @@ import {
   FetchStreamDownloadSizeArgs,
   FetchStreamThumbnailArgs,
   ItemModel,
-  ItemStateModel,
   Model,
   MovieKey,
   MovieModel,
@@ -25,16 +24,14 @@ import {
   SeriesThumbnailsModel,
   StreamSeason,
   StreamSuccessResponse,
-  WatchItemState,
 } from '@/types'
 
 class Database extends Dexie {
-  private static readonly VERSION = 2
+  private static readonly VERSION = 3.0
   private static readonly NAME = 'tv-db'
   private static readonly MAX_ITEMS = 100
   private static readonly MAX_STREAMS = 5000
   items!: Table<ItemModel, number>
-  itemsStates!: Table<ItemStateModel, number>
   movies!: Table<MovieModel, MovieKey>
   series!: Table<SeriesModel, SeriesKey>
   seasons!: Table<SeasonsModel, SeasonsKey>
@@ -47,7 +44,6 @@ class Database extends Dexie {
     super(Database.NAME)
     this.version(Database.VERSION).stores({
       items: 'id, createdAt, updatedAt',
-      itemsStates: 'id, createdAt, updatedAt',
       movies: '[id+translatorId+isCamrip+isAds+isDirector], createdAt, updatedAt',
       series: '[id+translatorId+season+episode], createdAt, updatedAt',
       seasons: '[id+translatorId], createdAt, updatedAt',
@@ -108,27 +104,6 @@ class Database extends Dexie {
       return document
     }
     return new DOMParser().parseFromString(entry.html, 'text/html')
-  }
-
-  async getItemState(id: number) {
-    const entry = await this.itemsStates.get(id)
-    return entry?.state
-  }
-
-  async updateItemsStates(states: Record<number, WatchItemState | undefined>) {
-    const date = new Date()
-    for (const idStr of Object.keys(states)) {
-      const id = parseInt(idStr)
-      const state = states[id]
-      if (state) {
-        const entry = await this.itemsStates.get(id)
-        if (!entry) {
-          this.itemsStates.add({ id, state, createdAt: date, updatedAt: date })
-        } else {
-          this.itemsStates.update(id, { state, updatedAt: date })
-        }
-      }
-    }
   }
 
   private async getMovieSize(args: FetchStreamDownloadSizeArgs, fetch: () => Promise<number>) {

@@ -1,5 +1,4 @@
 import { StreamSeason, StreamSuccessResponse } from './ajax.types'
-import { WatchItemState } from './watch.types'
 
 export interface Model {
   createdAt: Date
@@ -9,11 +8,6 @@ export interface Model {
 export interface ItemModel extends Model {
   id: number
   html: string
-}
-
-export interface ItemStateModel extends Model {
-  id: number
-  state: WatchItemState
 }
 
 interface IDModel {

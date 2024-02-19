@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import {
-  db,
   fetchItem,
   fetchSeriesStream,
   fetchStreamDetails,
   fetchTranslator,
+  getItemState,
   refererFromId,
   transliterate,
 } from '@/api'
@@ -25,8 +25,6 @@ import {
   WatchPlaylistPlayItem,
   WatchStoreState,
 } from '@/types'
-
-import { deleteItemStatesLS, getItemStatesLS } from './watch.schemas'
 
 type Thunk = ThunkApiConfig
 type ThunkConditionApi = { getState: () => AppStoreState }
@@ -104,15 +102,10 @@ const initialState: WatchStoreState = {
 export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
   'watch/getItem',
   async ({ fullId, nextState }, { signal, getState }) => {
-    let itemState = getState().watch.states[fullId.id]
+    const uid = getState().profile.user!.uid
+    let itemState: WatchItemState | null | undefined = getState().watch.states[fullId.id]
     if (!itemState) {
-      // Migration from old state storage
-      const states = getItemStatesLS()
-      if (states) {
-        await db.updateItemsStates(states)
-        deleteItemStatesLS()
-      }
-      itemState = await db.getItemState(fullId.id)
+      itemState = await getItemState(uid, fullId.id)
       if (nextState) {
         if (itemState) {
           itemState.translatorId = nextState.translatorId
