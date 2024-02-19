@@ -116,7 +116,7 @@ function parseSearchItems(parser: Parser, parent: ParentNode) {
 
     // Poster URL
     parser.setParent(item)
-    const itemPoster = parser.switchToChild(`img[alt*='${title}']`)
+    const itemPoster = parser.switchToChild('img')
     if (!itemPoster) continue
     const posterUrl = parser.attr('src')
     if (!posterUrl) continue
