@@ -33,7 +33,6 @@ export function Player(props: PlayerProps) {
             <Fragment>
               <PlayerNative key={mediaUrl} />
               <PlayerThumbnailsOverlay />
-              {/* TODO: Thumbnails Overlay */}
               <PlayerControls />
             </Fragment>
           )}

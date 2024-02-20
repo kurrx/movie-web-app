@@ -5,7 +5,6 @@ import type { MouseEvent as ReactMouseEvent } from 'react'
 import { PointerEvent, useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { clamp, convertSeconds } from '@/api'
-import { Skeleton } from '@/components'
 import { useElementRect, useStore } from '@/hooks'
 
 import {
@@ -179,7 +178,6 @@ export function Timeline() {
         }}
       >
         <div className='timeline-thumbnails-image-container'>
-          <Skeleton className='timeline-thumbnails-image-skeleton !rounded-0' />
           <div className='timeline-thumbnails-image' style={thumbnailsImage} />
         </div>
         <div className='timeline-thumbnails-time'>{convertSeconds(thumbnaisProgress)}</div>
