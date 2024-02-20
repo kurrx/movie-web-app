@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from 'react'
 
 import { cn } from '@/api'
-import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
+import { BookMarkIcon, EyeIcon, HeartIcon } from '@/assets'
 import { Table } from '@/components'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
@@ -27,6 +27,7 @@ import { IMDbButton } from './IMDbButton'
 import { IssuesMenu } from './IssuesMenu'
 import { KinopoiskButton } from './KinopoiskButton'
 import { Person } from './Person'
+import { RateMenu } from './RateMenu'
 import { ShareMenu } from './ShareMenu'
 
 export interface WatchInfoProps {
@@ -45,6 +46,7 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const episode = selector((state) => selectWatchItemStateEpisode(state, id))
   const profile = selector((state) => selectWatchItemProfile(state, id))
   const category = useMemo(() => ({ to: `/explore/${item.typeId}`, title: item.type }), [item])
+  const [shareOpen, setShareOpen] = useState(false)
   const [favoriteDisabled, setFavoriteDisabled] = useState(false)
   const [savedDisabled, setSavedDisabled] = useState(false)
   const [watchedDisabled, setWatchedDisabled] = useState(false)
@@ -124,7 +126,11 @@ export function WatchInfo({ id }: WatchInfoProps) {
   const setRating = useCallback(
     async (rating: number | null) => {
       if (ratingDisabled) return
-      if (profile.rating === rating) return null
+      if (profile.rating === rating) {
+        if (!profile.rating) return
+        if (!rating) return
+        setShareOpen(true)
+      }
       setRatingDisabled(true)
       await dispatch(updateWatchItemProfile({ id, rating }))
       setRatingDisabled(false)
@@ -151,17 +157,23 @@ export function WatchInfo({ id }: WatchInfoProps) {
         <ActionButton notFill Icon={EyeIcon} active={profile.watched} onClick={toggleWatched}>
           Watched
         </ActionButton>
-        <ActionButton disabled Icon={StarIcon} active={profile.rating !== null}>
-          {profile.rating === null ? 'Rate' : profile.rating}
-        </ActionButton>
+        <RateMenu
+          title={item.title}
+          subtitle={item.year?.toString()}
+          posterUrl={item.posterUrl || item.highResPosterUrl || 'null'}
+          rating={profile.rating}
+          onRateChange={setRating}
+        />
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
         <ShareMenu
+          open={shareOpen}
           id={id}
           itemTitle={item.title}
           itemLink={itemLink}
           title={title}
           link={shareLink}
+          onOpenChange={setShareOpen}
         />
         <DownloadMenu filename={filename} qualities={qualities} />
         <IssuesMenu id={id} />

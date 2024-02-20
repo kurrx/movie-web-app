@@ -22,14 +22,17 @@ import { useAppSelector } from '@/hooks'
 import { selectWatchItemStateTimestamp } from '../../watch.slice'
 
 export interface ShareMenuProps {
+  open: boolean
   id: number
   itemTitle: string
   itemLink: string
   title: string
   link: string
+  onOpenChange: (open: boolean) => void
 }
 
-export function ShareMenu({ id, itemTitle, itemLink, title, link }: ShareMenuProps) {
+export function ShareMenu(props: ShareMenuProps) {
+  const { open, id, itemTitle, itemLink, title, link, onOpenChange } = props
   const ref = useRef<HTMLInputElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const timestamp = useAppSelector((state) => selectWatchItemStateTimestamp(state, id))
@@ -76,7 +79,7 @@ export function ShareMenu({ id, itemTitle, itemLink, title, link }: ShareMenuPro
   }, [finalTitle, finalLink])
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button className='rounded-full' variant='secondary'>
           <ShareIcon className='mr-2 h-4 w-4' />
