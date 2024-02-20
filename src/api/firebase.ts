@@ -44,7 +44,7 @@ export const statesCollection = collection(firestore, 'states')
 export const fireDatabase = getDatabase(firebaseApp)
 export const statesRef = ref(fireDatabase, 'states')
 
-function convertState(document: FirestoreItemState) {
+function convertItemState(document: FirestoreItemState) {
   const state: WatchItemState = {
     translatorId: document.translatorId,
     timestamp: 0,
@@ -61,7 +61,7 @@ function convertState(document: FirestoreItemState) {
   return state
 }
 
-function serializeState(uid: string, id: number, state: WatchItemState) {
+function serializeItemState(uid: string, id: number, state: WatchItemState) {
   const document: FirestoreItemState = {
     uid,
     id,
@@ -81,22 +81,14 @@ function serializeState(uid: string, id: number, state: WatchItemState) {
   return document
 }
 
-function getStateDocumentRef(uid: string, id: number) {
-  return doc(statesCollection, `${uid}-${id}`)
-}
-
-function getStateTimestampRef(uid: string, id: number) {
-  return child(statesRef, `${uid}/${id}/timestamp`)
-}
-
-function getStateRefs(uid: string, id: number) {
+function getItemStateRefs(uid: string, id: number) {
   return {
-    documentRef: getStateDocumentRef(uid, id),
-    timestampRef: getStateTimestampRef(uid, id),
+    ref: doc(statesCollection, `${uid}-${id}`),
+    timestampRef: child(statesRef, `${uid}/${id}/timestamp`),
   }
 }
 
-export async function getItemStateTimestampByRef(ref: DatabaseReference) {
+export async function getItemStateTimestamp(ref: DatabaseReference) {
   return new Promise<number>((resolve) => {
     onValue(
       ref,
@@ -112,44 +104,38 @@ export async function getItemStateTimestampByRef(ref: DatabaseReference) {
   })
 }
 
-export async function getItemStateTimestamp(uid: string, id: number) {
-  const timestampRef = getStateTimestampRef(uid, id)
-  return await getItemStateTimestampByRef(timestampRef)
-}
-
-export async function saveItemStateTimestampByRef(ref: DatabaseReference, timestamp: number) {
+export async function saveItemStateTimestamp(ref: DatabaseReference, timestamp: number) {
   return await set(ref, timestamp).catch(noop)
 }
 
-export async function saveItemStateTimestamp(uid: string, id: number, timestamp: number) {
-  const timestampRef = getStateTimestampRef(uid, id)
-  return await saveItemStateTimestampByRef(timestampRef, timestamp)
-}
-
 export async function getItemState(uid: string, id: number) {
-  const { documentRef, timestampRef } = getStateRefs(uid, id)
-  const documentSnap = await getDoc(documentRef)
-  if (!documentSnap.exists()) return { state: null, exists: false }
-  const document = documentSnap.data() as FirestoreItemState
-  const state = convertState(document)
-  state.timestamp = await getItemStateTimestampByRef(timestampRef)
+  const { ref, timestampRef } = getItemStateRefs(uid, id)
+  const [document, timestamp] = await Promise.all([
+    getDoc(ref),
+    getItemStateTimestamp(timestampRef),
+  ])
+  if (!document.exists()) return { state: null, exists: false }
+  const state = convertItemState(document.data() as FirestoreItemState)
+  state.timestamp = timestamp
   return { state, exists: true }
 }
 
 export async function saveItemState(uid: string, id: number, state: WatchItemState) {
-  const { documentRef, timestampRef } = getStateRefs(uid, id)
-  const document = serializeState(uid, id, state)
-  await saveItemStateTimestampByRef(timestampRef, state.timestamp)
-  return await setDoc(documentRef, document).catch(noop)
+  const { ref, timestampRef } = getItemStateRefs(uid, id)
+  const document = serializeItemState(uid, id, state)
+  return await Promise.all([
+    setDoc(ref, document).catch(noop),
+    saveItemStateTimestamp(timestampRef, state.timestamp),
+  ])
 }
 
 export async function updateItemState(uid: string, id: number, state: UpdateItemStateArgs) {
-  const { documentRef, timestampRef } = getStateRefs(uid, id)
+  const { ref, timestampRef } = getItemStateRefs(uid, id)
   const timestamp = state.timestamp
   if (typeof timestamp === 'number') {
     delete state.timestamp
-    await saveItemStateTimestampByRef(timestampRef, timestamp)
+    saveItemStateTimestamp(timestampRef, timestamp)
   }
   if (Object.keys(state).length === 0) return
-  return await setDoc(documentRef, state, { merge: true }).catch(noop)
+  return await setDoc(ref, state, { merge: true }).catch(noop)
 }
