@@ -16,9 +16,17 @@ export interface WatchItemState {
   episode?: number
 }
 
+export interface WatchProfileItem {
+  favorite: boolean
+  saved: boolean
+  watched: boolean
+  rating?: number | null
+}
+
 export interface WatchItem extends FetchableState {
   id: number
   item: Item | null
+  profile: WatchProfileItem | null
 }
 
 export interface WatchStoreState {

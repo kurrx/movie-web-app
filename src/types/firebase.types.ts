@@ -3,15 +3,25 @@ export interface FirestoreModel {
   id: number
 }
 
-export interface FirestoreItem extends FirestoreModel {
+export interface FirebaseProfileItem extends FirestoreModel {
   title: string
+  isSeries: boolean
   url: string
   posterUrl: string
   description: string
+  lastWatched: number
   favorite: boolean
   saved: boolean
   watched: boolean
-  duration?: number | null
+  kpRating?: number | null
+  rating?: number | null
+}
+
+export interface UpdateProfileItemArgs {
+  lastWatched?: number
+  favorite?: boolean
+  saved?: boolean
+  watched?: boolean
   rating?: number | null
 }
 

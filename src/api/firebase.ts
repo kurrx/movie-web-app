@@ -3,7 +3,15 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/
 import { child, DatabaseReference, getDatabase, onValue, ref, set } from 'firebase/database'
 import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore/lite'
 
-import { FirestoreItemState, UpdateItemStateArgs, WatchItemState } from '@/types'
+import {
+  FirebaseProfileItem,
+  FirestoreItemState,
+  Item,
+  UpdateItemStateArgs,
+  UpdateProfileItemArgs,
+  WatchItemState,
+  WatchProfileItem,
+} from '@/types'
 
 import {
   FIREBASE_API_KEY,
@@ -40,6 +48,7 @@ export async function googleLogout() {
 
 export const firestore = getFirestore(firebaseApp)
 export const statesCollection = collection(firestore, 'states')
+export const profileItemsCollection = collection(firestore, 'profile-items')
 
 export const fireDatabase = getDatabase(firebaseApp)
 export const statesRef = ref(fireDatabase, 'states')
@@ -129,13 +138,65 @@ export async function saveItemState(uid: string, id: number, state: WatchItemSta
   ])
 }
 
-export async function updateItemState(uid: string, id: number, state: UpdateItemStateArgs) {
+export async function updateItemState(uid: string, id: number, args: UpdateItemStateArgs) {
   const { ref, timestampRef } = getItemStateRefs(uid, id)
-  const timestamp = state.timestamp
+  const timestamp = args.timestamp
   if (typeof timestamp === 'number') {
-    delete state.timestamp
+    delete args.timestamp
     saveItemStateTimestamp(timestampRef, timestamp)
   }
-  if (Object.keys(state).length === 0) return
-  return await setDoc(ref, state, { merge: true }).catch(noop)
+  if (Object.keys(args).length === 0) return
+  return await setDoc(ref, args, { merge: true }).catch(noop)
+}
+
+function convertProfileItem(document: WatchProfileItem) {
+  return {
+    favorite: document.favorite,
+    saved: document.saved,
+    watched: document.watched,
+    rating: document.rating,
+  }
+}
+
+function serializeProfileItem(uid: string, id: number, item: Item) {
+  const year = item.year ? `${item.year}, ` : ''
+  const country = item.country ? `${item.country}, ` : ''
+  const document: FirebaseProfileItem = {
+    uid,
+    id,
+    title: item.title,
+    isSeries: item.itemType === 'series',
+    url: `/${item.typeId}/${item.genreId}/${item.slug}`,
+    posterUrl: item.posterUrl || item.highResPosterUrl || 'null',
+    description: `${year}${country}${item.genre}`,
+    lastWatched: Date.now(),
+    favorite: false,
+    saved: false,
+    watched: false,
+    kpRating: item.kinopoiskRating?.rate || null,
+    rating: null,
+  }
+  return document
+}
+
+function getProfileItemRef(uid: string, id: number) {
+  return doc(profileItemsCollection, `${uid}-${id}`)
+}
+
+export async function updateProfileItem(uid: string, id: number, args: UpdateProfileItemArgs) {
+  const ref = getProfileItemRef(uid, id)
+  if (Object.keys(args).length === 0) return
+  return await setDoc(ref, args, { merge: true }).catch(noop)
+}
+
+export async function getOrSaveProfileItem(uid: string, id: number, item: Item) {
+  const ref = getProfileItemRef(uid, id)
+  const document = await getDoc(ref)
+  if (document.exists()) {
+    updateProfileItem(uid, id, { lastWatched: Date.now() })
+    return convertProfileItem(document.data() as FirebaseProfileItem)
+  }
+  const serialized = serializeProfileItem(uid, id, item)
+  setDoc(ref, serialized).catch(noop)
+  return convertProfileItem(serialized)
 }

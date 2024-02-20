@@ -6,6 +6,7 @@ import {
   fetchStreamDetails,
   fetchTranslator,
   getItemState,
+  getOrSaveProfileItem,
   refererFromId,
   saveItemState,
   transliterate,
@@ -26,6 +27,7 @@ import {
   WatchPlaylistItemFranchise,
   WatchPlaylistItemSeason,
   WatchPlaylistPlayItem,
+  WatchProfileItem,
   WatchStoreState,
 } from '@/types'
 
@@ -40,6 +42,7 @@ type GetItemReturn = {
   item: Awaited<ReturnType<typeof fetchItem>>
   itemState: WatchItemState
   needToSave: boolean
+  profile: WatchProfileItem
 }
 type GetItemParam = { fullId: ItemFullID; nextState?: WatchItemState | null }
 type GetStreamReturn = Awaited<ReturnType<typeof fetchStreamDetails>>
@@ -152,6 +155,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
       signal,
       referer: refererFromId(fullId),
     })
+    const profile = await getOrSaveProfileItem(uid, fullId.id, item)
     if (!itemState) {
       itemState = {
         translatorId: item.translators[0].id,
@@ -160,7 +164,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         subtitle: 'null',
       }
     }
-    return { uid, item, itemState, needToSave }
+    return { uid, item, itemState, needToSave, profile }
   },
   {
     condition(arg, api) {
@@ -309,6 +313,7 @@ const watchSlice = createSlice({
             error: null,
             requestId: action.meta.requestId,
             item: null,
+            profile: null,
           })
           state.switchStates.push({
             id: action.meta.arg.fullId.id,
@@ -321,12 +326,14 @@ const watchSlice = createSlice({
           item.error = null
           item.requestId = action.meta.requestId
           item.item = null
+          item.profile = null
         }
       })
       .addCase(getItem.fulfilled, (state, action) => {
         const item = state.items.find((i) => i.requestId === action.meta.requestId)
         if (item && item.state === FetchState.LOADING) {
           const fetchedItem = action.payload.item
+          const profileItem = action.payload.profile
           const nextState = action.payload.itemState
           const uid = action.payload.uid
           const needToSave = action.payload.needToSave
@@ -361,6 +368,7 @@ const watchSlice = createSlice({
           item.requestId = null
           item.state = FetchState.SUCCESS
           item.item = fetchedItem
+          item.profile = profileItem
         }
       })
       .addCase(getItem.rejected, (state, action) => {
