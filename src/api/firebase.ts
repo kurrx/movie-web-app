@@ -193,7 +193,7 @@ export async function getOrSaveProfileItem(uid: string, id: number, item: Item) 
   const ref = getProfileItemRef(uid, id)
   const document = await getDoc(ref)
   if (document.exists()) {
-    updateProfileItem(uid, id, { lastWatched: Date.now() })
+    // updateProfileItem(uid, id, { lastWatched: Date.now() })
     return convertProfileItem(document.data() as FirebaseProfileItem)
   }
   const serialized = serializeProfileItem(uid, id, item)
