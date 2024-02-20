@@ -11,6 +11,7 @@ import {
   saveItemState,
   transliterate,
   updateItemState,
+  updateProfileItem,
 } from '@/api'
 import { FetchState, SwitchState } from '@/core'
 import {
@@ -21,6 +22,7 @@ import {
   Stream,
   ThunkApiConfig,
   UpdateItemStateArgs,
+  UpdateProfileItemArgs,
   WatchItemState,
   WatchPlaylist,
   WatchPlaylistItem,
@@ -58,6 +60,7 @@ type UTimeParam = { time: number } & UpdateParam
 type UTimeReturn = UpdateReturn<null>
 type USubtitleParam = { subtitle: string | null } & UpdateParam
 type USubtitleReturn = UpdateReturn<null>
+type UProfileParam = UpdateProfileItemArgs & UpdateParam
 
 function switchPending(state: WatchStoreState, action: SwitchAction) {
   const switchState = state.switchStates.find((s) => s.id === action.meta.arg.id)!
@@ -296,6 +299,12 @@ export const setSubtitle = createAsyncThunk<USubtitleReturn, USubtitleParam, Thu
   blankAsync,
 )
 
+export const updateWatchItemProfile = createAsyncThunk<void, UProfileParam, Thunk>(
+  'watch/updateWatchItemProfile',
+  async (args, { getState }) =>
+    await updateProfileItem(getState().profile.user!.uid, args.id, args),
+)
+
 const watchSlice = createSlice({
   name: 'watch',
   initialState,
@@ -405,6 +414,24 @@ const watchSlice = createSlice({
         if (itemState.subtitle !== subtitle) {
           itemState.subtitle = subtitle
           updateItemState(uid, action.meta.arg.id, { subtitle })
+        }
+      })
+      .addCase(updateWatchItemProfile.fulfilled, (state, action) => {
+        const item = state.items.find((i) => i.id === action.meta.arg.id)!
+        if (item.profile) {
+          const args = action.meta.arg
+          if (typeof args.rating !== 'undefined') {
+            item.profile.rating = args.rating
+          }
+          if (typeof args.favorite !== 'undefined') {
+            item.profile.favorite = args.favorite
+          }
+          if (typeof args.saved !== 'undefined') {
+            item.profile.saved = args.saved
+          }
+          if (typeof args.watched !== 'undefined') {
+            item.profile.watched = args.watched
+          }
         }
       })
 
@@ -542,6 +569,10 @@ const watchSlice = createSlice({
 export const selectWatchItemOptional = (state: AppStoreState, id: number) =>
   state.watch.items.find((i) => i.id === id)
 export const selectWatchItem = createSelector(selectWatchItemOptional, (item) => item!.item!)
+export const selectWatchItemProfile = createSelector(
+  selectWatchItemOptional,
+  (item) => item!.profile!,
+)
 export const selectWatchItemSwitchState = (state: AppStoreState, id: number) =>
   state.watch.switchStates.find((s) => s.id === id)!
 export const selectWatchItemFetchState = createSelector(

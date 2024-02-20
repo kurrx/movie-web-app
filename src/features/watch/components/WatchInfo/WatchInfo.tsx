@@ -5,17 +5,19 @@ import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
 import { Table } from '@/components'
 import { Title } from '@/features/router'
 import { explore } from '@/features/router/explore'
-import { useAppSelector } from '@/hooks'
+import { useStore } from '@/hooks'
 
 import {
   selectWatchItem,
   selectWatchItemEpisodeTitle,
   selectWatchItemFilename,
   selectWatchItemFullTitle,
+  selectWatchItemProfile,
   selectWatchItemQualities,
   selectWatchItemStateEpisode,
   selectWatchItemStateSeason,
   selectWatchItemStateTranslatorId,
+  updateWatchItemProfile,
 } from '../../watch.slice'
 import { ActionButton } from './ActionButton'
 import { Collection } from './Collection'
@@ -32,20 +34,21 @@ export interface WatchInfoProps {
 }
 
 export function WatchInfo({ id }: WatchInfoProps) {
-  const item = useAppSelector((state) => selectWatchItem(state, id))
-  const title = useAppSelector((state) => selectWatchItemFullTitle(state, id))
-  const filename = useAppSelector((state) => selectWatchItemFilename(state, id))
-  const episodeTitle = useAppSelector((state) => selectWatchItemEpisodeTitle(state, id))
-  const qualities = useAppSelector((state) => selectWatchItemQualities(state, id))
-  const translatorId = useAppSelector((state) => selectWatchItemStateTranslatorId(state, id))
-  const season = useAppSelector((state) => selectWatchItemStateSeason(state, id))
-  const episode = useAppSelector((state) => selectWatchItemStateEpisode(state, id))
-  const [favorite, setFavorite] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [watched, setWatched] = useState(false)
-  const [rated] = useState(false)
-  const [rating] = useState<number | null>(null)
+  const [dispatch, selector] = useStore()
+  const item = selector((state) => selectWatchItem(state, id))
+  const title = selector((state) => selectWatchItemFullTitle(state, id))
+  const filename = selector((state) => selectWatchItemFilename(state, id))
+  const episodeTitle = selector((state) => selectWatchItemEpisodeTitle(state, id))
+  const qualities = selector((state) => selectWatchItemQualities(state, id))
+  const translatorId = selector((state) => selectWatchItemStateTranslatorId(state, id))
+  const season = selector((state) => selectWatchItemStateSeason(state, id))
+  const episode = selector((state) => selectWatchItemStateEpisode(state, id))
+  const profile = selector((state) => selectWatchItemProfile(state, id))
   const category = useMemo(() => ({ to: `/explore/${item.typeId}`, title: item.type }), [item])
+  const [favoriteDisabled, setFavoriteDisabled] = useState(false)
+  const [savedDisabled, setSavedDisabled] = useState(false)
+  const [watchedDisabled, setWatchedDisabled] = useState(false)
+  const [ratingDisabled, setRatingDisabled] = useState(false)
   const genres = useMemo(
     () =>
       item.genreIds.map((genreId) => ({
@@ -97,17 +100,37 @@ export function WatchInfo({ id }: WatchInfoProps) {
     return `${itemLink}?${query}`
   }, [itemLink, translatorId, season, episode])
 
-  const toggleFavorite = useCallback(() => {
-    setFavorite((prev) => !prev)
-  }, [])
+  const toggleFavorite = useCallback(async () => {
+    if (favoriteDisabled) return
+    setFavoriteDisabled(true)
+    await dispatch(updateWatchItemProfile({ id, favorite: !profile.favorite }))
+    setFavoriteDisabled(false)
+  }, [dispatch, id, profile, favoriteDisabled])
 
-  const toggleSaved = useCallback(() => {
-    setSaved((prev) => !prev)
-  }, [])
+  const toggleSaved = useCallback(async () => {
+    if (savedDisabled) return
+    setSavedDisabled(true)
+    await dispatch(updateWatchItemProfile({ id, saved: !profile.saved }))
+    setSavedDisabled(false)
+  }, [dispatch, id, profile, savedDisabled])
 
-  const toggleWatched = useCallback(() => {
-    setWatched((prev) => !prev)
-  }, [])
+  const toggleWatched = useCallback(async () => {
+    if (watchedDisabled) return
+    setWatchedDisabled(true)
+    await dispatch(updateWatchItemProfile({ id, watched: !profile.watched }))
+    setWatchedDisabled(false)
+  }, [dispatch, id, profile, watchedDisabled])
+
+  const setRating = useCallback(
+    async (rating: number | null) => {
+      if (ratingDisabled) return
+      if (profile.rating === rating) return null
+      setRatingDisabled(true)
+      await dispatch(updateWatchItemProfile({ id, rating }))
+      setRatingDisabled(false)
+    },
+    [dispatch, id, profile, ratingDisabled],
+  )
 
   return (
     <Fragment>
@@ -119,17 +142,17 @@ export function WatchInfo({ id }: WatchInfoProps) {
         )}
       </section>
       <section className='w-full overflow-x-scroll space-x-2 flex items-center py-4 px-4 no-scrollbar sm:container'>
-        <ActionButton disabled Icon={HeartIcon} active={favorite} onClick={toggleFavorite}>
-          {favorite ? 'Remove' : 'Favorite'}
+        <ActionButton Icon={HeartIcon} active={profile.favorite} onClick={toggleFavorite}>
+          Favorite
         </ActionButton>
-        <ActionButton disabled Icon={BookMarkIcon} active={saved} onClick={toggleSaved}>
-          {saved ? 'Saved' : 'Save'}
+        <ActionButton Icon={BookMarkIcon} active={profile.saved} onClick={toggleSaved}>
+          Watchlist
         </ActionButton>
-        <ActionButton disabled notFill Icon={EyeIcon} active={watched} onClick={toggleWatched}>
+        <ActionButton notFill Icon={EyeIcon} active={profile.watched} onClick={toggleWatched}>
           Watched
         </ActionButton>
-        <ActionButton disabled Icon={StarIcon} active={rated && rating !== null}>
-          {!rated || rating === null ? 'Rate' : rating}
+        <ActionButton disabled Icon={StarIcon} active={profile.rating !== null}>
+          {profile.rating === null ? 'Rate' : profile.rating}
         </ActionButton>
         {item.kinopoiskRating && <KinopoiskButton rating={item.kinopoiskRating} />}
         {item.imdbRating && <IMDbButton rating={item.imdbRating} />}
