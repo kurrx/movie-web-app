@@ -3,18 +3,22 @@ export interface FirestoreModel {
   id: number
 }
 
+interface ProfileItemField<T> {
+  value: T
+  updatedAt: number
+}
+
 export interface FirebaseProfileItem extends FirestoreModel {
   title: string
   isSeries: boolean
   url: string
   posterUrl: string
   description: string
-  lastWatched: number
-  favorite: boolean
-  saved: boolean
-  watched: boolean
   kpRating?: number | null
-  rating?: number | null
+  favorite: ProfileItemField<boolean>
+  saved: ProfileItemField<boolean>
+  watched: ProfileItemField<boolean>
+  rating: ProfileItemField<number | null | undefined>
 }
 
 export interface UpdateProfileItemArgs {

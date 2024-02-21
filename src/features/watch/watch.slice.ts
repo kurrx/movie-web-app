@@ -6,7 +6,7 @@ import {
   fetchStreamDetails,
   fetchTranslator,
   getItemState,
-  getOrSaveProfileItem,
+  getProfileItem,
   refererFromId,
   saveItemState,
   transliterate,
@@ -158,7 +158,7 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
       signal,
       referer: refererFromId(fullId),
     })
-    const profile = await getOrSaveProfileItem(uid, fullId.id, item)
+    const profile = await getProfileItem(uid, fullId.id, item)
     if (!itemState) {
       itemState = {
         translatorId: item.translators[0].id,
@@ -301,8 +301,11 @@ export const setSubtitle = createAsyncThunk<USubtitleReturn, USubtitleParam, Thu
 
 export const updateWatchItemProfile = createAsyncThunk<void, UProfileParam, Thunk>(
   'watch/updateWatchItemProfile',
-  async (args, { getState }) =>
-    await updateProfileItem(getState().profile.user!.uid, args.id, args),
+  async (args, { getState }) => {
+    const uid = getState().profile.user!.uid
+    const item = getState().watch.items.find((i) => i.id === args.id)!.item!
+    return await updateProfileItem(uid, args.id, item, args)
+  },
 )
 
 const watchSlice = createSlice({

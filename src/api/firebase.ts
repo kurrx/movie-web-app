@@ -1,7 +1,14 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
 import { child, DatabaseReference, getDatabase, onValue, ref, set } from 'firebase/database'
-import { collection, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore/lite'
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  runTransaction,
+  setDoc,
+} from 'firebase/firestore/lite'
 
 import {
   FirebaseProfileItem,
@@ -10,7 +17,6 @@ import {
   UpdateItemStateArgs,
   UpdateProfileItemArgs,
   WatchItemState,
-  WatchProfileItem,
 } from '@/types'
 
 import {
@@ -149,18 +155,19 @@ export async function updateItemState(uid: string, id: number, args: UpdateItemS
   return await setDoc(ref, args, { merge: true }).catch(noop)
 }
 
-function convertProfileItem(document: WatchProfileItem) {
+function convertProfileItem(document: FirebaseProfileItem) {
   return {
-    favorite: document.favorite,
-    saved: document.saved,
-    watched: document.watched,
-    rating: document.rating,
+    favorite: document.favorite.value,
+    saved: document.saved.value,
+    watched: document.watched.value,
+    rating: document.rating.value,
   }
 }
 
 function serializeProfileItem(uid: string, id: number, item: Item) {
   const year = item.year ? `${item.year}, ` : ''
   const country = item.country ? `${item.country}, ` : ''
+  const now = Date.now()
   const document: FirebaseProfileItem = {
     uid,
     id,
@@ -169,12 +176,23 @@ function serializeProfileItem(uid: string, id: number, item: Item) {
     url: `/${item.typeId}/${item.genreId}/${item.slug}`,
     posterUrl: item.posterUrl || item.highResPosterUrl || 'null',
     description: `${year}${country}${item.genre}`,
-    lastWatched: Date.now(),
-    favorite: false,
-    saved: false,
-    watched: false,
     kpRating: item.kinopoiskRating?.rate || null,
-    rating: null,
+    favorite: {
+      value: false,
+      updatedAt: now,
+    },
+    saved: {
+      value: false,
+      updatedAt: now,
+    },
+    watched: {
+      value: false,
+      updatedAt: now,
+    },
+    rating: {
+      value: null,
+      updatedAt: now,
+    },
   }
   return document
 }
@@ -183,20 +201,56 @@ function getProfileItemRef(uid: string, id: number) {
   return doc(profileItemsCollection, `${uid}-${id}`)
 }
 
-export async function updateProfileItem(uid: string, id: number, args: UpdateProfileItemArgs) {
-  const ref = getProfileItemRef(uid, id)
-  if (Object.keys(args).length === 0) return
-  return await setDoc(ref, args, { merge: true }).catch(noop)
-}
-
-export async function getOrSaveProfileItem(uid: string, id: number, item: Item) {
+export async function getProfileItem(uid: string, id: number, item: Item) {
   const ref = getProfileItemRef(uid, id)
   const document = await getDoc(ref)
   if (document.exists()) {
-    // updateProfileItem(uid, id, { lastWatched: Date.now() })
     return convertProfileItem(document.data() as FirebaseProfileItem)
   }
-  const serialized = serializeProfileItem(uid, id, item)
-  setDoc(ref, serialized).catch(noop)
-  return convertProfileItem(serialized)
+  return convertProfileItem(serializeProfileItem(uid, id, item))
+}
+
+export async function updateProfileItem(
+  uid: string,
+  id: number,
+  item: Item,
+  args: UpdateProfileItemArgs,
+) {
+  const ref = getProfileItemRef(uid, id)
+  if (Object.keys(args).length === 0) return
+  return await runTransaction(firestore, async (tx) => {
+    const document = await tx.get(ref)
+    let updateDocument: FirebaseProfileItem
+    if (!document.exists()) {
+      updateDocument = serializeProfileItem(uid, id, item)
+    } else {
+      updateDocument = document.data() as FirebaseProfileItem
+    }
+    const now = Date.now()
+    if (args.favorite !== undefined) {
+      updateDocument.favorite.value = args.favorite
+      updateDocument.favorite.updatedAt = now
+    }
+    if (args.saved !== undefined) {
+      updateDocument.saved.value = args.saved
+      updateDocument.saved.updatedAt = now
+    }
+    if (args.watched !== undefined) {
+      updateDocument.watched.value = args.watched
+      updateDocument.watched.updatedAt = now
+    }
+    if (args.rating !== undefined) {
+      updateDocument.rating.value = args.rating
+      updateDocument.rating.updatedAt = now
+    }
+    const isFavorite = updateDocument.favorite.value
+    const isSaved = updateDocument.saved.value
+    const isWatched = updateDocument.watched.value
+    const hasRating = updateDocument.rating.value !== null
+    if (isFavorite || isSaved || isWatched || hasRating) {
+      tx.set(ref, updateDocument)
+    } else if (document.exists()) {
+      tx.delete(ref)
+    }
+  })
 }
