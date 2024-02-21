@@ -4,16 +4,24 @@ import { child, DatabaseReference, getDatabase, onValue, ref, set } from 'fireba
 import {
   collection,
   doc,
+  getCountFromServer,
   getDoc,
+  getDocs,
   getFirestore,
+  limit,
+  orderBy,
+  query,
+  QueryConstraint,
   runTransaction,
   setDoc,
-} from 'firebase/firestore/lite'
+  where,
+} from 'firebase/firestore'
 
 import {
   FirebaseProfileItem,
   FirestoreItemState,
   Item,
+  SearchItem,
   UpdateItemStateArgs,
   UpdateProfileItemArgs,
   WatchItemState,
@@ -27,7 +35,9 @@ import {
   FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_PROJECT_ID,
   FIREBASE_STORAGE_BUCKET,
+  PROVIDER_URL,
 } from './env'
+import { parseUrlToIds } from './parser'
 import { noop } from './utils'
 
 export const firebaseApp = initializeApp({
@@ -164,6 +174,20 @@ function convertProfileItem(document: FirebaseProfileItem) {
   }
 }
 
+function convertProfileItemToCard(document: FirebaseProfileItem): SearchItem {
+  return {
+    ...parseUrlToIds(`${PROVIDER_URL}${document.url}`)!,
+    title: document.title,
+    posterUrl: document.posterUrl,
+    description: document.description,
+    rating: document.kpRating || null,
+    favorite: document.favorite.value,
+    saved: document.saved.value,
+    watched: document.watched.value,
+    myRating: document.rating.value,
+  }
+}
+
 function serializeProfileItem(uid: string, id: number, item: Item) {
   const year = item.year ? `${item.year}, ` : ''
   const country = item.country ? `${item.country}, ` : ''
@@ -253,4 +277,42 @@ export async function updateProfileItem(
       tx.delete(ref)
     }
   })
+}
+
+async function queryProfileItems(uid: string, type: 'favorite' | 'saved' | 'watched' | 'rating') {
+  const queries: QueryConstraint[] = [where('uid', '==', uid)]
+
+  if (type === 'rating') {
+    queries.push(where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+  } else {
+    queries.push(where(`${type}.value`, '==', true))
+  }
+  queries.push(orderBy(`${type}.updatedAt`, 'desc'))
+
+  const totalPromise = getCountFromServer(query(profileItemsCollection, ...queries)).then(
+    (snap) => snap.data().count,
+  )
+
+  queries.push(limit(3))
+
+  const itemsPromise = await getDocs(query(profileItemsCollection, ...queries)).then((snap) => {
+    return snap.docs.map((doc) => convertProfileItemToCard(doc.data() as FirebaseProfileItem))
+  })
+
+  const [items, total] = await Promise.all([itemsPromise, totalPromise])
+
+  return { items, total }
+}
+
+export async function queryProfileAllItems(uid: string) {
+  const [favorites, saves, watches, rates, total] = await Promise.all([
+    queryProfileItems(uid, 'favorite'),
+    queryProfileItems(uid, 'saved'),
+    queryProfileItems(uid, 'watched'),
+    queryProfileItems(uid, 'rating'),
+    getCountFromServer(query(profileItemsCollection, where('uid', '==', uid))).then(
+      (snap) => snap.data().count,
+    ),
+  ])
+  return { favorites, saves, watches, rates, total }
 }

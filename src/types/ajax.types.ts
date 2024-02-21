@@ -27,6 +27,10 @@ export interface SearchItem extends ItemFullID {
   posterUrl: string
   description: string
   rating: number | null
+  favorite?: boolean
+  saved?: boolean
+  watched?: boolean
+  myRating?: number | null
 }
 
 // Explore Types

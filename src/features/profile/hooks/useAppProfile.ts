@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { firebaseAuth } from '@/api'
 import { useAppDispatch } from '@/hooks'
 
-import { setProfileReady, setProfileUser } from '../profile.slice'
+import { queryShort, setProfileReady, setProfileUser } from '../profile.slice'
 
 const readyId = { id: 0 }
 
@@ -14,6 +14,9 @@ export function useAppProfile() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
       dispatch(setProfileUser(user))
+      if (user?.uid) {
+        dispatch(queryShort(user.uid))
+      }
     })
 
     const id = (readyId.id = Date.now())
