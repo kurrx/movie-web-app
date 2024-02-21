@@ -26,18 +26,20 @@ export function DownloadMenu({ filename, qualities }: DownloadMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-[12rem]' collisionPadding={16}>
         <DropdownMenuGroup>
-          {qualities.map(({ id, altername, downloadUrl, downloadSizeStr }) => (
+          {qualities.map(({ id, altername, downloadUrl, downloadSize, downloadSizeStr }) => (
             <DropdownMenuItem key={id} asChild>
               <a
                 href={`${downloadUrl}?proxy-filename=${encodeURIComponent(`${id}_${filename.replaceAll(' ', '_')}.mp4`)}`}
                 className='cursor-pointer'
+                target='_blank'
+                rel='noreferrer'
               >
                 {id}
                 {altername && (
                   <sup className='text-muted-foreground text-[0.5rem] font-medium'>{altername}</sup>
                 )}
                 <DropdownMenuShortcut className='tracking-tight'>
-                  {downloadSizeStr}
+                  {downloadSize ? downloadSizeStr : '? MB'}
                 </DropdownMenuShortcut>
               </a>
             </DropdownMenuItem>

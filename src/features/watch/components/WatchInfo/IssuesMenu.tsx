@@ -59,9 +59,10 @@ export function IssuesMenu({ id }: { id: number }) {
                 </code>{' '}
                 button.
               </li>
+              <li>Try to change quality of video.</li>
               <li>
-                If reloading does not help solve the issue, try clearing the cache. To do this,
-                click the&nbsp;
+                If reloading and quality changing does not help solve the issue, try clearing the
+                cache. To do this, click the&nbsp;
                 <code className='relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold'>
                   Clear Cache
                 </code>{' '}

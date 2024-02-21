@@ -205,24 +205,34 @@ const playerSlice = createSlice({
     },
 
     startHovering(state, action: PayloadAction<number>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       state.isTimelineHovering = true
       state.timelineSeekProgress = action.payload
     },
 
     startDragging(state, action: PayloadAction<number>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       state.isTimelineDragging = true
       state.timelineSeekProgress = action.payload
     },
 
     timelineMove(state, action: PayloadAction<number>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       state.timelineSeekProgress = action.payload
     },
 
     endHovering(state) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       state.isTimelineHovering = false
     },
 
     endDragging(state) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       state.isTimelineDragging = false
       state.progress = state.timelineSeekProgress
       state.thumbnailsOverlayProgress = state.timelineSeekProgress
@@ -234,6 +244,8 @@ const playerSlice = createSlice({
     },
 
     seekTo(state, action: PayloadAction<NonNullable<PlayerSeek>>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       const seek = action.payload
       if (state.seek !== seek) {
         state.displayAccumulatedSeek = 0
@@ -251,6 +263,8 @@ const playerSlice = createSlice({
     },
 
     endSeeking(state, action: PayloadAction<ReactPlayer>) {
+      if (!state.ready) return
+      if (!state.durationFetched) return
       const player = action.payload
       const time = clamp(state.progress + state.accumulatedSeek, 0, state.duration - 1)
       state.seek = null
@@ -512,7 +526,6 @@ export const selectPlayerLoading = createSelector(
   (fetched, buffering) => !fetched || buffering,
 )
 export const selectPlayerControlsVisible = createSelector(
-  selectPlayerFetched,
   selectPlayerEnded,
   selectPlayerTooltipHovered,
   selectPlayerInteracted,
@@ -524,7 +537,6 @@ export const selectPlayerControlsVisible = createSelector(
   selectPlayerIsTimelineDragging,
   selectPlayerSeek,
   (
-    fetched,
     ended,
     tooltipHovered,
     interacted,
@@ -536,7 +548,6 @@ export const selectPlayerControlsVisible = createSelector(
     isTimelineDragging,
     seek,
   ) => {
-    if (!fetched) return false
     if (fastForwarding) return false
     return (
       ended ||

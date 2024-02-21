@@ -6,7 +6,6 @@ import { useStore } from '@/hooks'
 
 import {
   selectPlayerEnded,
-  selectPlayerFetched,
   selectPlayerFullscreen,
   selectPlayerPip,
   setPlayerPip,
@@ -16,13 +15,12 @@ import { Button } from './Button'
 export function PipButton() {
   const [dispatch, selector] = useStore()
   const pip = selector(selectPlayerPip)
-  const fetched = selector(selectPlayerFetched)
   const ended = selector(selectPlayerEnded)
   const fullscreen = selector(selectPlayerFullscreen)
   const id = useMemo(() => (pip ? 'pip-off' : 'pip-on'), [pip])
   const Icon = useMemo(() => (pip ? PipOffIcon : PipOnIcon), [pip])
   const tooltip = useMemo(() => (pip ? 'Exit Picture-in-Picture' : 'Picture-in-Picture'), [pip])
-  const disabled = useMemo(() => !fetched || ended || fullscreen, [fetched, ended, fullscreen])
+  const disabled = useMemo(() => ended || fullscreen, [ended, fullscreen])
 
   const togglePip = useCallback(() => {
     if (disabled) return
