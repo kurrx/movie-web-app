@@ -23,14 +23,7 @@ import {
 } from '@/types'
 
 import { PROVIDER_DOMAIN, PROXY_URL } from './env'
-import {
-  base64ToString,
-  capitalizeFirstLetter,
-  product,
-  stringToBase64,
-  trimStr,
-  unite,
-} from './utils'
+import { capitalizeFirstLetter, trimStr } from './utils'
 
 const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
 const NOT_REALEASED_ERROR = 'This title is not released yet.'
@@ -508,7 +501,7 @@ function parseItemRating(parser: Parser, parent: Element, selector: string): Ite
     parser.switchToChild('a', true)
     const linkEncoded = parser.attr('href')?.replaceAll('/help/', '').slice(0, -1)
     if (!linkEncoded) return null
-    const link = decodeURIComponent(base64ToString(linkEncoded))
+    const link = decodeURIComponent(atob(linkEncoded))
 
     // Rate
     parser.setParent(contentElem)
@@ -1085,20 +1078,26 @@ function parseStreamSubtitles(
   return results
 }
 
+const trashChars = ['$$#!!@#!@##', '^^^!@##!!##', '####^!!##!@@', '@@@@@!##!^^^', '$$!!@$$@^!@#$$@']
 function parseStreamQualities(url: string) {
-  const trashList = ['@', '#', '!', '^', '$']
-  const two = unite(product(trashList, 2))
-  const tree = unite(product(trashList, 3))
-  const trashCodesSet = two.concat(tree)
-
-  const arr = url.replace('#h', '').split('//_//')
-  let trashString = arr.join('')
-
-  for (const codeSet of trashCodesSet) {
-    trashString = trashString.replaceAll(stringToBase64(codeSet), '')
+  let finalString = url.replace('#h', '')
+  for (let i = 4; i >= 0; i--) {
+    const trashStr = btoa(
+      encodeURIComponent(trashChars[i]).replace(/%([0-9A-F]{2})/g, (_, p1) => {
+        return String.fromCharCode(Number('0x' + p1))
+      }),
+    )
+    finalString = finalString.replace('//_//' + trashStr, '')
   }
+  finalString = decodeURIComponent(
+    atob(finalString)
+      .split('')
+      .map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+      })
+      .join(''),
+  )
 
-  const finalString = base64ToString(trashString)
   const qualitiesArr = finalString.split(',')
   const qualities: StreamQuality[] = []
   const seenUrls: string[] = []

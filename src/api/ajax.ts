@@ -234,18 +234,19 @@ export const cdn = new Request({
   .useRequest(sendProxiedUserAgent)
   .construct()
 
-export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs) {
+export async function fetchStreamDownloadSize(args: FetchStreamDownloadSizeArgs, retry = 0) {
   const { qualityId, downloadUrl, signal } = args
-  const size = await db.getSize(args, async () => {
-    try {
+  try {
+    const size = await db.getSize(args, async () => {
       const res = await cdn.head(downloadUrl, { signal })
       const size = Number(res.headers['Content-Length'] || res.headers['content-length'] || '0')
       return size
-    } catch {
-      return 0
-    }
-  })
-  return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
+    })
+    return { id: qualityId, downloadSize: size, downloadSizeStr: bytesToStr(size) }
+  } catch (err) {
+    if (retry < 3) return await fetchStreamDownloadSize(args, retry + 1)
+    return { id: qualityId, downloadSize: 0, downloadSizeStr: bytesToStr(0) }
+  }
 }
 
 export async function fetchStreamThumbnails(args: FetchStreamThumbnailArgs, retry = 0) {

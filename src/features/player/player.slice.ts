@@ -526,6 +526,7 @@ export const selectPlayerLoading = createSelector(
   (fetched, buffering) => !fetched || buffering,
 )
 export const selectPlayerControlsVisible = createSelector(
+  selectPlayerFetched,
   selectPlayerEnded,
   selectPlayerTooltipHovered,
   selectPlayerInteracted,
@@ -537,6 +538,7 @@ export const selectPlayerControlsVisible = createSelector(
   selectPlayerIsTimelineDragging,
   selectPlayerSeek,
   (
+    fetched,
     ended,
     tooltipHovered,
     interacted,
@@ -548,6 +550,7 @@ export const selectPlayerControlsVisible = createSelector(
     isTimelineDragging,
     seek,
   ) => {
+    if (!fetched) return false
     if (fastForwarding) return false
     return (
       ended ||
