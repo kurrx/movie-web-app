@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
 import { ExploreBestDialog, FeaturesProvider, LoginDialog, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
-import { AuthMiddleware, VPNMiddleware } from '@/middlewares'
+import { VPNMiddleware } from '@/middlewares'
 import {
   ExploreCollectionsView,
   ExplorePersonView,
@@ -33,23 +33,19 @@ export function App() {
                   <ExploreBestDialog />
                   <LoginDialog />
                   <Routes>
-                    <Route path='/' element={<HomeView />} />
+                    <Route index element={<HomeView />} />
                     <Route path='/policy' element={<PolicyView />} />
-                    <Route
-                      path='/watch/:typeId/:genreId/:slug'
-                      element={
-                        <AuthMiddleware>
-                          <WatchView />
-                        </AuthMiddleware>
-                      }
-                    />
-                    <Route path='/explore/collections' element={<ExploreCollectionsView />} />
-                    <Route
-                      path='/explore/collections/page/:page'
-                      element={<ExploreCollectionsView />}
-                    />
-                    <Route path='/explore/person/:personId' element={<ExplorePersonView />} />
-                    <Route path='/explore/*' element={<ExploreView />} />
+                    <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
+
+                    <Route path='/explore'>
+                      <Route path='collections'>
+                        <Route index element={<ExploreCollectionsView />} />
+                        <Route path='page/:page' element={<ExploreCollectionsView />} />
+                      </Route>
+                      <Route path='person/:personId' element={<ExplorePersonView />} />
+                      <Route path='*' element={<ExploreView />} />
+                    </Route>
+
                     <Route path='*' element={<RedirectView to='/' />} />
                   </Routes>
                 </VPNMiddleware>
