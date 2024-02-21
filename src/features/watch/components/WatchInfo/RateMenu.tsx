@@ -58,6 +58,8 @@ export function RateMenu(props: RateMenuProps) {
   const { title, subtitle, posterUrl, rating, onRateChange } = props
   const x = useMotionValue(0)
   const prevX = useRef(0)
+  const isStickyAnimation = useRef(false)
+  const isDragging = useRef(false)
   const [open, setOpen] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [sliderRating, setSliderRating] = useState<number | null>(rating || null)
@@ -99,16 +101,22 @@ export function RateMenu(props: RateMenuProps) {
     setSliderRating(value)
   })
 
-  const onDragEnd = useCallback(() => {
+  useMotionValueEvent(x, 'animationComplete', () => {
+    if (isStickyAnimation.current || isDragging.current) return
     const next = (valueFromX(x.get()) || 0) * -80
-    if (x.isAnimating()) x.stop()
-    console.log(x.isAnimating())
     animate(x, next, {
       autoplay: true,
       ease: 'easeOut',
       duration: 0.3,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  })
+
+  const onDrag = useCallback(() => {
+    isDragging.current = true
+  }, [])
+
+  const onDragEnd = useCallback(() => {
+    isDragging.current = false
   }, [])
 
   useEffect(() => {
@@ -170,14 +178,14 @@ export function RateMenu(props: RateMenuProps) {
             <motion.div
               drag='x'
               dragConstraints={{ left: -800, right: 0 }}
-              dragTransition={{}}
-              dragMomentum={false}
               whileTap={{ cursor: 'grabbing' }}
               style={{ x }}
               className={cn(
                 'absolute top-2.5 left-0 px-[calc(50%-2.5rem)]',
                 'flex items-center justify-center hover:cursor-grab',
               )}
+              onDrag={onDrag}
+              onDragStart={onDrag}
               onDragEnd={onDragEnd}
             >
               <Rate rating={null} />
