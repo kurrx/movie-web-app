@@ -8,6 +8,7 @@ import { FallbackView } from '@/views'
 import { exploreSearch, selectExploreResult } from '../../explore.slice'
 import { ExploreProvider } from './ExploreProvider'
 import { ExploreResult } from './ExploreResult'
+import { ExploreResultLoader } from './ExploreResultLoader'
 
 export function ExploreContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -27,7 +28,12 @@ export function ExploreContent({ url }: { url: string }) {
     <FallbackView
       dismissible
       state={state}
-      text='Loading titles...'
+      customLoadingView={
+        <Fragment>
+          <Title>Loading titles...</Title>
+          <ExploreResultLoader />
+        </Fragment>
+      }
       error={exploreItem?.error}
       onReload={get}
     >
