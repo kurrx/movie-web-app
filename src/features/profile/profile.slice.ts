@@ -2,7 +2,7 @@ import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@r
 import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
-import { googleLogin, queryProfileAllItems } from '@/api'
+import { googleLogin } from '@/api'
 import { AppStoreState, ProfileStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: ProfileStoreState = {
@@ -11,7 +11,6 @@ const initialState: ProfileStoreState = {
   error: null,
   requestId: null,
   user: null,
-  short: null,
 }
 
 type LoginReturn = Awaited<ReturnType<typeof googleLogin>>
@@ -24,17 +23,6 @@ export const login = createAsyncThunk<LoginReturn, void, ThunkApiConfig>(
       const loading = state.loading
       const user = state.user
       return !user && !loading
-    },
-  },
-)
-
-type QueryShortReturn = Awaited<ReturnType<typeof queryProfileAllItems>>
-export const queryShort = createAsyncThunk<QueryShortReturn, string, ThunkApiConfig>(
-  'profile/queryShort',
-  async (uid) => await queryProfileAllItems(uid),
-  {
-    condition(uid, api) {
-      return !api.getState().profile.short
     },
   },
 )
@@ -60,9 +48,6 @@ const profileSlice = createSlice({
 
     setProfileUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload
-      if (!state.user) {
-        state.short = null
-      }
     },
   },
 
@@ -93,12 +78,6 @@ const profileSlice = createSlice({
           state.user = null
         }
       })
-
-    builder.addCase(queryShort.fulfilled, (state, action) => {
-      if (state.user?.uid === action.meta.arg) {
-        state.short = action.payload
-      }
-    })
   },
 })
 
@@ -113,6 +92,5 @@ export const selectProfileDialog = createSelector(
 export const selectProfileUser = (state: AppStoreState) => state.profile.user
 export const selectProfileLoading = (state: AppStoreState) => state.profile.loading
 export const selectProfileError = (state: AppStoreState) => state.profile.error
-export const selectProfileShort = (state: AppStoreState) => state.profile.short
 
 export const profileReducer = profileSlice.reducer

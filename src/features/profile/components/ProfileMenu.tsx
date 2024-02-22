@@ -19,12 +19,7 @@ import {
 import { ThemeSwitcher } from '@/features/theme'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
 
-import {
-  selectProfileLoading,
-  selectProfileShort,
-  selectProfileUser,
-  setProfileDialog,
-} from '../profile.slice'
+import { selectProfileLoading, selectProfileUser, setProfileDialog } from '../profile.slice'
 
 interface AvatarProps {
   id: string
@@ -58,7 +53,6 @@ function Avatar({ id, url, alt }: AvatarProps) {
 export function ProfileMenu() {
   const user = useAppSelector(selectProfileUser)
   const loading = useAppSelector(selectProfileLoading)
-  const short = useAppSelector(selectProfileShort)
   const { setTrue: openLoginDialog } = useStoreBoolean(setProfileDialog)
 
   return (
@@ -96,41 +90,41 @@ export function ProfileMenu() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {short && short.total > 0 && (
+            {false && (
               <Fragment>
                 <DropdownMenuItem asChild className='flex items-center justify-start'>
                   <NavLink to='/profile'>
                     <PersonIcon className='h-4 w-4 mr-2' />
                     Profile
-                    <DropdownMenuShortcut>{short.total}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
                   </NavLink>
                 </DropdownMenuItem>
-                {short.saves.total > 0 && (
+                {false && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <BookMarkIcon className='h-4 w-4 mr-2 fill-transparent' />
                     Saved
-                    <DropdownMenuShortcut>{short.saves.total}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {short.favorites.total > 0 && (
+                {false && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <HeartIcon className='h-4 w-4 mr-2' />
                     Favorite
-                    <DropdownMenuShortcut>{short.favorites.total}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {short.watches.total > 0 && (
+                {false && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <EyeIcon className='h-4 w-4 mr-2' />
                     Watched
-                    <DropdownMenuShortcut>{short.watches.total}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {short.rates.total > 0 && (
+                {false && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <StarIcon className='h-4 w-4 mr-2' />
                     Rated
-                    <DropdownMenuShortcut>{short.rates.total}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
               </Fragment>
