@@ -75,6 +75,11 @@ function Item(props: ItemProps) {
 const countersList = ['saved', 'favorite', 'watched', 'rated'] as const
 
 export function ProfileItems({ counters }: { counters: ProfileCounters | null }) {
+  const hasAnyCounters = useMemo(
+    () => countersList.some((counter) => !!counters && counters[counter] > 0),
+    [counters],
+  )
+
   if (!counters) {
     return (
       <Fragment>
@@ -83,6 +88,14 @@ export function ProfileItems({ counters }: { counters: ProfileCounters | null })
         <ItemLoader />
         <ItemLoader />
       </Fragment>
+    )
+  }
+
+  if (!hasAnyCounters) {
+    return (
+      <div className='flex-1 flex items-center justify-center'>
+        <p className='text-lg font-bold text-muted-foreground'>Profile is empty</p>
+      </div>
     )
   }
 
