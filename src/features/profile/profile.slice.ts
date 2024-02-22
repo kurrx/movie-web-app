@@ -3,7 +3,7 @@ import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
 import { googleLogin } from '@/api'
-import { AppStoreState, ProfileStoreState, ThunkApiConfig } from '@/types'
+import { AppStoreState, ProfileCounters, ProfileStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: ProfileStoreState = {
   dialog: false,
@@ -11,6 +11,7 @@ const initialState: ProfileStoreState = {
   error: null,
   requestId: null,
   user: null,
+  counters: null,
 }
 
 type LoginReturn = Awaited<ReturnType<typeof googleLogin>>
@@ -49,6 +50,10 @@ const profileSlice = createSlice({
     setProfileUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload
     },
+
+    setProfileCounters(state, action: PayloadAction<ProfileCounters | null>) {
+      state.counters = action.payload
+    },
   },
 
   extraReducers(builder) {
@@ -81,7 +86,8 @@ const profileSlice = createSlice({
   },
 })
 
-export const { setProfileDialog, setProfileReady, setProfileUser } = profileSlice.actions
+export const { setProfileDialog, setProfileReady, setProfileUser, setProfileCounters } =
+  profileSlice.actions
 
 export const selectProfileIsLoggedIn = (state: AppStoreState) => state.profile.user !== null
 export const selectProfileDialog = createSelector(
@@ -92,5 +98,6 @@ export const selectProfileDialog = createSelector(
 export const selectProfileUser = (state: AppStoreState) => state.profile.user
 export const selectProfileLoading = (state: AppStoreState) => state.profile.loading
 export const selectProfileError = (state: AppStoreState) => state.profile.error
+export const selectProfileCounters = (state: AppStoreState) => state.profile.counters
 
 export const profileReducer = profileSlice.reducer

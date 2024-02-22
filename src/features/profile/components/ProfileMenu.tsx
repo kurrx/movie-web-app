@@ -19,7 +19,12 @@ import {
 import { ThemeSwitcher } from '@/features/theme'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
 
-import { selectProfileLoading, selectProfileUser, setProfileDialog } from '../profile.slice'
+import {
+  selectProfileCounters,
+  selectProfileLoading,
+  selectProfileUser,
+  setProfileDialog,
+} from '../profile.slice'
 
 interface AvatarProps {
   id: string
@@ -53,6 +58,7 @@ function Avatar({ id, url, alt }: AvatarProps) {
 export function ProfileMenu() {
   const user = useAppSelector(selectProfileUser)
   const loading = useAppSelector(selectProfileLoading)
+  const counters = useAppSelector(selectProfileCounters)
   const { setTrue: openLoginDialog } = useStoreBoolean(setProfileDialog)
 
   return (
@@ -90,41 +96,41 @@ export function ProfileMenu() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {false && (
+            {counters && counters.total > 0 && (
               <Fragment>
                 <DropdownMenuItem asChild className='flex items-center justify-start'>
                   <NavLink to='/profile'>
                     <PersonIcon className='h-4 w-4 mr-2' />
                     Profile
-                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{counters.total}</DropdownMenuShortcut>
                   </NavLink>
                 </DropdownMenuItem>
-                {false && (
+                {counters.saved > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <BookMarkIcon className='h-4 w-4 mr-2 fill-transparent' />
                     Saved
-                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{counters.saved}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {false && (
+                {counters.favorite > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <HeartIcon className='h-4 w-4 mr-2' />
                     Favorite
-                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{counters.favorite}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {false && (
+                {counters.watched > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <EyeIcon className='h-4 w-4 mr-2' />
                     Watched
-                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{counters.watched}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
-                {false && (
+                {counters.rated > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <StarIcon className='h-4 w-4 mr-2' />
                     Rated
-                    <DropdownMenuShortcut>{0}</DropdownMenuShortcut>
+                    <DropdownMenuShortcut>{counters.rated}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}
               </Fragment>

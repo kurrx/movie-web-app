@@ -8,7 +8,9 @@ interface ProfileItemField<T> {
   updatedAt: number
 }
 
-export interface FirebaseProfileItem extends FirestoreModel {
+export type FirestoreProfileItemType = 'favorite' | 'saved' | 'watched' | 'rating'
+
+export interface FirestoreProfileItem extends FirestoreModel {
   title: string
   isSeries: boolean
   url: string
@@ -27,6 +29,31 @@ export interface UpdateProfileItemArgs {
   saved?: boolean
   watched?: boolean
   rating?: number | null
+}
+
+export interface ProfileCounters {
+  total: number
+
+  favorite: number
+  saved: number
+  watched: number
+  rated: number
+
+  seriesType: number
+  moviesType: number
+
+  films: number
+  cartoons: number
+  series: number
+  animation: number
+}
+
+export type ProfileCounter = keyof ProfileCounters
+export type ProfileTypeCounter = 'films' | 'cartoons' | 'series' | 'animation'
+
+export interface UpdateCounterAction {
+  type: 'increment' | 'decrement'
+  counter: ProfileCounter
 }
 
 export interface FirestoreItemState extends FirestoreModel {

@@ -1,27 +1,36 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
-import { child, DatabaseReference, getDatabase, onValue, ref, set } from 'firebase/database'
+import {
+  child,
+  DatabaseReference,
+  getDatabase,
+  onValue,
+  ref,
+  runTransaction as runTransactionDB,
+  set,
+} from 'firebase/database'
 import {
   collection,
   doc,
-  getCountFromServer,
   getDoc,
   getDocs,
   getFirestore,
   limit,
   orderBy,
   query,
-  QueryConstraint,
   runTransaction,
   setDoc,
   where,
 } from 'firebase/firestore'
 
 import {
-  FirebaseProfileItem,
   FirestoreItemState,
+  FirestoreProfileItem,
+  FirestoreProfileItemType,
   Item,
+  ProfileCounters,
   SearchItem,
+  UpdateCounterAction,
   UpdateItemStateArgs,
   UpdateProfileItemArgs,
   WatchItemState,
@@ -68,6 +77,7 @@ export const profileItemsCollection = collection(firestore, 'profile-items')
 
 export const fireDatabase = getDatabase(firebaseApp)
 export const statesRef = ref(fireDatabase, 'states')
+export const countersRef = ref(fireDatabase, 'counters')
 
 function convertItemState(document: FirestoreItemState) {
   const state: WatchItemState = {
@@ -165,7 +175,7 @@ export async function updateItemState(uid: string, id: number, args: UpdateItemS
   return await setDoc(ref, args, { merge: true }).catch(noop)
 }
 
-function convertProfileItem(document: FirebaseProfileItem) {
+function convertProfileItem(document: FirestoreProfileItem) {
   return {
     favorite: document.favorite.value,
     saved: document.saved.value,
@@ -174,7 +184,7 @@ function convertProfileItem(document: FirebaseProfileItem) {
   }
 }
 
-function convertProfileItemToCard(document: FirebaseProfileItem): SearchItem {
+function convertProfileItemToCard(document: FirestoreProfileItem): SearchItem {
   return {
     ...parseUrlToIds(`${PROVIDER_URL}${document.url}`)!,
     title: document.title,
@@ -192,7 +202,7 @@ function serializeProfileItem(uid: string, id: number, item: Item) {
   const year = item.year ? `${item.year}, ` : ''
   const country = item.country ? `${item.country}, ` : ''
   const now = Date.now()
-  const document: FirebaseProfileItem = {
+  const document: FirestoreProfileItem = {
     uid,
     id,
     title: item.title,
@@ -225,11 +235,42 @@ function getProfileItemRef(uid: string, id: number) {
   return doc(profileItemsCollection, `${uid}-${id}`)
 }
 
+function getProfileCountersRef(uid: string) {
+  return child(countersRef, uid)
+}
+
+export function subscribeProfileCounters(
+  uid: string,
+  callback: (counters: ProfileCounters | null) => void,
+) {
+  return onValue(getProfileCountersRef(uid), (snapshot) => {
+    const value = snapshot.val()
+    if (typeof value === 'object' && value !== null) {
+      const counters: ProfileCounters = {
+        total: value.total || 0,
+        favorite: value.favorite || 0,
+        saved: value.saved || 0,
+        watched: value.watched || 0,
+        rated: value.rated || 0,
+        seriesType: value.seriesType || 0,
+        moviesType: value.moviesType || 0,
+        films: value.films || 0,
+        cartoons: value.cartoons || 0,
+        series: value.series || 0,
+        animation: value.animation || 0,
+      }
+      callback(counters)
+    } else {
+      callback(null)
+    }
+  })
+}
+
 export async function getProfileItem(uid: string, id: number, item: Item) {
   const ref = getProfileItemRef(uid, id)
   const document = await getDoc(ref)
   if (document.exists()) {
-    return convertProfileItem(document.data() as FirebaseProfileItem)
+    return convertProfileItem(document.data() as FirestoreProfileItem)
   }
   return convertProfileItem(serializeProfileItem(uid, id, item))
 }
@@ -240,79 +281,133 @@ export async function updateProfileItem(
   item: Item,
   args: UpdateProfileItemArgs,
 ) {
-  const ref = getProfileItemRef(uid, id)
   if (Object.keys(args).length === 0) return
-  return await runTransaction(firestore, async (tx) => {
+  const ref = getProfileItemRef(uid, id)
+  const counterActions = await runTransaction(firestore, async (tx) => {
+    const counterActions: UpdateCounterAction[] = []
     const document = await tx.get(ref)
-    let updateDocument: FirebaseProfileItem
+    let updateDocument: FirestoreProfileItem
     if (!document.exists()) {
       updateDocument = serializeProfileItem(uid, id, item)
     } else {
-      updateDocument = document.data() as FirebaseProfileItem
+      updateDocument = document.data() as FirestoreProfileItem
     }
     const now = Date.now()
-    if (args.favorite !== undefined) {
+    if (args.favorite !== undefined && args.favorite !== updateDocument.favorite.value) {
       updateDocument.favorite.value = args.favorite
       updateDocument.favorite.updatedAt = now
+      counterActions.push({
+        type: args.favorite ? 'increment' : 'decrement',
+        counter: 'favorite',
+      })
     }
-    if (args.saved !== undefined) {
+    if (args.saved !== undefined && args.saved !== updateDocument.saved.value) {
       updateDocument.saved.value = args.saved
       updateDocument.saved.updatedAt = now
+      counterActions.push({
+        type: args.saved ? 'increment' : 'decrement',
+        counter: 'saved',
+      })
     }
-    if (args.watched !== undefined) {
+    if (args.watched !== undefined && args.watched !== updateDocument.watched.value) {
       updateDocument.watched.value = args.watched
       updateDocument.watched.updatedAt = now
+      counterActions.push({
+        type: args.watched ? 'increment' : 'decrement',
+        counter: 'watched',
+      })
     }
-    if (args.rating !== undefined) {
+    if (args.rating !== undefined && args.rating !== updateDocument.rating.value) {
       updateDocument.rating.value = args.rating
       updateDocument.rating.updatedAt = now
+      counterActions.push({
+        type: args.rating ? 'increment' : 'decrement',
+        counter: 'rated',
+      })
     }
+    if (counterActions.length === 0) return []
     const isFavorite = updateDocument.favorite.value
     const isSaved = updateDocument.saved.value
     const isWatched = updateDocument.watched.value
     const hasRating = updateDocument.rating.value !== null
     if (isFavorite || isSaved || isWatched || hasRating) {
-      tx.set(ref, updateDocument)
+      if (!document.exists()) {
+        counterActions.push({
+          type: 'increment',
+          counter: 'total',
+        })
+        counterActions.push({
+          type: 'increment',
+          counter: updateDocument.isSeries ? 'seriesType' : 'moviesType',
+        })
+        counterActions.push({
+          type: 'increment',
+          counter: item.typeId as 'films' | 'cartoons' | 'series' | 'animation',
+        })
+      }
+      await tx.set(ref, updateDocument)
     } else if (document.exists()) {
-      tx.delete(ref)
+      counterActions.push({
+        type: 'decrement',
+        counter: 'total',
+      })
+      counterActions.push({
+        type: 'decrement',
+        counter: updateDocument.isSeries ? 'seriesType' : 'moviesType',
+      })
+      counterActions.push({
+        type: 'decrement',
+        counter: item.typeId as 'films' | 'cartoons' | 'series' | 'animation',
+      })
+      await tx.delete(ref)
     }
+    return counterActions
+  })
+
+  if (counterActions.length === 0) return
+  const countersRef = getProfileCountersRef(uid)
+  return await runTransactionDB(countersRef, (counters) => {
+    if (!counters) counters = {}
+    for (const action of counterActions) {
+      if (action.type === 'increment') {
+        if (typeof counters[action.counter] !== 'number') {
+          counters[action.counter] = 0
+        }
+        counters[action.counter]++
+      } else {
+        if (typeof counters[action.counter] !== 'number') {
+          counters[action.counter] = 1
+        }
+        counters[action.counter]--
+        if (counters[action.counter] === 0) {
+          delete counters[action.counter]
+        }
+      }
+    }
+    return counters
   })
 }
 
-async function queryProfileItems(uid: string, type: 'favorite' | 'saved' | 'watched' | 'rating') {
-  const queries: QueryConstraint[] = [where('uid', '==', uid)]
-
-  if (type === 'rating') {
-    queries.push(where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-  } else {
-    queries.push(where(`${type}.value`, '==', true))
-  }
-  queries.push(orderBy(`${type}.updatedAt`, 'desc'))
-
-  const totalPromise = getCountFromServer(query(profileItemsCollection, ...queries)).then(
-    (snap) => snap.data().count,
+async function getProfileItemTypes(uid: string, type: FirestoreProfileItemType) {
+  const q = query(
+    profileItemsCollection,
+    where('uid', '==', uid),
+    type === 'rating'
+      ? where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      : where(`${type}.value`, '==', true),
+    orderBy(`${type}.updatedAt`, 'desc'),
+    limit(3),
   )
-
-  queries.push(limit(3))
-
-  const itemsPromise = await getDocs(query(profileItemsCollection, ...queries)).then((snap) => {
-    return snap.docs.map((doc) => convertProfileItemToCard(doc.data() as FirebaseProfileItem))
-  })
-
-  const [items, total] = await Promise.all([itemsPromise, totalPromise])
-
-  return { items, total }
+  const result = await getDocs(q)
+  return result.docs.map((doc) => convertProfileItemToCard(doc.data() as FirestoreProfileItem))
 }
 
 export async function queryProfileAllItems(uid: string) {
-  const [favorites, saves, watches, rates, total] = await Promise.all([
-    queryProfileItems(uid, 'favorite'),
-    queryProfileItems(uid, 'saved'),
-    queryProfileItems(uid, 'watched'),
-    queryProfileItems(uid, 'rating'),
-    getCountFromServer(query(profileItemsCollection, where('uid', '==', uid))).then(
-      (snap) => snap.data().count,
-    ),
+  const [favorites, saves, watches, rates] = await Promise.all([
+    getProfileItemTypes(uid, 'favorite'),
+    getProfileItemTypes(uid, 'saved'),
+    getProfileItemTypes(uid, 'watched'),
+    getProfileItemTypes(uid, 'rating'),
   ])
-  return { favorites, saves, watches, rates, total }
+  return { favorites, saves, watches, rates }
 }
