@@ -78,12 +78,10 @@ export function ProfileItems({ counters }: { counters: ProfileCounters | null })
   if (!counters) {
     return (
       <Fragment>
-        <Fragment>
-          <ItemLoader />
-          <ItemLoader />
-          <ItemLoader />
-          <ItemLoader />
-        </Fragment>
+        <ItemLoader />
+        <ItemLoader />
+        <ItemLoader />
+        <ItemLoader />
       </Fragment>
     )
   }
