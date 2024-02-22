@@ -8,6 +8,7 @@ import { FallbackView } from '@/views'
 import { exploreCollections, selectExploreCollectionsResult } from '../../explore.slice'
 import { ExploreCollectionsProvider } from './ExploreCollectionsProvider'
 import { ExploreCollectionsResult } from './ExploreCollectionsResult'
+import { ExploreCollectionsResultLoader } from './ExploreCollectionsResultLoader'
 
 export function ExploreCollectionsContent({ url }: { url: string }) {
   const [dispatch, selector] = useStore()
@@ -27,7 +28,12 @@ export function ExploreCollectionsContent({ url }: { url: string }) {
     <FallbackView
       dismissible
       state={state}
-      text='Loading collections...'
+      customLoadingView={
+        <Fragment>
+          <Title>Loading collections...</Title>
+          <ExploreCollectionsResultLoader />
+        </Fragment>
+      }
       error={collectionsResult?.error}
       onReload={get}
     >
