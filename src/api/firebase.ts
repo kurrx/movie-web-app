@@ -395,7 +395,7 @@ export async function getProfileItems(uid: string, type: FirestoreProfileItemTyp
     type === 'rated'
       ? where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
       : where(`${type}.value`, '==', true),
-    orderBy(`${type}.updatedAt`, 'desc'),
+    orderBy(`${type === 'rated' ? 'rating' : type}.updatedAt`, 'desc'),
     limit(6),
   )
   const result = await getDocs(q)
