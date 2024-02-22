@@ -67,7 +67,7 @@ function Item(props: ItemProps) {
         </div>
         <p className='text-lg font-black text-[var(--ui-primary)]'>{count}</p>
       </NavLink>
-      {loading ? <ExploreItemsLoader count={6} /> : <ExploreItems items={items} />}
+      {loading ? <ExploreItemsLoader count={count} /> : <ExploreItems items={items} />}
     </div>
   )
 }
