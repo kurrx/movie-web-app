@@ -13,6 +13,7 @@ import {
   ExploreView,
   HomeView,
   PolicyView,
+  ProfileView,
   RedirectView,
   WatchView,
 } from '@/views'
@@ -36,6 +37,10 @@ export function App() {
                     <Route index element={<HomeView />} />
                     <Route path='/policy' element={<PolicyView />} />
                     <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
+
+                    <Route path='/profile'>
+                      <Route index element={<ProfileView />} />
+                    </Route>
 
                     <Route path='/explore'>
                       <Route path='collections'>

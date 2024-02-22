@@ -1,6 +1,7 @@
 import { EnterIcon, ExitIcon, PersonIcon } from '@radix-ui/react-icons'
 import randomGradient from 'random-gradient'
 import { Fragment, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 import { cn, googleLogout } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, LoaderIcon, StarIcon } from '@/assets'
@@ -97,10 +98,12 @@ export function ProfileMenu() {
             <DropdownMenuSeparator />
             {short && short.total > 0 && (
               <Fragment>
-                <DropdownMenuItem className='flex items-center justify-start'>
-                  <PersonIcon className='h-4 w-4 mr-2' />
-                  Profile
-                  <DropdownMenuShortcut>{short.total}</DropdownMenuShortcut>
+                <DropdownMenuItem asChild className='flex items-center justify-start'>
+                  <NavLink to='/profile'>
+                    <PersonIcon className='h-4 w-4 mr-2' />
+                    Profile
+                    <DropdownMenuShortcut>{short.total}</DropdownMenuShortcut>
+                  </NavLink>
                 </DropdownMenuItem>
                 {short.saves.total > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
@@ -112,7 +115,7 @@ export function ProfileMenu() {
                 {short.favorites.total > 0 && (
                   <DropdownMenuItem className='flex items-center justify-start'>
                     <HeartIcon className='h-4 w-4 mr-2' />
-                    Favorites
+                    Favorite
                     <DropdownMenuShortcut>{short.favorites.total}</DropdownMenuShortcut>
                   </DropdownMenuItem>
                 )}

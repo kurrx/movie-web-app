@@ -39,23 +39,23 @@ export const explore: Navigation = {
     collections: [
       {
         title: 'Фильмы Netflix',
-        url: '/collections/834-filmy-netflix/',
+        url: '/collections/834-filmy-netflix',
       },
       {
         title: 'Фильмы HBO и HBO Max',
-        url: '/collections/1419-filmy-hbo/',
+        url: '/collections/1419-filmy-hbo',
       },
       {
         title: 'Фильмы Amazon',
-        url: '/collections/1417-filmy-amazon/',
+        url: '/collections/1417-filmy-amazon',
       },
       {
         title: 'Фильмы Disney',
-        url: '/collections/1075-filmy-disney/',
+        url: '/collections/1075-filmy-disney',
       },
       {
         title: 'Фильмы Apple TV+',
-        url: '/collections/1416-filmy-apple-tv/',
+        url: '/collections/1416-filmy-apple-tv',
       },
     ],
   },
@@ -93,31 +93,31 @@ export const explore: Navigation = {
     collections: [
       {
         title: 'Сериалы Netflix',
-        url: '/collections/640-serialy-netflix/',
+        url: '/collections/640-serialy-netflix',
       },
       {
         title: 'Сериалы HBO и HBO Max',
-        url: '/collections/639-serialy-hbo/',
+        url: '/collections/639-serialy-hbo',
       },
       {
         title: 'Сериалы Amazon Prime',
-        url: '/collections/831-serialy-amazon/',
+        url: '/collections/831-serialy-amazon',
       },
       {
         title: 'Сериалы Disney+',
-        url: '/collections/1148-serialy-disney/',
+        url: '/collections/1148-serialy-disney',
       },
       {
         title: 'Сериалы Apple TV+',
-        url: '/collections/1146-serialy-apple-tv/',
+        url: '/collections/1146-serialy-apple-tv',
       },
       {
         title: 'Сериалы Hulu',
-        url: '/collections/813-serialy-hulu/',
+        url: '/collections/813-serialy-hulu',
       },
       {
         title: 'Сериалы Epix',
-        url: '/collections/1251-serialy-epix/',
+        url: '/collections/1251-serialy-epix',
       },
     ],
   },
@@ -161,11 +161,11 @@ export const explore: Navigation = {
     collections: [
       {
         title: 'Мультфильмы Netflix',
-        url: '/collections/1004-animacionnye-serialy-netflix/',
+        url: '/collections/1004-animacionnye-serialy-netflix',
       },
       {
         title: 'Мультфильмы Disney',
-        url: '/collections/1-multfilmy-disney/',
+        url: '/collections/1-multfilmy-disney',
       },
     ],
   },
@@ -208,7 +208,7 @@ export const explore: Navigation = {
     collections: [
       {
         title: 'Аниме Netflix',
-        url: '/collections/1242-anime-netflix/',
+        url: '/collections/1242-anime-netflix',
       },
     ],
   },
