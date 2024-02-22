@@ -1,5 +1,5 @@
 import { SerializedError } from '@reduxjs/toolkit'
-import { Fragment, PropsWithChildren } from 'react'
+import { Fragment, PropsWithChildren, ReactNode } from 'react'
 
 import { AlertErrorDialog } from '@/components'
 import { FetchState } from '@/core'
@@ -9,6 +9,7 @@ import { LoadingView } from './LoadingView'
 
 export interface FallbackViewProps extends PropsWithChildren {
   state: FetchState
+  customLoadingView?: ReactNode
   text?: string
   error?: SerializedError | null
   dismissible?: boolean
@@ -17,9 +18,12 @@ export interface FallbackViewProps extends PropsWithChildren {
 }
 
 export function FallbackView(props: FallbackViewProps) {
-  const { state, text, error, dismissible, children, onReload, onClose } = props
+  const { state, text, customLoadingView, error, dismissible, children, onReload, onClose } = props
 
   if (state === FetchState.LOADING) {
+    if (customLoadingView) {
+      return customLoadingView
+    }
     return <LoadingView text={text} />
   }
 
