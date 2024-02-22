@@ -8,6 +8,7 @@ import { FallbackView } from '@/views'
 import { explorePerson, selectExplorePersonResult } from '../../explore.slice'
 import { ExplorePersonProvider } from './ExplorePersonProvider'
 import { ExplorePersonResult } from './ExplorePersonResult'
+import { ExplorePersonResultLoader } from './ExplorePersonResultLoader'
 
 export function ExplorePersonContent({ id }: { id: string }) {
   const [dispatch, selector] = useStore()
@@ -27,7 +28,12 @@ export function ExplorePersonContent({ id }: { id: string }) {
     <FallbackView
       dismissible
       state={state}
-      text='Loading person...'
+      customLoadingView={
+        <Fragment>
+          <Title>Loading person...</Title>
+          <ExplorePersonResultLoader />
+        </Fragment>
+      }
       error={personResult?.error}
       onReload={get}
     >
