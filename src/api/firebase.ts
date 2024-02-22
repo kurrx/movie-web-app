@@ -388,26 +388,16 @@ export async function updateProfileItem(
   })
 }
 
-async function getProfileItemTypes(uid: string, type: FirestoreProfileItemType) {
+export async function getProfileItems(uid: string, type: FirestoreProfileItemType) {
   const q = query(
     profileItemsCollection,
     where('uid', '==', uid),
-    type === 'rating'
+    type === 'rated'
       ? where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
       : where(`${type}.value`, '==', true),
     orderBy(`${type}.updatedAt`, 'desc'),
-    limit(3),
+    limit(6),
   )
   const result = await getDocs(q)
   return result.docs.map((doc) => convertProfileItemToCard(doc.data() as FirestoreProfileItem))
-}
-
-export async function queryProfileAllItems(uid: string) {
-  const [favorites, saves, watches, rates] = await Promise.all([
-    getProfileItemTypes(uid, 'favorite'),
-    getProfileItemTypes(uid, 'saved'),
-    getProfileItemTypes(uid, 'watched'),
-    getProfileItemTypes(uid, 'rating'),
-  ])
-  return { favorites, saves, watches, rates }
 }

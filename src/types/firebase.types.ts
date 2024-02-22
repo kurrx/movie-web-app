@@ -8,7 +8,7 @@ interface ProfileItemField<T> {
   updatedAt: number
 }
 
-export type FirestoreProfileItemType = 'favorite' | 'saved' | 'watched' | 'rating'
+export type FirestoreProfileItemType = 'favorite' | 'saved' | 'watched' | 'rated'
 
 export interface FirestoreProfileItem extends FirestoreModel {
   title: string
