@@ -1,9 +1,9 @@
 import { EnterIcon, ExitIcon, PersonIcon } from '@radix-ui/react-icons'
 import randomGradient from 'random-gradient'
-import { Fragment, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { cn, googleLogout } from '@/api'
+import { capitalizeFirstLetter, cn, googleLogout } from '@/api'
 import { BookMarkIcon, EyeIcon, HeartIcon, LoaderIcon, StarIcon } from '@/assets'
 import {
   Button,
@@ -18,6 +18,7 @@ import {
 } from '@/components'
 import { ThemeSwitcher } from '@/features/theme'
 import { useAppSelector, useStoreBoolean } from '@/hooks'
+import { FirestoreProfileItemType, ProfileCounters } from '@/types'
 
 import {
   selectProfileCounters,
@@ -54,6 +55,48 @@ function Avatar({ id, url, alt }: AvatarProps) {
     </span>
   )
 }
+
+interface ProfileLinkProps {
+  counters: ProfileCounters
+  type: 'total' | FirestoreProfileItemType
+}
+
+function ProfileLink({ counters, type }: ProfileLinkProps) {
+  const to = useMemo(() => {
+    if (type === 'total') return '/profile'
+    return `/profile/${type}`
+  }, [type])
+  const text = useMemo(() => {
+    if (type === 'total') return 'Profile'
+    return capitalizeFirstLetter(type)
+  }, [type])
+  const Icon = useMemo(() => {
+    switch (type) {
+      case 'total':
+        return PersonIcon
+      case 'saved':
+        return BookMarkIcon
+      case 'favorite':
+        return HeartIcon
+      case 'watched':
+        return EyeIcon
+      case 'rated':
+        return StarIcon
+    }
+  }, [type])
+
+  return (
+    <DropdownMenuItem asChild className='flex items-center justify-start'>
+      <NavLink to={to}>
+        <Icon className={cn('h-4 w-4 mr-2', type === 'saved' && 'fill-transparent')} />
+        {text}
+        {type !== 'total' && <DropdownMenuShortcut>{counters[type]}</DropdownMenuShortcut>}
+      </NavLink>
+    </DropdownMenuItem>
+  )
+}
+
+const showCounters = ['total', 'saved', 'favorite', 'watched', 'rated'] as const
 
 export function ProfileMenu() {
   const user = useAppSelector(selectProfileUser)
@@ -96,45 +139,11 @@ export function ProfileMenu() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {counters && counters.total > 0 && (
-              <Fragment>
-                <DropdownMenuItem asChild className='flex items-center justify-start'>
-                  <NavLink to='/profile'>
-                    <PersonIcon className='h-4 w-4 mr-2' />
-                    Profile
-                    <DropdownMenuShortcut>{counters.total}</DropdownMenuShortcut>
-                  </NavLink>
-                </DropdownMenuItem>
-                {counters.saved > 0 && (
-                  <DropdownMenuItem className='flex items-center justify-start'>
-                    <BookMarkIcon className='h-4 w-4 mr-2 fill-transparent' />
-                    Saved
-                    <DropdownMenuShortcut>{counters.saved}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                )}
-                {counters.favorite > 0 && (
-                  <DropdownMenuItem className='flex items-center justify-start'>
-                    <HeartIcon className='h-4 w-4 mr-2' />
-                    Favorite
-                    <DropdownMenuShortcut>{counters.favorite}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                )}
-                {counters.watched > 0 && (
-                  <DropdownMenuItem className='flex items-center justify-start'>
-                    <EyeIcon className='h-4 w-4 mr-2' />
-                    Watched
-                    <DropdownMenuShortcut>{counters.watched}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                )}
-                {counters.rated > 0 && (
-                  <DropdownMenuItem className='flex items-center justify-start'>
-                    <StarIcon className='h-4 w-4 mr-2' />
-                    Rated
-                    <DropdownMenuShortcut>{counters.rated}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                )}
-              </Fragment>
-            )}
+            {counters &&
+              counters.total > 0 &&
+              showCounters
+                .filter((type) => counters[type] > 0)
+                .map((type) => <ProfileLink key={type} counters={counters} type={type} />)}
           </Fragment>
         )}
         {!user && (
