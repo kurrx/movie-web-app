@@ -96,7 +96,7 @@ function ProfileLink({ counters, type }: ProfileLinkProps) {
   )
 }
 
-const showCounters = ['total', 'saved', 'favorite', 'watched', 'rated'] as const
+const countersList = ['total', 'saved', 'favorite', 'watched', 'rated'] as const
 
 export function ProfileMenu() {
   const user = useAppSelector(selectProfileUser)
@@ -140,8 +140,7 @@ export function ProfileMenu() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {counters &&
-              counters.total > 0 &&
-              showCounters
+              countersList
                 .filter((type) => counters[type] > 0)
                 .map((type) => <ProfileLink key={type} counters={counters} type={type} />)}
           </Fragment>

@@ -72,7 +72,7 @@ function Item(props: ItemProps) {
   )
 }
 
-const showCounters = ['saved', 'favorite', 'watched', 'rated'] as const
+const countersList = ['saved', 'favorite', 'watched', 'rated'] as const
 
 export function ProfileItems({ counters }: { counters: ProfileCounters | null }) {
   if (!counters) {
@@ -88,7 +88,7 @@ export function ProfileItems({ counters }: { counters: ProfileCounters | null })
 
   return (
     <Fragment>
-      {showCounters
+      {countersList
         .filter((type) => counters[type] > 0)
         .map((type) => (
           <Item
