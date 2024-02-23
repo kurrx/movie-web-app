@@ -6,7 +6,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
 import { ExploreBestDialog, FeaturesProvider, LoginDialog, SearchDialog, store } from '@/features'
 import { useAppViewport } from '@/hooks'
-import { VPNMiddleware } from '@/middlewares'
 import {
   ExploreCollectionsView,
   ExplorePersonView,
@@ -30,36 +29,34 @@ export function App() {
             <Navbar />
             <ScrollArea hideBar id='app-scroll'>
               <main id='content'>
-                <VPNMiddleware>
-                  <SearchDialog />
-                  <ExploreBestDialog />
-                  <LoginDialog />
-                  <Routes>
-                    <Route index element={<HomeView />} />
-                    <Route path='/policy' element={<PolicyView />} />
-                    <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
+                <SearchDialog />
+                <ExploreBestDialog />
+                <LoginDialog />
+                <Routes>
+                  <Route index element={<HomeView />} />
+                  <Route path='/policy' element={<PolicyView />} />
+                  <Route path='/watch/:typeId/:genreId/:slug' element={<WatchView />} />
 
-                    <Route path='/profile'>
-                      <Route index element={<ProfileView />} />
-                      <Route path='saved' element={<ProfileItemsView type='saved' />} />
-                      <Route path='favorite' element={<ProfileItemsView type='favorite' />} />
-                      <Route path='watched' element={<ProfileItemsView type='watched' />} />
-                      <Route path='rated' element={<ProfileItemsView type='rated' />} />
-                      <Route path='*' element={<RedirectView to='/profile' />} />
+                  <Route path='/profile'>
+                    <Route index element={<ProfileView />} />
+                    <Route path='saved' element={<ProfileItemsView type='saved' />} />
+                    <Route path='favorite' element={<ProfileItemsView type='favorite' />} />
+                    <Route path='watched' element={<ProfileItemsView type='watched' />} />
+                    <Route path='rated' element={<ProfileItemsView type='rated' />} />
+                    <Route path='*' element={<RedirectView to='/profile' />} />
+                  </Route>
+
+                  <Route path='/explore'>
+                    <Route path='collections'>
+                      <Route index element={<ExploreCollectionsView />} />
+                      <Route path='page/:page' element={<ExploreCollectionsView />} />
                     </Route>
+                    <Route path='person/:personId' element={<ExplorePersonView />} />
+                    <Route path='*' element={<ExploreView />} />
+                  </Route>
 
-                    <Route path='/explore'>
-                      <Route path='collections'>
-                        <Route index element={<ExploreCollectionsView />} />
-                        <Route path='page/:page' element={<ExploreCollectionsView />} />
-                      </Route>
-                      <Route path='person/:personId' element={<ExplorePersonView />} />
-                      <Route path='*' element={<ExploreView />} />
-                    </Route>
-
-                    <Route path='*' element={<RedirectView to='/' />} />
-                  </Routes>
-                </VPNMiddleware>
+                  <Route path='*' element={<RedirectView to='/' />} />
+                </Routes>
               </main>
               <Footer />
             </ScrollArea>

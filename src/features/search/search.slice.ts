@@ -7,7 +7,7 @@ import { AppStoreState, SearchStoreState, ThunkApiConfig } from '@/types'
 
 const initialState: SearchStoreState = {
   open: false,
-  disabled: true,
+  disabled: false,
   queries: [],
 }
 
