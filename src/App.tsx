@@ -13,6 +13,7 @@ import {
   ExploreView,
   HomeView,
   PolicyView,
+  ProfileItemsView,
   ProfileView,
   RedirectView,
   WatchView,
@@ -40,6 +41,11 @@ export function App() {
 
                     <Route path='/profile'>
                       <Route index element={<ProfileView />} />
+                      <Route path='saved' element={<ProfileItemsView type='saved' />} />
+                      <Route path='favorite' element={<ProfileItemsView type='favorite' />} />
+                      <Route path='watched' element={<ProfileItemsView type='watched' />} />
+                      <Route path='rated' element={<ProfileItemsView type='rated' />} />
+                      <Route path='*' element={<RedirectView to='/profile' />} />
                     </Route>
 
                     <Route path='/explore'>

@@ -18,8 +18,11 @@ import {
   limit,
   orderBy,
   query,
+  QueryConstraint,
+  QueryDocumentSnapshot,
   runTransaction,
   setDoc,
+  startAfter,
   where,
 } from 'firebase/firestore'
 
@@ -29,6 +32,8 @@ import {
   FirestoreProfileItemType,
   Item,
   ProfileCounters,
+  QueryProfileItemsArgs,
+  QueryProfileItemsResult,
   SearchItem,
   UpdateCounterAction,
   UpdateItemStateArgs,
@@ -388,16 +393,46 @@ export async function updateProfileItem(
   })
 }
 
-export async function getProfileItems(uid: string, type: FirestoreProfileItemType) {
-  const q = query(
-    profileItemsCollection,
+function getProfileItemsQueryFor(
+  uid: string,
+  type: FirestoreProfileItemType,
+  limitSize: number,
+  last?: QueryDocumentSnapshot,
+) {
+  const constraints: QueryConstraint[] = [
     where('uid', '==', uid),
     type === 'rated'
       ? where('rating.value', 'in', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
       : where(`${type}.value`, '==', true),
     orderBy(`${type === 'rated' ? 'rating' : type}.updatedAt`, 'desc'),
-    limit(6),
-  )
+  ]
+  if (last) {
+    constraints.push(startAfter(last))
+  }
+  constraints.push(limit(limitSize))
+  return query(profileItemsCollection, ...constraints)
+}
+
+export async function getProfileItems(uid: string, type: FirestoreProfileItemType) {
+  const q = getProfileItemsQueryFor(uid, type, 6)
   const result = await getDocs(q)
   return result.docs.map((doc) => convertProfileItemToCard(doc.data() as FirestoreProfileItem))
+}
+
+export async function queryProfileItems(
+  uid: string,
+  args: QueryProfileItemsArgs,
+): Promise<QueryProfileItemsResult> {
+  const { type, limitSize = 12, last } = args
+  const q = getProfileItemsQueryFor(uid, type, limitSize, last)
+  const result = await getDocs(q)
+  const newLast = result.docs[result.docs.length - 1]
+  const items = result.docs.map((doc) =>
+    convertProfileItemToCard(doc.data() as FirestoreProfileItem),
+  )
+  let next: null | (() => Promise<QueryProfileItemsResult>) = null
+  if (items.length === limitSize) {
+    next = async () => await queryProfileItems(uid, { type, limitSize, last: newLast })
+  }
+  return { items, next }
 }

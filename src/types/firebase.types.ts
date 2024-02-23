@@ -1,3 +1,7 @@
+import { QueryDocumentSnapshot } from 'firebase/firestore'
+
+import { SearchItem } from './ajax.types'
+
 export interface FirestoreModel {
   uid: string
   id: number
@@ -29,6 +33,17 @@ export interface UpdateProfileItemArgs {
   saved?: boolean
   watched?: boolean
   rating?: number | null
+}
+
+export interface QueryProfileItemsArgs {
+  type: FirestoreProfileItemType
+  limitSize?: number
+  last?: QueryDocumentSnapshot
+}
+
+export interface QueryProfileItemsResult {
+  items: SearchItem[]
+  next: (() => Promise<QueryProfileItemsResult>) | null
 }
 
 export interface ProfileCounters {
