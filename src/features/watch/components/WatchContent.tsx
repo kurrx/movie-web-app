@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { Fragment, useCallback, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { FetchState } from '@/core'
+import { Title } from '@/features/router'
 import { useStore } from '@/hooks'
 import { ItemFullID, WatchItemState } from '@/types'
 import { FallbackView } from '@/views/FallbackView'
 
 import { getItem, selectWatchItemOptional } from '../watch.slice'
+import { WatchContentLoader } from './WatchContentLoader'
 import { WatchInfo } from './WatchInfo'
 import { WatchPlayer } from './WatchPlayer'
 
@@ -63,6 +65,12 @@ export function WatchContent({ fullId }: { fullId: ItemFullID }) {
       dismissible
       state={state}
       text='Be patient. Title is loading...'
+      customLoadingView={
+        <Fragment>
+          <Title>Loading title...</Title>
+          <WatchContentLoader />
+        </Fragment>
+      }
       error={watchItem?.error}
       onReload={get}
     >
