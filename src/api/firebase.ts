@@ -110,6 +110,7 @@ function serializeItemState(uid: string, id: number, state: WatchItemState) {
     subtitle: null,
     season: null,
     episode: null,
+    updatedAt: Date.now(),
   }
   if (state.subtitle) {
     document.subtitle = state.subtitle
@@ -177,7 +178,7 @@ export async function updateItemState(uid: string, id: number, args: UpdateItemS
     saveItemStateTimestamp(timestampRef, timestamp)
   }
   if (Object.keys(args).length === 0) return
-  return await setDoc(ref, args, { merge: true }).catch(noop)
+  return await setDoc(ref, { ...args, updatedAt: Date.now() }, { merge: true }).catch(noop)
 }
 
 function convertProfileItem(document: FirestoreProfileItem) {

@@ -79,6 +79,7 @@ export interface FirestoreItemState extends FirestoreModel {
   subtitle?: string | null
   season?: number | null
   episode?: number | null
+  updatedAt: number
 }
 
 export interface UpdateItemStateArgs {
