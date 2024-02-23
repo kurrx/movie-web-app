@@ -371,7 +371,7 @@ export async function updateProfileItem(
 
   if (counterActions.length === 0) return
   const countersRef = getProfileCountersRef(uid)
-  return await runTransactionDB(countersRef, (counters) => {
+  await runTransactionDB(countersRef, (counters) => {
     if (!counters) counters = {}
     for (const action of counterActions) {
       if (action.type === 'increment') {
