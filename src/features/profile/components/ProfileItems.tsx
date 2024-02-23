@@ -46,11 +46,13 @@ function Item(props: ItemProps) {
     getProfileItems(uid, type)
       .then((items) => {
         setItems(items)
-        setLoading(false)
       })
       .catch(() => {
-        setLoading(false)
         setError(true)
+      })
+      .finally(() => {
+        signal.current = null
+        setLoading(false)
       })
   }, [uid, type])
 
