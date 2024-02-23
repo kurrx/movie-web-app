@@ -1,18 +1,18 @@
-import { Fragment } from 'react'
+import { Fragment, PropsWithChildren } from 'react'
 
 import { ExplorePagination as IExplorePagination, SearchItem } from '@/types'
 
 import { ExploreItemCard } from './ExploreItemCard'
 import { ExplorePagination } from './ExplorePagination'
 
-export interface ExploreItemsProps {
+export interface ExploreItemsProps extends PropsWithChildren {
   items: SearchItem[]
   url?: string
   pagination?: IExplorePagination
 }
 
 export function ExploreItems(props: ExploreItemsProps) {
-  const { items, url, pagination } = props
+  const { items, url, pagination, children } = props
 
   return (
     <Fragment>
@@ -20,6 +20,7 @@ export function ExploreItems(props: ExploreItemsProps) {
         {items.map((item) => (
           <ExploreItemCard key={item.id} item={item} />
         ))}
+        {children}
       </div>
       {pagination && url && <ExplorePagination url={url} pagination={pagination} />}
     </Fragment>
