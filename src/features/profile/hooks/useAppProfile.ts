@@ -3,15 +3,30 @@ import { Unsubscribe } from 'firebase/database'
 import { useEffect, useRef } from 'react'
 
 import { firebaseAuth, subscribeProfileCounters } from '@/api'
-import { useAppDispatch } from '@/hooks'
+import { useStore } from '@/hooks'
 
-import { setProfileCounters, setProfileReady, setProfileUser } from '../profile.slice'
+import {
+  getProfileLast,
+  selectProfileUser,
+  setProfileCounters,
+  setProfileReady,
+  setProfileUser,
+} from '../profile.slice'
 
 const readyId = { id: 0 }
 
 export function useAppProfile() {
-  const dispatch = useAppDispatch()
+  const [dispatch, selector] = useStore()
+  const user = selector(selectProfileUser)
   const unsubscribeCounter = useRef<Unsubscribe | null>(null)
+
+  useEffect(() => {
+    if (!user) return
+    const signal = dispatch(getProfileLast(user.uid))
+    return () => {
+      signal.abort()
+    }
+  }, [dispatch, user])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {

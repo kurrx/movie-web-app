@@ -2,8 +2,15 @@ import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@r
 import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
-import { googleLogin } from '@/api'
-import { AppStoreState, ProfileCounters, ProfileStoreState, ThunkApiConfig } from '@/types'
+import { getLastItem, googleLogin } from '@/api'
+import { FetchState } from '@/core'
+import {
+  AppStoreState,
+  LastItemState,
+  ProfileCounters,
+  ProfileStoreState,
+  ThunkApiConfig,
+} from '@/types'
 
 const initialState: ProfileStoreState = {
   dialog: false,
@@ -12,6 +19,12 @@ const initialState: ProfileStoreState = {
   requestId: null,
   user: null,
   counters: null,
+  last: {
+    item: null,
+    state: FetchState.LOADING,
+    error: null,
+    requestId: null,
+  },
 }
 
 type LoginReturn = Awaited<ReturnType<typeof googleLogin>>
@@ -24,6 +37,20 @@ export const login = createAsyncThunk<LoginReturn, void, ThunkApiConfig>(
       const loading = state.loading
       const user = state.user
       return !user && !loading
+    },
+  },
+)
+
+type GetLastReturn = LastItemState | null
+export const getProfileLast = createAsyncThunk<GetLastReturn, string, ThunkApiConfig>(
+  'profile/getLast',
+  async (uid) => await getLastItem(uid),
+  {
+    condition(arg, api) {
+      const profile = api.getState().profile
+      if (!profile.user) return
+      if (profile.user.uid !== arg) return
+      return profile.last.state !== FetchState.SUCCESS
     },
   },
 )
@@ -49,6 +76,15 @@ const profileSlice = createSlice({
 
     setProfileUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload
+      if (!state.user) {
+        state.counters = null
+        state.last = {
+          item: null,
+          state: FetchState.LOADING,
+          error: null,
+          requestId: null,
+        }
+      }
     },
 
     setProfileCounters(state, action: PayloadAction<ProfileCounters | null>) {
@@ -83,6 +119,34 @@ const profileSlice = createSlice({
           state.user = null
         }
       })
+
+    builder
+      .addCase(getProfileLast.pending, (state, action) => {
+        state.last.state = FetchState.LOADING
+        state.last.requestId = action.meta.requestId
+        state.last.error = null
+        state.last.item = null
+      })
+      .addCase(getProfileLast.fulfilled, (state, action) => {
+        if (!state.user) return
+        if (state.user.uid !== action.meta.arg) return
+        if (state.last.requestId === action.meta.requestId) {
+          state.last.state = FetchState.SUCCESS
+          state.last.requestId = null
+          state.last.error = null
+          state.last.item = action.payload
+        }
+      })
+      .addCase(getProfileLast.rejected, (state, action) => {
+        if (!state.user) return
+        if (state.user.uid !== action.meta.arg) return
+        if (state.last.requestId === action.meta.requestId) {
+          state.last.state = FetchState.ERROR
+          state.last.requestId = null
+          state.last.error = action.error
+          state.last.item = null
+        }
+      })
   },
 })
 
@@ -99,5 +163,6 @@ export const selectProfileUser = (state: AppStoreState) => state.profile.user
 export const selectProfileLoading = (state: AppStoreState) => state.profile.loading
 export const selectProfileError = (state: AppStoreState) => state.profile.error
 export const selectProfileCounters = (state: AppStoreState) => state.profile.counters
+export const selectProfileLastItem = (state: AppStoreState) => state.profile.last.item
 
 export const profileReducer = profileSlice.reducer

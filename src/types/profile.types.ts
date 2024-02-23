@@ -1,7 +1,12 @@
 import { SerializedError } from '@reduxjs/toolkit'
 import { User } from 'firebase/auth'
 
-import { ProfileCounters } from './firebase.types'
+import { LastItemState, ProfileCounters } from './firebase.types'
+import { FetchableState } from './store.types'
+
+export interface ProfileLastItemState extends FetchableState {
+  item: LastItemState | null
+}
 
 export interface ProfileStoreState {
   dialog: boolean
@@ -10,4 +15,5 @@ export interface ProfileStoreState {
   requestId: string | null
   user: User | null
   counters: ProfileCounters | null
+  last: ProfileLastItemState
 }
