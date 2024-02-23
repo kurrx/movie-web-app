@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { cn } from '@/api'
+import { BookMarkIcon, EyeIcon, HeartIcon, StarIcon } from '@/assets'
 import {
   Badge,
   Button,
@@ -46,6 +47,23 @@ export function ExploreItemCard({ item }: ExploreItemCardProps) {
             <KinopoiskBadge rating={item.rating} />
           </div>
         )}
+        {item.myRating && (
+          <div className='absolute right-[0.5rem] top-[0.5rem]'>
+            <div
+              className={cn(
+                'h-[1.1rem] w-[1.1rem] flex items-center font-bold',
+                'justify-center rounded-full text-white text-[0.6rem]',
+                item.myRating >= 7
+                  ? 'bg-[#3BB33B]'
+                  : item.myRating >= 5
+                    ? 'bg-[#777777]'
+                    : 'bg-[#FF0200]',
+              )}
+            >
+              {item.myRating}
+            </div>
+          </div>
+        )}
         <Badge
           variant='secondary'
           className={cn(
@@ -61,7 +79,12 @@ export function ExploreItemCard({ item }: ExploreItemCardProps) {
           <CardTitle>{item.title}</CardTitle>
           <CardDescription className='!text-xs'>{item.description}</CardDescription>
         </CardHeader>
-        <CardContent className='flex-1 !px-4 !pb-2'></CardContent>
+        <CardContent className='flex-1 !px-4 !pb-2 flex items-start justify-start wrap gap-2'>
+          {item.saved && <BookMarkIcon className='h-4 w-4 fill-[currentColor]' />}
+          {item.favorite && <HeartIcon className='h-4 w-4 fill-[currentColor]' />}
+          {item.watched && <EyeIcon className='h-4 w-4' />}
+          {item.myRating && <StarIcon className='h-4 w-4 fill-[currentColor]' />}
+        </CardContent>
         <CardFooter className='!px-4 !pb-2 flex-col space-y-2'>
           <Button asChild size='sm' className='w-full'>
             <NavLink to={to}>
