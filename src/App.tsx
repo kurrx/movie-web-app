@@ -4,7 +4,14 @@ import { Provider as StoreProvider } from 'react-redux'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { Footer, Navbar, ScrollArea, TooltipProvider } from '@/components'
-import { ExploreBestDialog, FeaturesProvider, LoginDialog, SearchDialog, store } from '@/features'
+import {
+  ExploreBestDialog,
+  FeaturesProvider,
+  LoginDialog,
+  ProfileLastItem,
+  SearchDialog,
+  store,
+} from '@/features'
 import { useAppViewport } from '@/hooks'
 import {
   ExploreCollectionsView,
@@ -32,6 +39,7 @@ export function App() {
                 <SearchDialog />
                 <ExploreBestDialog />
                 <LoginDialog />
+                <ProfileLastItem />
                 <Routes>
                   <Route index element={<HomeView />} />
                   <Route path='/policy' element={<PolicyView />} />

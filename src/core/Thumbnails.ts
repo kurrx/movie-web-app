@@ -74,7 +74,18 @@ export class Thumbnails {
   }
 
   getOverlaySegment(time: number, containerWidth: number, containerHeight: number) {
-    const segment = this.getSegment(time)
+    return Thumbnails.getBackgroundFromSegment(
+      this.getSegment(time),
+      containerWidth,
+      containerHeight,
+    )
+  }
+
+  static getBackgroundFromSegment(
+    segment: ThumbnailSegment | undefined | null,
+    containerWidth: number,
+    containerHeight: number,
+  ) {
     if (!segment) return undefined
     const videoRatio = segment.width / segment.height
     const containerRatio = containerWidth / containerHeight
@@ -93,5 +104,42 @@ export class Thumbnails {
       backgroundSize: `${Math.round(width * 5)}px ${Math.round(height * 5)}px`,
       backgroundImage: `url(${segment.url})`,
     }
+  }
+
+  private static getSegmentFromJSON(json: string) {
+    try {
+      const data = JSON.parse(json)
+      if (typeof data !== 'object' || !data) return null
+      if (
+        typeof data.start !== 'number' ||
+        typeof data.end !== 'number' ||
+        typeof data.url !== 'string' ||
+        typeof data.width !== 'number' ||
+        typeof data.height !== 'number' ||
+        typeof data.x !== 'number' ||
+        typeof data.y !== 'number'
+      ) {
+        return null
+      }
+      return {
+        start: data.start,
+        end: data.end,
+        url: data.url,
+        width: data.width,
+        height: data.height,
+        x: data.x,
+        y: data.y,
+      }
+    } catch {
+      return null
+    }
+  }
+
+  static getBackgroundFromJSON(json: string, containerWidth: number, containerHeight: number) {
+    return Thumbnails.getBackgroundFromSegment(
+      Thumbnails.getSegmentFromJSON(json),
+      containerWidth,
+      containerHeight,
+    )
   }
 }
