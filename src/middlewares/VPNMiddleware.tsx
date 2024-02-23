@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 
 import { dismissVpnError, selectDeviceVpn, validateVpn } from '@/features'
 import { useStore } from '@/hooks'
@@ -18,8 +18,6 @@ export function VPNMiddleware({ children }: PropsWithChildren) {
   const onClose = useCallback(() => {
     dispatch(dismissVpnError())
   }, [dispatch])
-
-  useEffect(validate, [validate])
 
   return (
     <FallbackView
