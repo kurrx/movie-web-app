@@ -41,17 +41,21 @@ function Item(props: ItemProps) {
     if (signal.current) signal.current.abort()
 
     setLoading(true)
-    signal.current = new AbortController()
+    const controller = (signal.current = new AbortController())
     getProfileItems(uid, type)
       .then((items) => {
-        setItems(items)
+        if (!controller.signal.aborted) {
+          signal.current = null
+          setItems(items)
+          setLoading(false)
+        }
       })
       .catch(() => {
-        setError(true)
-      })
-      .finally(() => {
-        signal.current = null
-        setLoading(false)
+        if (!controller.signal.aborted) {
+          signal.current = null
+          setError(true)
+          setLoading(false)
+        }
       })
   }, [uid, type])
 
