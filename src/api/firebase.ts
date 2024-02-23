@@ -6,6 +6,7 @@ import {
   getDatabase,
   onValue,
   ref,
+  remove,
   runTransaction as runTransactionDB,
   set,
 } from 'firebase/database'
@@ -31,6 +32,7 @@ import {
   FirestoreProfileItem,
   FirestoreProfileItemType,
   Item,
+  LastItemState,
   ProfileCounters,
   QueryProfileItemsArgs,
   QueryProfileItemsResult,
@@ -83,6 +85,7 @@ export const profileItemsCollection = collection(firestore, 'profile-items')
 export const fireDatabase = getDatabase(firebaseApp)
 export const statesRef = ref(fireDatabase, 'states')
 export const countersRef = ref(fireDatabase, 'counters')
+export const lastRef = ref(fireDatabase, 'last')
 
 function convertItemState(document: FirestoreItemState) {
   const state: WatchItemState = {
@@ -436,4 +439,33 @@ export async function queryProfileItems(
     next = async () => await queryProfileItems(uid, { type, limitSize, last: newLast })
   }
   return { items, next }
+}
+
+function getLastItemRef(uid: string) {
+  return child(lastRef, uid)
+}
+
+export async function getLastItem(uid: string) {
+  return new Promise<LastItemState | null>((resolve) => {
+    onValue(
+      getLastItemRef(uid),
+      (snapshot) => {
+        const value = snapshot.val()
+        if (typeof value === 'object' && value !== null) {
+          resolve(value as LastItemState)
+        } else {
+          resolve(null)
+        }
+      },
+      { onlyOnce: true },
+    )
+  })
+}
+
+export async function saveLastItem(uid: string, item: LastItemState | null) {
+  const ref = getLastItemRef(uid)
+  if (!item) {
+    return await remove(ref).catch(noop)
+  }
+  return await set(ref, item).catch(noop)
 }

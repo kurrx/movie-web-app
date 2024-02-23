@@ -90,3 +90,12 @@ export interface UpdateItemStateArgs {
   season?: number | null
   episode?: number | null
 }
+
+export interface LastItemState {
+  title: string
+  subtitle: string
+  url: string
+  thumbnailUrl: string
+  progress: number
+  duration: number
+}
