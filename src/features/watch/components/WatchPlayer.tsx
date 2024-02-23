@@ -102,14 +102,13 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
 
   const onTimeUpdate = useCallback(
     (time: number, duration: number) => {
-      const timeThumbnails = thumbnails.getOverlaySegment(time, 400, 200)
       dispatch(
         updateTime({
           id,
           time,
           duration,
           subtitle: episodeTitle || '',
-          thumbnailUrl: timeThumbnails ? JSON.stringify(timeThumbnails) : '',
+          thumbnailUrl: JSON.stringify(thumbnails.getSegment(time) || {}),
         }),
       )
     },
