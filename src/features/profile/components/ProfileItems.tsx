@@ -38,7 +38,6 @@ function Item(props: ItemProps) {
   }, [loading, count])
 
   const get = useCallback(() => {
-    if (!uid) return
     if (signal.current) signal.current.abort()
 
     setLoading(true)
