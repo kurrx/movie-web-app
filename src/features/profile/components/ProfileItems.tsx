@@ -28,7 +28,7 @@ function Item(props: ItemProps) {
   const { to, title, count, type } = props
   const uid = useAppSelector((state) => state.profile.user!.uid)
   const signal = useRef<AbortController | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [items, setItems] = useState<SearchItem[]>([])
   const subtitle = useMemo(() => {
