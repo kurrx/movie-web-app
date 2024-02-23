@@ -122,10 +122,10 @@ function serializeItemState(uid: string, id: number, state: WatchItemState) {
   return document
 }
 
-function getItemStateRefs(uid: string, id: number) {
+function getItemStateRefs(uid: string, id: number, directTs = true) {
   return {
     ref: doc(statesCollection, `${uid}-${id}`),
-    timestampRef: child(statesRef, `${uid}/${id}/timestamp`),
+    timestampRef: child(statesRef, directTs ? `${uid}/${id}/timestamp` : `${uid}/${id}`),
   }
 }
 
@@ -146,7 +146,7 @@ export async function getItemStateTimestamp(ref: DatabaseReference) {
 }
 
 export async function saveItemStateTimestamp(ref: DatabaseReference, timestamp: number) {
-  return await set(ref, timestamp).catch(noop)
+  return await set(ref, { timestamp, updatedAt: Date.now() }).catch(noop)
 }
 
 export async function getItemState(uid: string, id: number) {
@@ -162,7 +162,7 @@ export async function getItemState(uid: string, id: number) {
 }
 
 export async function saveItemState(uid: string, id: number, state: WatchItemState) {
-  const { ref, timestampRef } = getItemStateRefs(uid, id)
+  const { ref, timestampRef } = getItemStateRefs(uid, id, false)
   const document = serializeItemState(uid, id, state)
   return await Promise.all([
     setDoc(ref, document).catch(noop),
@@ -171,7 +171,7 @@ export async function saveItemState(uid: string, id: number, state: WatchItemSta
 }
 
 export async function updateItemState(uid: string, id: number, args: UpdateItemStateArgs) {
-  const { ref, timestampRef } = getItemStateRefs(uid, id)
+  const { ref, timestampRef } = getItemStateRefs(uid, id, false)
   const timestamp = args.timestamp
   if (typeof timestamp === 'number') {
     delete args.timestamp
