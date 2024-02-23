@@ -27,7 +27,7 @@ export interface PlayerProps {
   subtitle: string | null
   subtitles: ItemTrack[]
   thumbnails: Thumbnails
-  onTimeUpdate: (time: number) => void
+  onTimeUpdate: (time: number, duration: number) => void
   onPreloadNext: () => void
   onSwitchRetry: () => void
   onPlayItem: (item: WatchPlaylistPlayItem) => void

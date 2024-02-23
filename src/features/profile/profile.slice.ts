@@ -12,6 +12,8 @@ import {
   ThunkApiConfig,
 } from '@/types'
 
+import { updateTime } from '../watch'
+
 const initialState: ProfileStoreState = {
   dialog: false,
   loading: true,
@@ -147,6 +149,12 @@ const profileSlice = createSlice({
           state.last.item = null
         }
       })
+
+    builder.addCase(updateTime.fulfilled, (state, action) => {
+      if (!state.user) return
+      if (state.user.uid !== action.payload.uid) return
+      state.last.item = action.payload.result
+    })
   },
 })
 

@@ -8,6 +8,7 @@ import { useStore, useStoreBoolean } from '@/hooks'
 import { useFullscreen, usePlayerSubtitles } from '../hooks'
 import {
   resetPlayerState,
+  selectPlayerDuration,
   selectPlayerMuted,
   selectPlayerPip,
   selectPlayerPlaybackSpeedCombined,
@@ -36,6 +37,7 @@ export function PlayerNative() {
   const muted = selector(selectPlayerMuted)
   const playbackSpeed = selector(selectPlayerPlaybackSpeedCombined)
   const pip = selector(selectPlayerPip)
+  const duration = selector(selectPlayerDuration)
   const thresholdPassed = useRef(false)
 
   const onReady = useCallback(() => {
@@ -70,13 +72,13 @@ export function PlayerNative() {
     (progress: OnProgressProps) => {
       dispatch(setPlayerProgress(progress.playedSeconds))
       dispatch(setPlayerLoadedProgress(progress.loadedSeconds))
-      onTimeUpdate(progress.playedSeconds)
+      onTimeUpdate(progress.playedSeconds, duration)
       if (progress.played >= 0.75 && !thresholdPassed.current) {
         thresholdPassed.current = true
         onPreloadNext()
       }
     },
-    [dispatch, onTimeUpdate, onPreloadNext],
+    [dispatch, onTimeUpdate, onPreloadNext, duration],
   )
 
   const onSeek = useCallback(

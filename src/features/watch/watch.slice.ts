@@ -9,6 +9,7 @@ import {
   getProfileItem,
   refererFromId,
   saveItemState,
+  saveLastItem,
   transliterate,
   updateItemState,
   updateProfileItem,
@@ -19,6 +20,7 @@ import {
   ItemFullID,
   ItemMovie,
   ItemSeries,
+  LastItemState,
   Stream,
   ThunkApiConfig,
   UpdateItemStateArgs,
@@ -56,8 +58,13 @@ type STranslatorParam = { translatorId: number } & UpdateParam
 type SQualityReturn = UpdateReturn<null>
 type SQualityParam = { quality: string } & UpdateParam
 type SwitchAction = { meta: { arg: { id: number }; requestId: string } }
-type UTimeParam = { time: number } & UpdateParam
-type UTimeReturn = UpdateReturn<null>
+type UTimeParam = {
+  time: number
+  duration: number
+  subtitle: string
+  thumbnailUrl: string
+} & UpdateParam
+type UTimeReturn = UpdateReturn<LastItemState>
 type USubtitleParam = { subtitle: string | null } & UpdateParam
 type USubtitleReturn = UpdateReturn<null>
 type UProfileParam = UpdateProfileItemArgs & UpdateParam
@@ -292,7 +299,24 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
 
 export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
   'watch/updateTime',
-  blankAsync,
+  async ({ id, time, duration, subtitle, thumbnailUrl }, { getState }) => {
+    const state = getState().watch
+    const item = state.items.find((i) => i.id === id)!.item!
+    const uid = getState().profile.user!.uid
+    const last = {
+      title: item.title,
+      subtitle,
+      url: `/${item.typeId}/${item.genreId}/${item.slug}`,
+      thumbnailUrl,
+      progress: time,
+      duration,
+    }
+    await saveLastItem(uid, last)
+    return {
+      uid,
+      result: last,
+    }
+  },
 )
 export const setSubtitle = createAsyncThunk<USubtitleReturn, USubtitleParam, Thunk>(
   'watch/setSubtitle',

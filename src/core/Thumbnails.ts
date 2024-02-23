@@ -87,10 +87,10 @@ export class Thumbnails {
     const width = segment.width * ratio
     const height = segment.height * ratio
     return {
-      width,
-      height,
-      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
-      backgroundSize: `${width * 5}px ${height * 5}px`,
+      width: Math.round(width),
+      height: Math.round(height),
+      backgroundPosition: `${Math.round(-segment.x * ratio)}px ${Math.round(-segment.y * ratio)}px`,
+      backgroundSize: `${Math.round(width * 5)}px ${Math.round(height * 5)}px`,
       backgroundImage: `url(${segment.url})`,
     }
   }

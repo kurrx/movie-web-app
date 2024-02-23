@@ -8,6 +8,7 @@ import { WatchPlaylistPlayItem } from '@/types'
 import {
   getStreamDetails,
   preloadNextEpisode,
+  selectWatchItemEpisodeTitle,
   selectWatchItemFullTitle,
   selectWatchItemPlaylist,
   selectWatchItemPlaylistAdjacents,
@@ -42,6 +43,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const [dispatch, selector] = useStore()
   const navigate = useNavigate()
   const title = selector((state) => selectWatchItemFullTitle(state, id))
+  const episodeTitle = selector((state) => selectWatchItemEpisodeTitle(state, id))
   const quality = selector((state) => selectWatchItemQuality(state, id))
   const qualities = selector((state) => selectWatchItemQualities(state, id))
   const mediaUrl = useMemo(() => quality.streamUrl, [quality])
@@ -99,10 +101,19 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   )
 
   const onTimeUpdate = useCallback(
-    (time: number) => {
-      dispatch(updateTime({ id, time }))
+    (time: number, duration: number) => {
+      const timeThumbnails = thumbnails.getOverlaySegment(time, 400, 200)
+      dispatch(
+        updateTime({
+          id,
+          time,
+          duration,
+          subtitle: episodeTitle || '',
+          thumbnailUrl: timeThumbnails ? JSON.stringify(timeThumbnails) : '',
+        }),
+      )
     },
-    [dispatch, id],
+    [dispatch, id, episodeTitle, thumbnails],
   )
   const onPreloadNext = useCallback(() => {
     if (!playlistAdjacents.next) return
