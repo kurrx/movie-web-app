@@ -2,7 +2,7 @@ import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@r
 import { User } from 'firebase/auth'
 import { SetStateAction } from 'react'
 
-import { getLastItem, googleLogin } from '@/api'
+import { getLastItem, googleLogin, saveLastItem } from '@/api'
 import { FetchState } from '@/core'
 import {
   AppStoreState,
@@ -55,6 +55,11 @@ export const getProfileLast = createAsyncThunk<GetLastReturn, string, ThunkApiCo
       return profile.last.state !== FetchState.SUCCESS
     },
   },
+)
+
+export const clearProfileLast = createAsyncThunk<void, string, ThunkApiConfig>(
+  'profile/clearLast',
+  async (uid) => await saveLastItem(uid, null),
 )
 
 const profileSlice = createSlice({
@@ -150,11 +155,17 @@ const profileSlice = createSlice({
         }
       })
 
-    builder.addCase(updateTime.fulfilled, (state, action) => {
-      if (!state.user) return
-      if (state.user.uid !== action.payload.uid) return
-      state.last.item = action.payload.result
-    })
+    builder
+      .addCase(updateTime.fulfilled, (state, action) => {
+        if (!state.user) return
+        if (state.user.uid !== action.payload.uid) return
+        state.last.item = action.payload.result
+      })
+      .addCase(clearProfileLast.fulfilled, (state, action) => {
+        if (!state.user) return
+        if (state.user.uid !== action.meta.arg) return
+        state.last.item = null
+      })
   },
 })
 
