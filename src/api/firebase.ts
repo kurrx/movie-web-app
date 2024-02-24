@@ -463,6 +463,7 @@ export async function getLastItem(uid: string) {
   if (!last) return null
   const timestamp = await getItemStateTimestamp(getItemStateRefs(uid, last.id).timestampRef)
   last.progress = timestamp
+  return last
 }
 
 export async function saveLastItem(uid: string, item: LastItemState | null) {
