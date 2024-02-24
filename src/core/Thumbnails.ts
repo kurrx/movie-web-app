@@ -74,18 +74,7 @@ export class Thumbnails {
   }
 
   getOverlaySegment(time: number, containerWidth: number, containerHeight: number) {
-    return Thumbnails.getBackgroundFromSegment(
-      this.getSegment(time),
-      containerWidth,
-      containerHeight,
-    )
-  }
-
-  static getBackgroundFromSegment(
-    segment: ThumbnailSegment | undefined | null,
-    containerWidth: number,
-    containerHeight: number,
-  ) {
+    const segment = this.getSegment(time)
     if (!segment) return undefined
     const videoRatio = segment.width / segment.height
     const containerRatio = containerWidth / containerHeight
@@ -98,10 +87,10 @@ export class Thumbnails {
     const width = segment.width * ratio
     const height = segment.height * ratio
     return {
-      width: Math.round(width),
-      height: Math.round(height),
-      backgroundPosition: `${Math.round(-segment.x * ratio)}px ${Math.round(-segment.y * ratio)}px`,
-      backgroundSize: `${Math.round(width * 5)}px ${Math.round(height * 5)}px`,
+      width,
+      height,
+      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
+      backgroundSize: `${width * 5}px ${height * 5}px`,
       backgroundImage: `url(${segment.url})`,
     }
   }
@@ -135,11 +124,33 @@ export class Thumbnails {
     }
   }
 
-  static getBackgroundFromJSON(json: string, containerWidth: number, containerHeight: number) {
-    return Thumbnails.getBackgroundFromSegment(
-      Thumbnails.getSegmentFromJSON(json),
-      containerWidth,
-      containerHeight,
-    )
+  static getBackgroundWithHeightFromJSON(json: string, preferedHeight: number) {
+    const segment = Thumbnails.getSegmentFromJSON(json)
+    if (!segment) return undefined
+    const ratio = preferedHeight / segment.height
+    const width = segment.width * ratio
+    const height = segment.height * ratio
+    return {
+      width,
+      height,
+      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
+      backgroundSize: `${width * 5}px ${height * 5}px`,
+      backgroundImage: `url(${segment.url})`,
+    }
+  }
+
+  static getBackgroundWithWidthFromJSON(json: string, preferedWidth: number) {
+    const segment = Thumbnails.getSegmentFromJSON(json)
+    if (!segment) return undefined
+    const ratio = preferedWidth / segment.width
+    const width = segment.width * ratio
+    const height = segment.height * ratio
+    return {
+      width,
+      height,
+      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
+      backgroundSize: `${width * 5}px ${height * 5}px`,
+      backgroundImage: `url(${segment.url})`,
+    }
   }
 }

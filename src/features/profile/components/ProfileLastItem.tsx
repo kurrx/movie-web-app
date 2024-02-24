@@ -20,7 +20,7 @@ function ProfileLastItemDesktop({ item, onClose }: ProfileLastItemProps) {
   const ref = useRef<HTMLDivElement>(null)
   const rect = useElementRect(ref)
   const thumbnails = useMemo(
-    () => Thumbnails.getBackgroundFromJSON(item.thumbnailUrl, rect.width, rect.height),
+    () => Thumbnails.getBackgroundWithWidthFromJSON(item.thumbnailUrl, rect.width),
     [item, rect],
   )
   const to = useMemo(() => `/watch${item.url}`, [item.url])
@@ -32,8 +32,7 @@ function ProfileLastItemDesktop({ item, onClose }: ProfileLastItemProps) {
   return (
     <div className='z-[3] fixed w-[25rem] bottom-0 shadow-xl right-5 rounded-t-xl overflow-hidden bg-background border-x border-t'>
       <div ref={ref} className='relative'>
-        <div className='w-full pt-[calc((9/16)*100%)]' />
-        <div className='absolute top-0 left-0 w-full h-full' style={thumbnails} />
+        <div style={thumbnails} />
         <div className='absolute top-0 left-0 w-full h-full bg-black/40' />
         <div className='absolute bottom-0 left-0 h-1 w-full'>
           <div className='absolute w-full h-full bg-white/40 left-0 top-0' />
@@ -70,16 +69,15 @@ function ProfileLastItemMobile({ item, onClose }: ProfileLastItemProps) {
   const ref = useRef<HTMLAnchorElement>(null)
   const rect = useElementRect(ref)
   const thumbnails = useMemo(
-    () => Thumbnails.getBackgroundFromJSON(item.thumbnailUrl, rect.width, rect.height),
+    () => Thumbnails.getBackgroundWithHeightFromJSON(item.thumbnailUrl, rect.height),
     [item, rect],
   )
   const to = useMemo(() => `/watch${item.url}`, [item.url])
 
   return (
     <div className='z-[3] fixed w-full bottom-0 shadow-xl left-0 overflow-hidden bg-background border-t flex items-center justify-start'>
-      <NavLink ref={ref} to={to} className='shrink-0 relative w-[6rem] block'>
-        <span className='w-full pt-[calc((9/16)*100%)] block' />
-        <span className='absolute top-0 left-0 w-full h-full' style={thumbnails} />
+      <NavLink ref={ref} to={to} className='shrink-0 relative h-[3rem] block'>
+        <span className='block' style={thumbnails} />
       </NavLink>
       <NavLink to={to} className='flex-1 overflow-hidden pl-2'>
         <span className='block truncate text-xs font-bold'>{item.title}</span>
