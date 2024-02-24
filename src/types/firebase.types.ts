@@ -94,6 +94,7 @@ export interface UpdateItemStateArgs {
 }
 
 export interface LastItemState {
+  id: number
   title: string
   subtitle: string
   url: string

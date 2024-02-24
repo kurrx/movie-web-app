@@ -63,6 +63,7 @@ type UTimeParam = {
   duration: number
   subtitle: string
   thumbnails: ThumbnailSegment
+  update: boolean
 } & UpdateParam
 type UTimeReturn = UpdateReturn<LastItemState>
 type USubtitleParam = { subtitle: string | null } & UpdateParam
@@ -299,11 +300,12 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
 
 export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
   'watch/updateTime',
-  async ({ id, time, duration, subtitle, thumbnails }, { getState }) => {
+  async ({ id, time, duration, subtitle, thumbnails, update }, { getState }) => {
     const state = getState().watch
     const item = state.items.find((i) => i.id === id)!.item!
     const uid = getState().profile.user!.uid
     const last = {
+      id,
       title: item.title,
       subtitle,
       url: `/${item.typeId}/${item.genreId}/${item.slug}`,
@@ -311,7 +313,9 @@ export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
       progress: time,
       duration,
     }
-    await saveLastItem(uid, last)
+    if (update) {
+      await saveLastItem(uid, last)
+    }
     return {
       uid,
       result: last,

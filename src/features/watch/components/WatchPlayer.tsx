@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Player } from '@/features/player'
@@ -59,6 +59,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
   const stream = selector((state) => selectWatchItemStream(state, id))
   const [switchAction, setSwitchAction] = useState<SwitchAction>(null)
   const [switchArgs, setSwitchArgs] = useState<SwitchArgs>(null)
+  const prevSegmentStr = useRef<string | null>(null)
 
   const makeSwitch = useCallback(
     (action?: SwitchAction, args?: SwitchArgs) => {
@@ -102,15 +103,19 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
 
   const onTimeUpdate = useCallback(
     (time: number, duration: number) => {
+      const segment = thumbnails.getSegment(time)
+      const segmentStr = JSON.stringify(segment)
       dispatch(
         updateTime({
           id,
           time,
           duration,
           subtitle: episodeTitle || '',
-          thumbnails: thumbnails.getSegment(time),
+          thumbnails: segment,
+          update: prevSegmentStr.current !== segmentStr,
         }),
       )
+      prevSegmentStr.current = segmentStr
     },
     [dispatch, id, episodeTitle, thumbnails],
   )

@@ -446,7 +446,7 @@ function getLastItemRef(uid: string) {
 }
 
 export async function getLastItem(uid: string) {
-  return new Promise<LastItemState | null>((resolve) => {
+  const last = await new Promise<LastItemState | null>((resolve) => {
     onValue(
       getLastItemRef(uid),
       (snapshot) => {
@@ -460,6 +460,9 @@ export async function getLastItem(uid: string) {
       { onlyOnce: true },
     )
   })
+  if (!last) return null
+  const timestamp = await getItemStateTimestamp(getItemStateRefs(uid, last.id).timestampRef)
+  last.progress = timestamp
 }
 
 export async function saveLastItem(uid: string, item: LastItemState | null) {
@@ -467,5 +470,12 @@ export async function saveLastItem(uid: string, item: LastItemState | null) {
   if (!item) {
     return await remove(ref).catch(noop)
   }
-  return await set(ref, item).catch(noop)
+  return await set(ref, {
+    id: item.id,
+    title: item.title,
+    subtitle: item.subtitle,
+    url: item.url,
+    thumbnails: item.thumbnails,
+    duration: item.duration,
+  }).catch(noop)
 }
