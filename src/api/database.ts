@@ -27,7 +27,7 @@ import {
 } from '@/types'
 
 class Database extends Dexie {
-  private static readonly VERSION = 3.0
+  private static readonly VERSION = 4.0
   private static readonly NAME = 'tv-db'
   private static readonly MAX_ITEMS = 100
   private static readonly MAX_STREAMS = 5000
