@@ -14,7 +14,7 @@ import {
   updateItemState,
   updateProfileItem,
 } from '@/api'
-import { FetchState, SwitchState } from '@/core'
+import { FetchState, SwitchState, ThumbnailSegment } from '@/core'
 import {
   AppStoreState,
   ItemFullID,
@@ -62,7 +62,7 @@ type UTimeParam = {
   time: number
   duration: number
   subtitle: string
-  thumbnailUrl: string
+  thumbnails: ThumbnailSegment
 } & UpdateParam
 type UTimeReturn = UpdateReturn<LastItemState>
 type USubtitleParam = { subtitle: string | null } & UpdateParam
@@ -299,7 +299,7 @@ export const preloadNextEpisode = createAsyncThunk<void, SEpisodeParam, Thunk>(
 
 export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
   'watch/updateTime',
-  async ({ id, time, duration, subtitle, thumbnailUrl }, { getState }) => {
+  async ({ id, time, duration, subtitle, thumbnails }, { getState }) => {
     const state = getState().watch
     const item = state.items.find((i) => i.id === id)!.item!
     const uid = getState().profile.user!.uid
@@ -307,7 +307,7 @@ export const updateTime = createAsyncThunk<UTimeReturn, UTimeParam, Thunk>(
       title: item.title,
       subtitle,
       url: `/${item.typeId}/${item.genreId}/${item.slug}`,
-      thumbnailUrl,
+      thumbnails,
       progress: time,
       duration,
     }

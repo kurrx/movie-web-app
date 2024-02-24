@@ -108,7 +108,7 @@ export function WatchPlayer({ id }: WatchPlayerProps) {
           time,
           duration,
           subtitle: episodeTitle || '',
-          thumbnailUrl: JSON.stringify(thumbnails.getSegment(time) || {}),
+          thumbnails: thumbnails.getSegment(time),
         }),
       )
     },

@@ -20,7 +20,7 @@ function ProfileLastItemDesktop({ item, onClose }: ProfileLastItemProps) {
   const ref = useRef<HTMLDivElement>(null)
   const rect = useElementRect(ref)
   const thumbnails = useMemo(
-    () => Thumbnails.getBackgroundWithWidthFromJSON(item.thumbnailUrl, rect.width),
+    () => Thumbnails.getBackgroundWithWidth(item.thumbnails, rect.width),
     [item, rect],
   )
   const to = useMemo(() => `/watch${item.url}`, [item.url])
@@ -69,7 +69,7 @@ function ProfileLastItemMobile({ item, onClose }: ProfileLastItemProps) {
   const ref = useRef<HTMLAnchorElement>(null)
   const rect = useElementRect(ref)
   const thumbnails = useMemo(
-    () => Thumbnails.getBackgroundWithHeightFromJSON(item.thumbnailUrl, rect.height),
+    () => Thumbnails.getBackgroundWithHeight(item.thumbnails, rect.height),
     [item, rect],
   )
   const to = useMemo(() => `/watch${item.url}`, [item.url])

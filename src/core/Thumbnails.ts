@@ -95,9 +95,8 @@ export class Thumbnails {
     }
   }
 
-  private static getSegmentFromJSON(json: string) {
+  private static validateSegment(data: ThumbnailSegment) {
     try {
-      const data = JSON.parse(json)
       if (typeof data !== 'object' || !data) return null
       if (
         typeof data.start !== 'number' ||
@@ -124,33 +123,33 @@ export class Thumbnails {
     }
   }
 
-  static getBackgroundWithHeightFromJSON(json: string, preferedHeight: number) {
-    const segment = Thumbnails.getSegmentFromJSON(json)
-    if (!segment) return undefined
-    const ratio = preferedHeight / segment.height
-    const width = segment.width * ratio
-    const height = segment.height * ratio
+  static getBackgroundWithHeight(segment: ThumbnailSegment, preferedHeight: number) {
+    const newSegment = Thumbnails.validateSegment(segment)
+    if (!newSegment) return undefined
+    const ratio = preferedHeight / newSegment.height
+    const width = newSegment.width * ratio
+    const height = newSegment.height * ratio
     return {
       width,
       height,
-      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
+      backgroundPosition: `${-newSegment.x * ratio}px ${-newSegment.y * ratio}px`,
       backgroundSize: `${width * 5}px ${height * 5}px`,
-      backgroundImage: `url(${segment.url})`,
+      backgroundImage: `url(${newSegment.url})`,
     }
   }
 
-  static getBackgroundWithWidthFromJSON(json: string, preferedWidth: number) {
-    const segment = Thumbnails.getSegmentFromJSON(json)
-    if (!segment) return undefined
-    const ratio = preferedWidth / segment.width
-    const width = segment.width * ratio
-    const height = segment.height * ratio
+  static getBackgroundWithWidth(segment: ThumbnailSegment, preferedWidth: number) {
+    const newSegment = Thumbnails.validateSegment(segment)
+    if (!newSegment) return undefined
+    const ratio = preferedWidth / newSegment.width
+    const width = newSegment.width * ratio
+    const height = newSegment.height * ratio
     return {
       width,
       height,
-      backgroundPosition: `${-segment.x * ratio}px ${-segment.y * ratio}px`,
+      backgroundPosition: `${-newSegment.x * ratio}px ${-newSegment.y * ratio}px`,
       backgroundSize: `${width * 5}px ${height * 5}px`,
-      backgroundImage: `url(${segment.url})`,
+      backgroundImage: `url(${newSegment.url})`,
     }
   }
 }

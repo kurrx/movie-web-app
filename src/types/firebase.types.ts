@@ -1,5 +1,7 @@
 import { QueryDocumentSnapshot } from 'firebase/firestore'
 
+import { ThumbnailSegment } from '@/core'
+
 import { SearchItem } from './ajax.types'
 
 export interface FirestoreModel {
@@ -95,7 +97,7 @@ export interface LastItemState {
   title: string
   subtitle: string
   url: string
-  thumbnailUrl: string
+  thumbnails: ThumbnailSegment
   progress: number
   duration: number
 }
