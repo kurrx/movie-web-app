@@ -132,6 +132,11 @@ export function PlayerNative() {
           forceHLS: true,
           forceSafariHLS: true,
           hlsVersion: '1.5.4',
+          hlsOptions: {
+            maxBufferLength: 180,
+            maxBufferSize: 33554432000,
+            maxMaxBufferLength: 600,
+          },
           tracks: subtitles,
         }}
         playing={playing}

@@ -1113,7 +1113,7 @@ function parseStreamQualities(url: string) {
     qualities.push({
       id,
       altername,
-      streamUrl,
+      streamUrl: `${PROXY_URL}/${streamUrl}`,
       downloadUrl: `${PROXY_URL}/${downloadUrl}`,
       downloadSize: 0,
       downloadSizeStr: '0B',
