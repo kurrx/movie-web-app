@@ -3,7 +3,7 @@ import { useMediaQuery } from 'usehooks-ts'
 
 import { useAppDispatch } from '@/hooks'
 
-import { setDeviceIsMobile, setDeviceIsTouch, validateVpn } from '../device.slice'
+import { setDeviceIsMobile, setDeviceIsTouch } from '../device.slice'
 
 export function useAppDevice() {
   const dispatch = useAppDispatch()
@@ -17,11 +17,4 @@ export function useAppDevice() {
   useEffect(() => {
     dispatch(setDeviceIsTouch(isTouch))
   }, [dispatch, isTouch])
-
-  useEffect(() => {
-    const signal = dispatch(validateVpn())
-    return () => {
-      signal.abort()
-    }
-  }, [dispatch])
 }
