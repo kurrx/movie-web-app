@@ -326,7 +326,11 @@ export async function updateProfileItem(
         counter: 'watched',
       })
     }
-    if (args.rating !== undefined && args.rating !== updateDocument.rating.value) {
+    if (
+      args.rating !== undefined &&
+      ((args.rating === null && updateDocument.rating.value !== null) ||
+        (args.rating !== null && updateDocument.rating.value === null))
+    ) {
       updateDocument.rating.value = args.rating
       updateDocument.rating.updatedAt = now
       counterActions.push({

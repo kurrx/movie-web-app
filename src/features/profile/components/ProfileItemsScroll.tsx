@@ -15,7 +15,7 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
   const uid = useAppSelector((state) => state.profile.user!.uid)
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<SearchItem[]>([])
-  const next = useRef<QueryProfileItemsResult['next'] | null>(null)
+  const [next, setNext] = useState<QueryProfileItemsResult['next'] | null>(null)
   const signal = useRef<AbortController | null>(null)
   const remaining = useMemo(() => count - items.length, [items, count])
   const loadersCount = useMemo(() => Math.min(12, remaining), [remaining])
@@ -31,7 +31,7 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
           signal.current = null
           setItems(result.items)
           setLoading(false)
-          next.current = result.next
+          setNext(result.next)
         }
       })
       .catch(() => {
@@ -43,18 +43,17 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
   }, [uid, type])
 
   const onLoadMore = useCallback(() => {
-    if (!next.current) return
+    if (!next) return
     setLoading(true)
-    next
-      .current()
+    next()
       .then((result) => {
         setItems((prev) => prev.concat(result.items))
-        next.current = result.next
+        setNext(result.next)
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [])
+  }, [next])
 
   useEffect(get, [get])
 
@@ -64,7 +63,7 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
         {loading &&
           Array.from({ length: loadersCount }).map((_, i) => <ExploreItemCardLoader key={i} />)}
       </ExploreItems>
-      {!loading && remaining > 0 && (
+      {!loading && remaining > 0 && next && (
         <Button className='mt-8 mx-auto' onClick={onLoadMore}>
           Load more titles...
         </Button>
