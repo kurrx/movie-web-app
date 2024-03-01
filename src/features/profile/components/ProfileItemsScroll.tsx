@@ -15,7 +15,7 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
   const uid = useAppSelector((state) => state.profile.user!.uid)
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<SearchItem[]>([])
-  const [next, setNext] = useState<QueryProfileItemsResult['next'] | null>(null)
+  const next = useRef<QueryProfileItemsResult['next'] | null>(null)
   const signal = useRef<AbortController | null>(null)
   const remaining = useMemo(() => count - items.length, [items, count])
   const loadersCount = useMemo(() => Math.min(12, remaining), [remaining])
@@ -31,7 +31,7 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
           signal.current = null
           setItems(result.items)
           setLoading(false)
-          setNext(result.next)
+          next.current = result.next
         }
       })
       .catch(() => {
@@ -43,12 +43,13 @@ export function ProfileItemsScroll({ type, count }: ProfileItemsScrollProps) {
   }, [uid, type])
 
   const onLoadMore = useCallback(() => {
-    if (!next) return
+    if (!next.current) return
     setLoading(true)
-    next()
+    next
+      .current()
       .then((result) => {
         setItems((prev) => prev.concat(result.items))
-        setNext(result.next)
+        next.current = result.next
       })
       .finally(() => {
         setLoading(false)
