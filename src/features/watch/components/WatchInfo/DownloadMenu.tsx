@@ -29,7 +29,7 @@ export function DownloadMenu({ filename, qualities }: DownloadMenuProps) {
           {qualities.map(({ id, altername, downloadUrl, downloadSize, downloadSizeStr }) => (
             <DropdownMenuItem key={id} asChild>
               <a
-                href={`${downloadUrl}?proxy-filename=${encodeURIComponent(`${id}_${filename.replaceAll(' ', '_')}.mp4`)}`}
+                href={`${downloadUrl}?proxy-tv-video-filename=${encodeURIComponent(`${id}_${filename.replaceAll(' ', '_')}.mp4`)}`}
                 className='cursor-pointer'
                 target='_blank'
                 rel='noreferrer'
