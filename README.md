@@ -55,7 +55,27 @@ repository.
 
 ### Features
 
-TODO
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
+  <img alt="Player Screenshot" src="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
+</picture>
+
+- **YouTube-like player experience** - Keyboard shortcuts on desktop, gesture based controls on
+  mobile, picture-in-picture, full-screen mode, theater mode, timeline seeking, volume controls,
+  thumbnails preview, subtitles, localized audio tracks, etc.
+
+- **Progress** - The app keeps track of your progress in the series and movies you watch. You can
+  always continue watching from where you left off.
+
+- **Continuous Play** - The app automatically plays the next episode / next film in cinematic
+  universe in the series.
+
+- **Explore** - Discover new titles by genre, year, rating, collections, cinematic universes, etc.
+
+- **Share** - Send exact time of the video to your friends.
+
+- **Profile** - Save titles to your favorite, watch, watched, rated lists.
 
 ## Getting Started
 
