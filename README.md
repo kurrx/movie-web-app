@@ -1,14 +1,61 @@
-# tv.kurr.dev
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-dark.png?raw=true">
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-light.png?raw=true">
   <img alt="Banner" src="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-light.png?raw=true">
 </picture>
 
+<h1 align="center">tv.kurr.dev</h1>
+
+<p align="center">All-in-one streaming service with YouTube-like player experience</p>
+
 ## Overview
 
+This project is a web application that allows you to watch Movies, TV Shows, Anime in one place. It
+is designed to be a simple and easy-to-use platform that provides a YouTube-like player experience.
+
+You can find the live version of the application at [tv.kurr.dev](https://tv.kurr.dev).
+
+### Tech Stack
+
+Project is created with: [TypeScript](https://typescriptlang.org), [React](https://react.dev),
+[RTK](https://redux-toolkit.js.org), [Firebase](https://firebase.google.com) (Auth, Firestore,
+Realtime Database), [shadcn/ui](https://ui.shadcn.com),
+[react-player](https://npmjs.com/package/react-player), [Dexie](https://dexie.org),
+[CORS Proxy](https://github.com/kurrx/cors-proxy) and more.
+
+The main goal behind these decisions is to create streaming service without any expenses.
+
+#### Firebase
+
+For my purposes Firebase provides a free tier that is enough for my needs. But you may ask _"Why
+Firestore and Realtime Database?"_ Fair question.
+
+**Realtime Database** pricing model is based on the amount of data stored and the amount of data
+downloaded. It's a good choice for entities that are updated frequently and not too large. For that
+reason I use it to store user's playback settings such as last watched title, where the user left
+off, etc.
+
+**Firestore** pricing model is based on the number of reads, writes, and deletes. It's a good choice
+for entities that are not updated frequently. For that reason I use it to store the main data such
+as users saved, watched, rated, favorite titles, etc.
+
+#### Dexie
+
+I also use Dexie to store data in a browser's IndexedDB. This allows me to cache responses on the
+client side in order to reduce the load on the my proxy server and speed up the application load
+time in general. I invalidate the cache every 24 hours. This is done to avoid the situation when the
+data is outdated (in case when new episode is released, etc).
+
+#### CORS Proxy
+
+I use my own CORS Proxy server to bypass CORS restrictions of the browser. This is necessary because
+I scrape data from a site that does not provide an API and does not have CORS headers set up. You
+can find more information about the server in the [CORS Proxy](https://github.com/kurrx/cors-proxy)
+repository.
+
 ### Features
+
+TODO
 
 ## Getting Started
 
