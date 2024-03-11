@@ -30,17 +30,8 @@ export function PolicyView() {
             download/streaming links to the content.
           </p>
           <p className='leading-7 [&:not(:first-child)]:mt-6'>
-            All material and data I take from{' '}
-            <a
-              href={PROVIDER_URL}
-              target='_blank'
-              rel='noreferrer'
-              className='underline-offset-4 underline'
-            >
-              public sources
-            </a>{' '}
-            using Web Scraping. If you are a copyright holder and want to remove content from the
-            app you must do so on the{' '}
+            All material and data I take from public sources using Web Scraping. If you are a
+            copyright holder and want to remove content from the app you must do so on the{' '}
             <a
               href={`${PROVIDER_URL}/abuse.html`}
               target='_blank'
@@ -76,9 +67,8 @@ export function PolicyView() {
           <p className='leading-7 [&:not(:first-child)]:mt-3'>
             I only collect and store data on my servers if you are one of the app access holders and
             are registered on the app. All data is deleted the moment you lose access to the site,
-            this process is automated. All data is stored in a secure database (Google Cloud,
-            Netherlands) and is not shared with anyone. I do not sell or use any of this data. This
-            data includes:
+            this process is automated. All data is stored in a secure database and is not shared
+            with anyone. I do not sell or use any of this data. This data includes:
           </p>
           <ul className='mt-4 ml-6 list-disc [&>li]:mt-2'>
             <li>Email Address</li>
