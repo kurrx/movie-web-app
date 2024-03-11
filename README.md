@@ -1,5 +1,90 @@
 # tv.kurr.dev
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-light.png?raw=true">
+  <img alt="Banner" src="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/banner-light.png?raw=true">
+</picture>
+
+## Overview
+
+### Features
+
+## Getting Started
+
+### Installation
+
+```shell
+# Clone git repository
+git clone https://github.com/kurrx/tv.kurr.dev.git
+cd tv.kurr.dev
+
+# Install dependencies
+npm install
+
+# Create development .env from example, and edit it
+cp .env.example .env.development.local
+
+# Start development server
+npm run start
+```
+
+### Configuration
+
+First, you need to create a `.env.development.local` file in the root of the project. This file will
+contain all the environment variables that are required for the application to work. You can use the
+`.env.example` file as a template.
+
+```
+...
+
+VITE_PROVIDER_URL=https://example.com
+VITE_PROXY_URL=https://example.com
+
+VITE_FIREBASE_API_KEY=YOUR_API_KEY
+VITE_FIREBASE_AUTH_DOMAIN=AUTH_DOMAIN_HOST
+VITE_FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET=STORAGE_BUCKET_HOST
+VITE_FIREBASE_MESSAGING_SENDER_ID=SENDER_ID
+VITE_FIREBASE_APP_ID=APP_ID
+VITE_FIREBASE_DB_URL=DB_URL
+
+...
+```
+
+- `VITE_FIREBASE_*` - To configure these settings you need to be familiar with Firebase and its
+  services. You can find more information about Firebase in the
+  [official documentation](https://firebase.google.com/docs). All variables can be found in the
+  [Firebase Console](https://console.firebase.google.com/) in your project settings.
+
+- `VITE_PROVIDER_URL` - URL of the site providing the data. This project is designed to work with
+  one specific website that I will not disclose. You can use any other site that provides similar
+  data. (Keep in mind that you also need to change the code that scrapes the data from the site and
+  the data structure)
+
+- `VITE_PROXY_URL` - URL of the proxy server. This server is used to bypass CORS restrictions of
+  browser. For that purposes you can use my project -
+  [CORS Proxy](https://github.com/kurrx/cors-proxy).
+
+## Copyright Infringement
+
+I created this application categorically for the purpose of training and demonstrating my skills as
+a professional in my field. I do not pursue the purpose of distribution or sale of copyrighted video
+content.
+
+Access to my application is highly restricted and is only available on **read-only mode**. No one
+can access the copyrighted video content without my permission. Even when access to the site is
+granted, it is for purely demonstrative purposes, and access will be revoked shortly after that. I
+do not store any copyrighted data on my server and do not publicly provide any download/streaming
+links to the content.
+
+All material and data I take from public sources using Web Scraping. If you are a copyright holder
+and want to remove content from the app you must do so on the
+[site providing the data](https://tv.kurr.dev/policy). I respect the intellectual property of
+others. If you believe that your work has been copied in a way that constitutes copyright
+infringement, please contact with me in a way that is convenient for you using the links on
+[my website](https://kurr.dev).
+
 ## License
 
 The MIT License

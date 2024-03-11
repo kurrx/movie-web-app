@@ -1,7 +1,7 @@
 {
   "name": "tv.kurr.dev",
   "version": "1.0.0",
-  "description": "Movie and TV Shows App",
+  "description": "A movie streaming service built with React, Redux & Web Scraping",
   "repository": {
     "type": "git",
     "url": "https://github.com/kurrx/tv.kurr.dev.git"

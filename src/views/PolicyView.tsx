@@ -22,12 +22,12 @@ export function PolicyView() {
             sale of copyrighted video content.
           </p>
           <p className='leading-7 [&:not(:first-child)]:mt-6'>
-            Access to my application is highly stricted and is only available on{' '}
+            Access to my application is highly restricted and is only available on{' '}
             <b>read-only mode</b>. No one can access the copyrighted video content without my
             permission. Even when access to the site is granted, it is for purely demonstrative
             purposes, and access will be revoked shortly after that. I do not store any copyrighted
-            data on my server (more on Privacy section). I do not provide any download/streaming
-            links to the content.
+            data on my server (more on Privacy section) and do not publicly provide any
+            download/streaming links to the content.
           </p>
           <p className='leading-7 [&:not(:first-child)]:mt-6'>
             All material and data I take from{' '}
@@ -71,21 +71,6 @@ export function PolicyView() {
             it.
           </p>
           <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight mt-6'>
-            Browser only data
-          </h3>
-          <p className='leading-7 [&:not(:first-child)]:mt-3'>
-            Most of the data that the app retrieves is only stored in the browser itself, and you
-            can clear it with data cleaning. I do not sell, store them on my server, or use this
-            data for any purpose. This data includes:
-          </p>
-          <ul className='mt-4 ml-6 list-disc [&>li]:mt-2'>
-            <li>IP Address (Used only to identify VPN access)</li>
-            <li>Theme - Dark/Light</li>
-            <li>Cached requests data</li>
-            <li>Player settings</li>
-            <li>Functional Cookies from provider website</li>
-          </ul>
-          <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight mt-6'>
             Data that I collect
           </h3>
           <p className='leading-7 [&:not(:first-child)]:mt-3'>
@@ -100,10 +85,7 @@ export function PolicyView() {
             <li>Fullname</li>
             <li>Avatar Image</li>
             <li>Playback related data</li>
-            <li>Watched movies/shows</li>
-            <li>Saved movies/shows</li>
-            <li>Rated movies/shows</li>
-            <li>Movies/shows that marked as &quot;Favorite&quot;</li>
+            <li>Watched, Saved, Rated, Favorite movies and shows</li>
           </ul>
           <h3 className='scroll-m-20 text-2xl font-semibold tracking-tight mt-6'>
             Third party services
