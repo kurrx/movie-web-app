@@ -25,7 +25,7 @@ import {
 import { PROVIDER_DOMAIN, PROXY_URL } from './env'
 import { capitalizeFirstLetter, trimStr } from './utils'
 
-const NOT_AVAILABLE_ERROR = 'Rezka is not available. Try again later.'
+const NOT_AVAILABLE_ERROR = 'Provider is not available. Try again later.'
 const NOT_REALEASED_ERROR = 'This title is not released yet.'
 
 export function parseSlugToId(slug: string): number | null {
