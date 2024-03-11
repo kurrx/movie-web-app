@@ -1,23 +1,27 @@
 {
   "name": "tv.kurr.dev",
-  "type": "module",
   "version": "1.0.0",
   "description": "Movie and TV Shows App",
-  "repository": "git@github.com:kurrx/tv.kurr.dev.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kurrx/tv.kurr.dev.git"
+  },
+  "license": "MIT",
   "author": {
     "name": "Kurbanali Ruslan",
     "email": "kurr.eax@gmail.com",
     "url": "https://github.com/kurrx"
   },
+  "type": "module",
   "scripts": {
-    "start": "vite --host",
     "build": "vite build",
-    "serve": "npm run build && vite preview --port 3000",
-    "deploy": "npm run build && firebase deploy",
     "commit": "git-cz",
+    "deploy": "npm run build && firebase deploy",
     "format": "prettier . --write --ignore-path .gitignore && git update-index --again",
     "lint": "eslint . --ext .ts,.tsx --fix --ignore-path .gitignore",
     "prepare": "husky install",
+    "serve": "npm run build && vite preview --port 3000",
+    "start": "vite --host",
     "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
