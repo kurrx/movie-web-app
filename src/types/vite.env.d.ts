@@ -6,7 +6,6 @@ interface ImportMetaEnv {
 
   readonly VITE_PROVIDER_URL: string
   readonly VITE_PROXY_URL: string
-  readonly VITE_PROXY_IP: string
 
   readonly VITE_FIREBASE_API_KEY: string
   readonly VITE_FIREBASE_AUTH_DOMAIN: string

@@ -7,7 +7,6 @@ export const APP_VERSION = import.meta.env.VITE_APP_VERSION
 export const PROVIDER_URL = import.meta.env.VITE_PROVIDER_URL
 export const PROVIDER_DOMAIN = PROVIDER_URL.replaceAll('https://', '').replaceAll('http://', '')
 export const PROXY_URL = import.meta.env.VITE_PROXY_URL
-export const PROXY_IP = import.meta.env.VITE_PROXY_IP
 
 export const FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY
 export const FIREBASE_AUTH_DOMAIN = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
