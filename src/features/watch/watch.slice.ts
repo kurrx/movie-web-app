@@ -175,6 +175,9 @@ export const getItem = createAsyncThunk<GetItemReturn, GetItemParam, Thunk>(
         subtitle: 'null',
       }
     }
+    const translator =
+      item.translators.find((t) => t.id === itemState?.translatorId) || item.translators[0]
+    itemState.translatorId = translator.id
     return { uid, item, itemState, needToSave, profile }
   },
   {

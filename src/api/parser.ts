@@ -622,6 +622,9 @@ function parseItemTranslators(
   for (const translator of translators) {
     parser.setParent(translator)
 
+    // Is premium
+    if (parser.contains('b-prem_translator')) continue
+
     // ID
     const id = parser.attrInt('data-translator_id')
     if (id === null) continue
