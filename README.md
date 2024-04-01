@@ -156,7 +156,7 @@ infringement, please contact with me in a way that is convenient for you using t
 
 The MIT License
 
-Copyright (C) 2024 Kurbanali Ruslan <kurr.eax@gmail.com>
+Copyright (C) 2024 Kurbanali Ruslan <ruslan@kurr.dev>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
