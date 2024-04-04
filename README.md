@@ -6,7 +6,7 @@
 
 <h1 align="center">tv.kurr.dev</h1>
 
-<p align="center">All-in-one streaming service with YouTube-like player experience</p>
+<p align="center">All-in-one movie web app with YouTube-like player experience</p>
 
 ## Overview
 
@@ -14,6 +14,30 @@ This project is a web application that allows you to watch Movies, TV Shows, Ani
 is designed to be a simple and easy-to-use platform that provides a YouTube-like player experience.
 
 You can find the live version of the application at [tv.kurr.dev](https://tv.kurr.dev).
+
+### Features
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-dark.png?raw=true">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
+  <img alt="Player Screenshot" src="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
+</picture>
+
+- **YouTube-like player experience** - Keyboard shortcuts on desktop, gesture based controls on
+  mobile, picture-in-picture, full-screen mode, theater mode, timeline seeking, volume controls,
+  thumbnails preview, subtitles, localized audio tracks, etc.
+
+- **Progress** - The app keeps track of your progress in the series and movies you watch. You can
+  always continue watching from where you left off.
+
+- **Continuous Play** - The app automatically plays the next episode / next film in cinematic
+  universe in the series.
+
+- **Explore** - Discover new titles by genre, year, rating, collections, cinematic universes, etc.
+
+- **Share** - Send exact time of the video to your friends.
+
+- **Profile** - Save titles to your favorite, watch, watched, rated lists.
 
 ### Tech Stack
 
@@ -23,7 +47,7 @@ Realtime Database), [shadcn/ui](https://ui.shadcn.com),
 [react-player](https://npmjs.com/package/react-player), [Dexie](https://dexie.org),
 [CORS Proxy](https://github.com/kurrx/cors-proxy) and more.
 
-The main goal behind these decisions is to create streaming service without any expenses.
+The main goal behind these decisions is to create movie web app without any expenses.
 
 #### Firebase
 
@@ -52,30 +76,6 @@ I use my own CORS Proxy server to bypass CORS restrictions of the browser. This 
 I scrape data from a site that does not provide an API and does not have CORS headers set up. You
 can find more information about the server in the [CORS Proxy](https://github.com/kurrx/cors-proxy)
 repository.
-
-### Features
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-dark.png?raw=true">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
-  <img alt="Player Screenshot" src="https://github.com/kurrx/tv.kurr.dev/blob/main/docs/player-light.png?raw=true">
-</picture>
-
-- **YouTube-like player experience** - Keyboard shortcuts on desktop, gesture based controls on
-  mobile, picture-in-picture, full-screen mode, theater mode, timeline seeking, volume controls,
-  thumbnails preview, subtitles, localized audio tracks, etc.
-
-- **Progress** - The app keeps track of your progress in the series and movies you watch. You can
-  always continue watching from where you left off.
-
-- **Continuous Play** - The app automatically plays the next episode / next film in cinematic
-  universe in the series.
-
-- **Explore** - Discover new titles by genre, year, rating, collections, cinematic universes, etc.
-
-- **Share** - Send exact time of the video to your friends.
-
-- **Profile** - Save titles to your favorite, watch, watched, rated lists.
 
 ## Getting Started
 
@@ -125,9 +125,10 @@ VITE_FIREBASE_DB_URL=DB_URL
   [Firebase Console](https://console.firebase.google.com/) in your project settings.
 
 - `VITE_PROVIDER_URL` - URL of the site providing the data. This project is designed to work with
-  one specific website that I will not disclose. You can use any other site that provides similar
-  data. (Keep in mind that you also need to change the code that scrapes the data from the site and
-  the data structure)
+  one specific website that I will not disclose for safety reasons. You can use any other site that
+  provides similar data (otherwise you need to change all typings and adjust it for yourself). Keep
+  in mind that you also need to change the code that scrapes the data from the site in following
+  files: `api/ajax.ts`, `api/parser.ts`.
 
 - `VITE_PROXY_URL` - URL of the proxy server. This server is used to bypass CORS restrictions of
   browser. For that purposes you can use my project -
@@ -146,11 +147,11 @@ do not store any copyrighted data on my server and do not publicly provide any d
 links to the content.
 
 All material and data I take from public sources using Web Scraping. If you are a copyright holder
-and want to remove content from the app you must do so on the
-[site providing the data](https://tv.kurr.dev/policy). I respect the intellectual property of
-others. If you believe that your work has been copied in a way that constitutes copyright
-infringement, please contact with me in a way that is convenient for you using the links on
-[my website](https://kurr.dev).
+and want to remove content from the app you must do so on the site providing the data
+([link for provider you can find here](https://tv.kurr.dev/policy)). I respect the intellectual
+property of others. If you believe that your work has been copied in a way that constitutes
+copyright infringement, please contact with me in a way that is convenient for you using the links
+on [my website](https://kurr.dev).
 
 ## License
 
