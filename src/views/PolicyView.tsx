@@ -7,19 +7,28 @@ export function PolicyView() {
         <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>Policy</h1>
         <section className='mt-8'>
           <h2 className='scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0'>
+            Overview
+          </h2>
+          <p className='leading-7 [&:not(:first-child)]:mt-6'>
+            This project is a web application that allows you to watch Movies, TV Shows, Anime in
+            one place. It is designed to be a simple and easy-to-use platform that provides a
+            YouTube-like player experience. App works by displaying video files from third-party
+            providers inside an intuitive and aesthetic user interface. Content is fetched from
+            third parties and scraping is fully done on the client. This means that the hoster has
+            no files or media on their server. All files are streamed directly from the third
+            parties.
+          </p>
+        </section>
+        <section className='mt-8'>
+          <h2 className='scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0'>
             Purpose of Application
           </h2>
           <p className='leading-7 [&:not(:first-child)]:mt-6'>
-            Welcome! My name is{' '}
-            <b>
-              Kurbanali <i>&quot;kurr&quot;</i> Ruslan
-            </b>
-            .
-          </p>
-          <p className='leading-7 [&:not(:first-child)]:mt-6'>
             I created this application categorically for the purpose of training and demonstrating
             my skills as a professional in my field. I do not pursue the purpose of distribution or
-            sale of copyrighted video content.
+            sale of copyrighted video content. I don&apos;t host any files, it merely links to 3rd
+            party services. Legal issues should be taken up with the file hosts and providers.
+            I&apos;m not responsible for any media files shown by the video providers.
           </p>
           <p className='leading-7 [&:not(:first-child)]:mt-6'>
             Access to my application is highly restricted and is only available on{' '}
