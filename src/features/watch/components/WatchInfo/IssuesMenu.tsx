@@ -49,7 +49,7 @@ export function IssuesMenu({ id }: { id: number }) {
           <div className='space-y-1'>
             <ul className='ml-6 list-disc [&>li]:mt-1'>
               <li>
-                Make sure your <b>VPN</b> and <b>Internet Connections</b> are stable.
+                Make sure your <b>Internet Connection</b> is stable.
               </li>
               <li>
                 In most cases, simply reloading the page helps fix errors. To do this, click
