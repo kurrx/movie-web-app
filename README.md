@@ -12,6 +12,10 @@
 
 This project is a web application that allows you to watch Movies, TV Shows, Anime in one place. It
 is designed to be a simple and easy-to-use platform that provides a YouTube-like player experience.
+App works by displaying video files from third-party providers inside an intuitive and aesthetic
+user interface. Content is fetched from third parties and scraping is fully done on the client. This
+means that the hoster has no files or media on their server. All files are streamed directly from
+the third parties.
 
 You can find the live version of the application at [tv.kurr.dev](https://tv.kurr.dev).
 
