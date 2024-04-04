@@ -54,7 +54,11 @@ export function LoginDialog() {
           </Button>
           {error && (
             <p className='mt-4 text-sm text-destructive'>
-              {error.message || 'Something went wrong'}
+              {error.message
+                ? error.message.includes('admin-restricted-operation')
+                  ? 'Admin restricted sign-ups'
+                  : error.message
+                : 'Something went wrong'}
             </p>
           )}
           <p className='px-8 mt-6 text-center text-sm text-muted-foreground'>
