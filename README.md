@@ -138,7 +138,9 @@ VITE_FIREBASE_DB_URL=DB_URL
 
 I created this application categorically for the purpose of training and demonstrating my skills as
 a professional in my field. I do not pursue the purpose of distribution or sale of copyrighted video
-content.
+content. I don't host any files, it merely links to 3rd party services. Legal issues should be taken
+up with the file hosts and providers. I'm not responsible for any media files shown by the video
+providers.
 
 Access to my application is highly restricted and is only available on **read-only mode**. No one
 can access the copyrighted video content without my permission. Even when access to the site is
