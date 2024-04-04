@@ -27,12 +27,12 @@ export function NavbarExploreDesktop({ children, navigation, onExploreOpen }: Na
         <DropdownMenuContent className='w-40' align='start'>
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              <NavLink to='/explore/new'>Новинки</NavLink>
+              <NavLink to='/explore/new'>New Arrivals</NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <NavLink to='/explore/collections'>Подборки</NavLink>
+              <NavLink to='/explore/collections'>Collections</NavLink>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onExploreOpen}>Найти лучшие</DropdownMenuItem>
+            <DropdownMenuItem onClick={onExploreOpen}>Best of</DropdownMenuItem>
             {Object.entries(navigation).map(([typeId, type]) => (
               <DropdownMenuSub key={typeId}>
                 <DropdownMenuSubTrigger>{type.title}</DropdownMenuSubTrigger>
